@@ -3,6 +3,15 @@
  */
 package edu.buffalo.cse.irf14.document;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * @author nikhillo
  * Class that parses a given file into a Document
@@ -16,10 +25,92 @@ public class Parser {
 	 */
 	public static Document parse(String filename) throws ParserException {
 		// TODO YOU MUST IMPLEMENT THIS
-		System.out.println("First Document to Start the Proejct");
-		System.out.println("Good Bye Cruel World");
-		System.out.println("Good Bye Cruel World AGain");
+		try {
+			FileReader reader = new FileReader(filename);
+			BufferedReader buff = new BufferedReader(reader);
+			Document d = new Document();
+			int lastIndex = filename.lastIndexOf(File.separator), titleCounter = 0;
+			String categoryPath = filename.substring(0,lastIndex);
+			String line;
+			String[] strAuthors=null;				//Had to use it because Document.SetField() accepts a String[]
+			List<String> authors = new ArrayList<String>();   // Had to use it because lists were easily modified.
+			
+			while ((line = buff.readLine()) != null) {
+				line = line.trim();
+				if (!line.equals("")) {
+					//Parse the first line as titile.
+					if (titleCounter == 0) {
+						d.setField(FieldNames.TITLE,line);
+						titleCounter += 1;
+					}
+					//If the second line has <AUTHOR> tag, call extractAuthor function to parse auhtors and organization.
+					else if(line.contains("<AUTHOR>")) {
+						authors=extractAuthor(line);
+						strAuthors = authors.subList(1,authors.size()).toArray(new String[authors.size()-1]);
+						
+						if(authors.get(0).equals("n")) {
+							d.setField(FieldNames.AUTHOR, strAuthors ); 
+						}
+						else {
+							d.setField(FieldNames.AUTHOR,Arrays.copyOfRange(strAuthors, 1, strAuthors.length-2));
+							d.setField(FieldNames.AUTHORORG,strAuthors[strAuthors.length-1]);
+						}
+					}
+					else {
+						//To Implement: Parse line with place,date and content.
+					}
+				}
+				
+			}
+
+			String fileId = filename.substring(lastIndex+1);
+			String category = categoryPath.substring(categoryPath.lastIndexOf(File.separator+1));
+			
+		} catch (Exception e) {
+			System.out.println("File may not exist.");
+		}
+		
+
 		return null;
+	}
+	
+	//Function to extract parse line with tag <AUTHOR> </AUTHOR>
+	public static List<String> extractAuthor(String line) {
+		int authorStartIndex = 0, authorEndIndex = 0, orgStartIndex = 0,flag=0;
+		List <String>authors = new ArrayList<String>();		
+		String orgName = null;
+		authors.add("n");		//if first element = n, there is no organization name in the list
+	
+		Matcher mat=Pattern.compile("[Bb][Yy]|[aA][Nn][Dd]|,|</AUTHOR>").matcher(line);
+		while(mat.find()) {
+			System.out.println(mat.group()+" "+mat.start()+" "+mat.end());
+			if(mat.group().equalsIgnoreCase("by")) {
+				authorStartIndex = mat.end(); 
+			} 
+			if(mat.group().equalsIgnoreCase("and")&&flag==0) {
+				authorEndIndex = mat.start();
+				authors.add(line.substring(authorStartIndex, authorEndIndex));
+				authorStartIndex =authorEndIndex+4;
+			}
+			if(mat.group().equals(",")) {
+				authorEndIndex = mat.start();
+				authors.add(line.substring(authorStartIndex, authorEndIndex));
+				orgStartIndex = authorEndIndex+1;
+			}
+			if(mat.group().equalsIgnoreCase("</AUTHOR>")) {
+				if (orgStartIndex != 0) {
+					orgName = line.substring(orgStartIndex, mat.start());
+				}
+				else {
+					authors.add(line.substring(authorStartIndex,mat.start()));
+				}
+			}
+		}
+	if (orgName != null) {
+		authors.set(0, "y");		//Setting it as y so that calling function know that the last element is organization name.
+		authors.add(orgName);
+	}
+	return authors;
 	}
 
 }
