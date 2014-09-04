@@ -17,6 +17,7 @@ public class Parser {
 	public static Document parse(String filename) throws ParserException {
 		// TODO YOU MUST IMPLEMENT THIS
 		System.out.println("First Document to Start the Proejct");
+		System.out.println("Good Bye Cruel World");
 		return null;
 	}
 
