@@ -33,7 +33,8 @@ public class Parser {
 			String categoryPath = filename.substring(0,lastIndex);
 			String line;
 			String[] strAuthors=null;				//Had to use it because Document.SetField() accepts a String[]
-			List<String> authors = new ArrayList<String>();   // Had to use it because lists were easily modified.
+			List<String> authors = new ArrayList<String>();   
+			// Had to use it because lists were easily modified.
 			
 			while ((line = buff.readLine()) != null) {
 				line = line.trim();
@@ -58,9 +59,12 @@ public class Parser {
 					}
 					else {
 						//To Implement: Parse line with place,date and content.
+							List<String> placeDate = extractPlaceAndDate(line);
+							d.setField(FieldNames.PLACE, placeDate.get(0));
+							d.setField(FieldNames.NEWSDATE, placeDate.get(0));
+							d.setField(FieldNames.CONTENT, placeDate.get(0));
 					}
 				}
-				
 			}
 
 			String fileId = filename.substring(lastIndex+1);
@@ -74,13 +78,51 @@ public class Parser {
 		return null;
 	}
 	
-	//Function to extract parse line with tag <AUTHOR> </AUTHOR>
-	public static List<String> extractAuthor(String line) {
-		int authorStartIndex = 0, authorEndIndex = 0, orgStartIndex = 0,flag=0;
-		List <String>authors = new ArrayList<String>();		
-		String orgName = null;
-		authors.add("n");		//if first element = n, there is no organization name in the list
+	/**
+	 * This method extract the Place, date and remaining 
+	 * content of the line.
+	 * @param line a String line that to be parsed
+	 * @return the extracted place, date and content from that line
+	 */
+	public static List<String> extractPlaceAndDate(String line) {
+		List<String> extract = new ArrayList<String>();
+		String months = "(-)|((jan)|(feb)|(mar)|(apr)|(may)|(jun)|"
+				+ "(jul)|(aug)|(sep)|(oct)|(nov)|(dec))";
+		Matcher mat = Pattern.compile(months,
+				Pattern.CASE_INSENSITIVE).matcher(line);
+		int start = 0, end = 0;
+		String place = "", date = "", content = "";
+		while (mat.find()) {
+			System.out.println(mat.group());
+			if ("-".equals(mat.group())) {
+				end = mat.end();
+				date = line.substring(start, end - 1);
+				content = line.substring(end);
+			}
+			else if (mat.group() != null) {
+				start = mat.start();
+				end = mat.end();
+				place = line.substring(0, start);
+				place = place.trim().substring(0, place.length() - 2);
+			}
+		}
+		extract.add(place);
+		extract.add(date);
+		extract.add(content);
+		return extract;
+	}
 	
+	/**
+	 * Function to extract parse line with tag <AUTHOR> </AUTHOR>
+	 * @param line
+	 * @return
+	 */
+	public static List<String> extractAuthor(String line) {
+		int authorStartIndex = 0, authorEndIndex = 0, orgStartIndex = 0, flag = 0;
+		List <String> authors = new ArrayList<String>();
+		String orgName = null;
+		//if first element = n, there is no organization name in the list
+		authors.add("n");
 		Matcher mat=Pattern.compile("[Bb][Yy]|[aA][Nn][Dd]|,|</AUTHOR>").matcher(line);
 		while(mat.find()) {
 			System.out.println(mat.group()+" "+mat.start()+" "+mat.end());
