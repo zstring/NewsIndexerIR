@@ -69,7 +69,7 @@ public class Parser {
 
 			String fileId = filename.substring(lastIndex+1);
 			String category = categoryPath.substring(categoryPath.lastIndexOf(File.separator+1));
-			
+			buff.close();
 		} catch (Exception e) {
 			System.out.println("File may not exist.");
 		}
@@ -118,33 +118,32 @@ public class Parser {
 	 * @return
 	 */
 	public static List<String> extractAuthor(String line) {
-		int authorStartIndex = 0, authorEndIndex = 0, orgStartIndex = 0, flag = 0;
+		int authorStartIndex = 0, authorEndIndex = 0, orgStartIndex = 0;
 		List <String> authors = new ArrayList<String>();
 		String orgName = null;
 		//if first element = n, there is no organization name in the list
 		authors.add("n");
-		Matcher mat=Pattern.compile("[Bb][Yy]|[aA][Nn][Dd]|,|</AUTHOR>").matcher(line);
+		Matcher mat=Pattern.compile(" [Bb][Yy] | [aA][Nn][Dd] |,|</AUTHOR>").matcher(line);
 		while(mat.find()) {
-			System.out.println(mat.group()+" "+mat.start()+" "+mat.end());
-			if(mat.group().equalsIgnoreCase("by")) {
+			if(mat.group().equalsIgnoreCase(" by ")) {
 				authorStartIndex = mat.end(); 
 			} 
-			if(mat.group().equalsIgnoreCase("and")&&flag==0) {
+			if(mat.group().equalsIgnoreCase(" and ")) {
 				authorEndIndex = mat.start();
-				authors.add(line.substring(authorStartIndex, authorEndIndex));
+				authors.add(line.substring(authorStartIndex, authorEndIndex).trim());
 				authorStartIndex =authorEndIndex+4;
 			}
 			if(mat.group().equals(",")) {
 				authorEndIndex = mat.start();
-				authors.add(line.substring(authorStartIndex, authorEndIndex));
+				authors.add(line.substring(authorStartIndex, authorEndIndex).trim());
 				orgStartIndex = authorEndIndex+1;
 			}
 			if(mat.group().equalsIgnoreCase("</AUTHOR>")) {
 				if (orgStartIndex != 0) {
-					orgName = line.substring(orgStartIndex, mat.start());
+					orgName = line.substring(orgStartIndex, mat.start()).trim();
 				}
 				else {
-					authors.add(line.substring(authorStartIndex,mat.start()));
+					authors.add(line.substring(authorStartIndex,mat.start()).trim());
 				}
 			}
 		}
