@@ -4,6 +4,7 @@
 package edu.buffalo.cse.irf14;
 
 import java.io.File;
+import java.util.Timer;
 
 import edu.buffalo.cse.irf14.document.Document;
 import edu.buffalo.cse.irf14.document.Parser;
@@ -42,6 +43,8 @@ public class Runner {
 		IndexWriter writer = new IndexWriter(indexDir);
 		
 		try {
+			double start_time = System.currentTimeMillis();
+			double end_time = 0;
 			for (String cat : catDirectories) {
 				dir = new File(ipDir+ File.separator+ cat);
 				files = dir.list();
@@ -57,10 +60,11 @@ public class Runner {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} 
-					
 				}
-				
 			}
+			end_time = System.currentTimeMillis();
+			System.out.println("Program Time: "
+					+ (end_time - start_time));
 			
 			writer.close();
 		} catch (IndexerException e) {
