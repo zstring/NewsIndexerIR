@@ -25,14 +25,17 @@ public class Parser {
 	 */
 	public static Document parse(String filename) throws ParserException {
 		// TODO YOU MUST IMPLEMENT THIS
+		Document d = new Document();
 		try {
 			FileReader reader = new FileReader(filename);
 			BufferedReader buff = new BufferedReader(reader);
-			Document d = new Document();
-			int lastIndex = filename.lastIndexOf(File.separator), titleCounter = 0;
-			String categoryPath = filename.substring(0,lastIndex);
+			int lastIndex = filename.lastIndexOf(File.separator), 
+					titleFlag = 0, flag = 0;
+			String categoryPath = filename.substring(0, lastIndex);
 			String line;
-			String[] strAuthors=null;				//Had to use it because Document.SetField() accepts a String[]
+			StringBuilder content = new StringBuilder();
+			//Had to use it because Document.SetField() accepts a String[]
+			String[] strAuthors=null;				
 			List<String> authors = new ArrayList<String>();   
 			// Had to use it because lists were easily modified.
 			
@@ -40,12 +43,12 @@ public class Parser {
 				line = line.trim();
 				if (!line.equals("")) {
 					//Parse the first line as titile.
-					if (titleCounter == 0) {
+					if (flag == 0) {
 						d.setField(FieldNames.TITLE,line);
-						titleCounter += 1;
+						flag = 1;
 					}
 					//If the second line has <AUTHOR> tag, call extractAuthor function to parse auhtors and organization.
-					else if(line.contains("<AUTHOR>")) {
+					else if(flag == 1 && line.contains("<AUTHOR>")) {
 						authors=extractAuthor(line);
 						strAuthors = authors.subList(1,authors.size()).toArray(new String[authors.size()-1]);
 						
@@ -56,26 +59,29 @@ public class Parser {
 							d.setField(FieldNames.AUTHOR,Arrays.copyOfRange(strAuthors, 1, strAuthors.length-2));
 							d.setField(FieldNames.AUTHORORG,strAuthors[strAuthors.length-1]);
 						}
+						flag = 2;
+					}
+					else if (flag == 1 || flag == 2) {
+						//To Implement: Parse line with place,date and content.
+						List<String> placeDate = extractPlaceAndDate(line);
+						d.setField(FieldNames.PLACE, placeDate.get(0));
+						d.setField(FieldNames.NEWSDATE, placeDate.get(1));
+						content.append(placeDate.get(2));
+						flag = 3;
 					}
 					else {
-						//To Implement: Parse line with place,date and content.
-							List<String> placeDate = extractPlaceAndDate(line);
-							d.setField(FieldNames.PLACE, placeDate.get(0));
-							d.setField(FieldNames.NEWSDATE, placeDate.get(0));
-							d.setField(FieldNames.CONTENT, placeDate.get(0));
+						content.append(line);
 					}
 				}
 			}
-
+			d.setField(FieldNames.CONTENT, content.toString());	
 			String fileId = filename.substring(lastIndex+1);
 			String category = categoryPath.substring(categoryPath.lastIndexOf(File.separator+1));
 			buff.close();
 		} catch (Exception e) {
-			System.out.println("File may not exist.");
+			System.out.println("File may not exist." + e.getMessage());
 		}
-		
-
-		return null;
+		return d;
 	}
 	
 	/**
@@ -123,7 +129,8 @@ public class Parser {
 		String orgName = null;
 		//if first element = n, there is no organization name in the list
 		authors.add("n");
-		Matcher mat=Pattern.compile(" [Bb][Yy] | [aA][Nn][Dd] |,|</AUTHOR>").matcher(line);
+		String regex = " (by) | (and) |,|</author>";
+		Matcher mat = Pattern.compile(regex, Pattern.CASE_INSENSITIVE).matcher(line);
 		while(mat.find()) {
 			if(mat.group().equalsIgnoreCase(" by ")) {
 				authorStartIndex = mat.end(); 
