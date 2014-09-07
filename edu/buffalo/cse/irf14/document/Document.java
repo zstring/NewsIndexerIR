@@ -37,4 +37,21 @@ public class Document {
 	public String[] getField(FieldNames fn) {
 		return map.get(fn);
 	}
+	@Override public String toString() {
+		StringBuilder result = new StringBuilder();
+		result.append("Category :" + this.getField(FieldNames.CATEGORY)[0] + "\n");
+		result.append("FILEID : " + this.getField(FieldNames.FILEID)[0] + "\n");
+		result.append("Title : " + this.getField(FieldNames.TITLE)[0] + "\n");
+		if (this.getField(FieldNames.AUTHOR) != null && this.getField(FieldNames.AUTHOR).length > 0)
+			result.append("Author : " + this.getField(FieldNames.AUTHOR)[0] + "\n");
+		if (this.getField(FieldNames.AUTHORORG) != null)
+			result.append("Author Org : " + this.getField(FieldNames.AUTHORORG)[0] + "\n");
+		if (this.getField(FieldNames.NEWSDATE) != null)
+			result.append("News Date : " + this.getField(FieldNames.NEWSDATE)[0] + "\n");
+		if (this.getField(FieldNames.PLACE) != null)
+			result.append("Place : " + this.getField(FieldNames.PLACE)[0] + "\n");
+		if (this.getField(FieldNames.CONTENT) != null)
+			result.append("Content : " + this.getField(FieldNames.CONTENT)[0] + "\n");
+		return result.toString();
+	}
 }
