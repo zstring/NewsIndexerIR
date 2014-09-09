@@ -57,12 +57,11 @@ public class Parser {
 					else if(flag == 1 && line.contains("<AUTHOR>")) {
 						authors = extractAuthor(line);
 						strAuthors = authors.subList(1, authors.size()).toArray(new String[authors.size() - 1]);
-
 						if(authors.get(0).equals("n")) {
 							d.setField(FieldNames.AUTHOR, strAuthors);
 						}
 						else {
-							d.setField(FieldNames.AUTHOR, Arrays.copyOfRange(strAuthors, 1, strAuthors.length - 1));
+							d.setField(FieldNames.AUTHOR, Arrays.copyOfRange(strAuthors, 0, strAuthors.length - 1));
 							d.setField(FieldNames.AUTHORORG, strAuthors[strAuthors.length - 1]);
 						}
 						flag = 2;
@@ -97,49 +96,37 @@ public class Parser {
 	public static List<String> extractPlaceAndDate(String line) {
 		
 		List<String> extract = new ArrayList<String>();
-		try {
-		String months = "(-)|((jan)|(feb)|(mar)|(apr)|(may)|(jun)|"
-				+ "(jul)|(aug)|(sep)|(oct)|(nov)|(dec))";
-		Matcher mat = Pattern.compile(months,
-				Pattern.CASE_INSENSITIVE).matcher(line);
-		int hyphenIndex = -1, monthIndex = -1;
 		String place = "", date = "", content = "";
-		
-			while (mat.find()) {
-				if ("-".equals(mat.group())) {
-					hyphenIndex = mat.start();
+		try {
+			if (line.contains("-")) {
+				
+				content = line.substring(line.indexOf("-")+1);
+				line = line.substring(0,line.indexOf("-"));
+				String months = "(jan)|(feb)|(mar)|(apr)|(may)|(jun)|"
+						+ "(jul)|(aug)|(sep)|(oct)|(nov)|(dec)";
+				Matcher mat = Pattern.compile(months,
+						Pattern.CASE_INSENSITIVE).matcher(line);
+				int monthIndex = -1;
+				if (mat.find()) {
+					monthIndex = mat.start();				
 				}
-				else if (mat.group() != null) {
-					monthIndex = mat.start();
+				if (monthIndex == -1) {
+					place = line.trim();
+				}
+				else {
+					place = line.substring(0, monthIndex).trim();
+					if (place.endsWith(",")) {
+						place = place.substring(0, place.length() - 1);
+					}
+					date = line.substring(monthIndex).trim();
 				}
 			}
-			if (hyphenIndex == -1) {
-				content = line;
-			}
-			else if (monthIndex == -1) {
-				place = line.substring(0, hyphenIndex).trim();
-				content = line.substring(hyphenIndex).trim();
-			}
-			else if (monthIndex == 0) {
-				date = line.substring(0, hyphenIndex).trim();
-				content = line.substring(hyphenIndex).trim();
-			}
-			else 
-			{
-				place = line.substring(0, monthIndex).trim();
-				if (place.endsWith(",")) {
-					place = place.substring(0, place.length() - 1);
-				}
-				date = line.substring(monthIndex, hyphenIndex).trim();
-				content = line.substring(hyphenIndex).trim();
-			}
-			extract.add(place);
-			extract.add(date);
-			extract.add(content);
-		} catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace(System.out);
-		}
+		} 
+		extract.add(place);
+		extract.add(date);
+		extract.add(content);
 		return extract;
 	}
 
@@ -157,21 +144,21 @@ public class Parser {
 			authors.add("n");
 			String regex = " (by) | (and) |,|</author>";
 			Matcher mat = Pattern.compile(regex, Pattern.CASE_INSENSITIVE).matcher(line);
-			while(mat.find()) {
-				if(mat.group().equalsIgnoreCase(" by ")) {
-					authorStartIndex = mat.end(); 
-				} 
-				if(mat.group().equalsIgnoreCase(" and ")) {
+			while (mat.find()) {
+				if (mat.group().equalsIgnoreCase(" by ")) {
+					authorStartIndex = mat.end();
+					}
+				else if (mat.group().equalsIgnoreCase(" and ")) {
 					authorEndIndex = mat.start();
 					authors.add(line.substring(authorStartIndex, authorEndIndex).trim());
 					authorStartIndex = authorEndIndex + 4;
 				}
-				if(mat.group().equals(",")) {
+				else if (mat.group().equals(",")) {
 					authorEndIndex = mat.start();
 					authors.add(line.substring(authorStartIndex, authorEndIndex).trim());
 					orgStartIndex = authorEndIndex + 1;
 				}
-				if(mat.group().equalsIgnoreCase("</AUTHOR>")) {
+				else if (mat.group().equalsIgnoreCase("</AUTHOR>")) {
 					if (orgStartIndex != 0) {
 						orgName = line.substring(orgStartIndex, mat.start()).trim();
 					}
@@ -186,9 +173,8 @@ public class Parser {
 				authors.set(0, "y");
 				authors.add(orgName);
 			}
-		} catch (Exception e)
-		{
-			System.out.println(" Error ");
+		} catch (Exception e) {
+			System.out.println(" Error " + e.getMessage());
 		}
 		return authors;
 	}

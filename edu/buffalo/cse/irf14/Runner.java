@@ -43,7 +43,7 @@ public class Runner {
 		
 		Document d = null;
 		IndexWriter writer = new IndexWriter(indexDir);
-		String fileAddress = "/home/inspire/Dropbox/UB/JavaWorkspace/newsindexer/news_training/testing/parsedResult.txt";
+		String fileAddress = "/home/avinav/test/parsedResult";
 		try {
 			double start_time = System.currentTimeMillis();
 			double end_time = 0;
