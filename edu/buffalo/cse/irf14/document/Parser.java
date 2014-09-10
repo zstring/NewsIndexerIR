@@ -24,13 +24,16 @@ public class Parser {
 	 */
 	public static Document parse(String filename) throws ParserException {
 		// TODO YOU MUST IMPLEMENT THIS
+		if (filename == null || "".equals(filename)) {
+			throw new ParserException();
+		}
 		Document d = new Document();
+		try {
 			int lastIndex = filename.lastIndexOf(File.separator)
 					, flag = 0;
 			String categoryPath = filename.substring(0, lastIndex);
 			String fileIdWithExtn = filename.substring(lastIndex + 1);
-			String fileId = fileIdWithExtn.replaceFirst("[.][^.]+$"
-					, "");
+			String fileId = fileIdWithExtn.replaceFirst("[.][^.]+$", "");
 			String category = categoryPath.substring(categoryPath.lastIndexOf
 					(File.separator) + 1);
 			d.setField(FieldNames.FILEID, fileId);
@@ -40,9 +43,9 @@ public class Parser {
 			//Had to use it because Document.SetField() accepts a String[]
 			String[] strAuthors = null;				
 			List<String> authors = new ArrayList<String>();   
-			try {
-				FileReader reader = new FileReader(filename);
-				BufferedReader buff = new BufferedReader(reader);
+
+			FileReader reader = new FileReader(filename);
+			BufferedReader buff = new BufferedReader(reader);
 			// Had to use it because lists were easily modified.
 
 			while ((line = buff.readLine()) != null) {
@@ -83,6 +86,7 @@ public class Parser {
 			buff.close();
 		} catch (Exception e) {
 			System.out.println("Error Occurred " + e.getMessage());
+			throw new ParserException();
 		}
 		return d;
 	}
@@ -130,8 +134,7 @@ public class Parser {
 		return extract;
 	}
 
-	/**
-	 * Function to extract parse line with tag <AUTHOR> </AUTHOR>
+	 /** Function to extract parse line with tag <AUTHOR> </AUTHOR>
 	 * @param line
 	 * @return
 	 */
