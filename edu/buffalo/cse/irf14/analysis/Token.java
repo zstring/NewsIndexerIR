@@ -67,11 +67,11 @@ public class Token {
 	 */
 	protected void merge(Token...tokens) {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
-		StringBuilder strBuilder = new StringBuilder();
+		StringBuilder strBuilder = new StringBuilder(termText);
 		for (int i = 0; i <tokens.length; i++) {
 			strBuilder.append(" " + tokens[i].getTermText());
 		}
-		termText = termText + strBuilder.toString();
+		termText = strBuilder.toString();
 		
 	}
 	

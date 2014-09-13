@@ -20,7 +20,7 @@ public class TokenStream implements Iterator<Token>{
 	
 	public TokenStream() {
 		tokenList = new ArrayList<Token>();
-		idx = 0;
+		idx = -1;
 	}
 	
 	
@@ -34,7 +34,7 @@ public class TokenStream implements Iterator<Token>{
 	@Override
 	public boolean hasNext() {
 		// TODO YOU MUST IMPLEMENT THIS
-		if (tokenList.get(idx+1) != null) {
+		if (idx < tokenList.size()) {
 			return true;
 		}
 		return false;
@@ -50,8 +50,12 @@ public class TokenStream implements Iterator<Token>{
 	@Override
 	public Token next() {
 		// TODO YOU MUST IMPLEMENT THIS
-		idx += 1;
-		return tokenList.get(idx);
+		if (hasNext()) {
+			idx += 1;
+			return tokenList.get(idx);
+		}
+		return null;
+		
 	}
 	
 	/**
@@ -63,8 +67,9 @@ public class TokenStream implements Iterator<Token>{
 	@Override
 	public void remove() {
 		// TODO YOU MUST IMPLEMENT THIS
-		tokenList.remove(idx);
-		
+		if (idx != -1 && idx < tokenList.size()) {
+			tokenList.remove(idx);
+		}
 	}
 	
 	/**
