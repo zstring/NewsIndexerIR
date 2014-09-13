@@ -3,16 +3,22 @@
  */
 package edu.buffalo.cse.irf14.analysis;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author nikhillo
  * Class that converts a given string into a {@link TokenStream} instance
  */
 public class Tokenizer {
+	
+	String dmeter;
 	/**
 	 * Default constructor. Assumes tokens are whitespace delimited
 	 */
 	public Tokenizer() {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
+		dmeter = " ";
 	}
 	
 	/**
@@ -21,6 +27,7 @@ public class Tokenizer {
 	 */
 	public Tokenizer(String delim) {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
+		dmeter = delim;
 	}
 	
 	/**
@@ -39,6 +46,20 @@ public class Tokenizer {
 	 */
 	public TokenStream consume(String str) throws TokenizerException {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
-		return null;
+		TokenStream tokenStream = new TokenStream();
+		try {
+			List<Token> tokenList = new ArrayList<Token>();
+			// Have to check if new tk object need to be created inside for
+			Token tk = new Token();
+			String[] words = str.split(dmeter);
+			for (int i = 0; i < words.length; i++) {
+				tk.setTermText(words[i]);
+				tokenList.add(tk);
+			}
+			tokenStream.setTokenList(tokenList);
+		} catch (Exception e) {
+			throw new TokenizerException();
+		}
+		return tokenStream;
 	}
 }
