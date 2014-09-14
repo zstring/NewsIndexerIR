@@ -23,14 +23,4 @@ public class TokenFilterSpecialChars extends TokenFilter {
 		}
 		return stream.hasNext();
 	}
-
-	@Override
-	public TokenStream getStream() {
-		// TODO Auto-generated method stub
-		if (stream != null) {
-			stream.reset();
-		}
-		return stream;
-	}
-
 }

@@ -22,4 +22,13 @@ public abstract class TokenFilter implements Analyzer {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
 		this.stream = stream;
 	}
+	
+	@Override
+	public TokenStream getStream() {
+		// TODO Auto-generated method stub
+		if (stream != null) {
+			stream.reset();
+		}
+		return stream;
+	}
 }

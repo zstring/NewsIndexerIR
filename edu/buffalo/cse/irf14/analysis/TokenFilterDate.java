@@ -28,14 +28,4 @@ public class TokenFilterDate extends TokenFilter {
 		}
 		return false;
 	}
-
-	/* (non-Javadoc)
-	 * @see edu.buffalo.cse.irf14.analysis.Analyzer#getStream()
-	 */
-	@Override
-	public TokenStream getStream() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }
