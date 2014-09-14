@@ -34,7 +34,7 @@ public class TokenStream implements Iterator<Token>{
 	@Override
 	public boolean hasNext() {
 		// TODO YOU MUST IMPLEMENT THIS
-		if (idx < tokenList.size()) {
+		if (idx < tokenList.size() - 1) {
 			return true;
 		}
 		return false;
@@ -79,7 +79,7 @@ public class TokenStream implements Iterator<Token>{
 	 */
 	public void reset() {
 		//TODO : YOU MUST IMPLEMENT THIS
-		idx = 0;
+		idx = -1;
 	}
 	
 	/**

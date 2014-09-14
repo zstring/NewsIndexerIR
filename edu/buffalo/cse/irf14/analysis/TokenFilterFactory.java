@@ -14,7 +14,7 @@ public class TokenFilterFactory {
 	 * Static member holds only one instance of
 	 *TokenFilterFactory
 	 */
-	private static TokenFilterFactory tFactory;
+	private static TokenFilterFactory tFactory = new TokenFilterFactory();
 	/*
 	 * This private constructor will prevent any other class from
 	 *instantiating
@@ -25,7 +25,7 @@ public class TokenFilterFactory {
 	 * Static method to return an instance of the factory class.
 	 * Usually factory classes are defined as singletons, i.e. 
 	 * only one instance of the class exists at any instance.
-	 * This is usually achieved by defining a private static instance
+	 * This is usually achieved by defining a private static instancefafa
 	 * that is initialized by the "private" constructor.
 	 * On the method being called, you return the static instance.
 	 * This allows you to reuse expensive objects that you may create
@@ -34,9 +34,6 @@ public class TokenFilterFactory {
 	 */
 	public static TokenFilterFactory getInstance() {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
-		if (tFactory == null) {
-			tFactory = new TokenFilterFactory();
-		}
 		return tFactory;
 	}
 	/**
@@ -49,6 +46,9 @@ public class TokenFilterFactory {
 	 */
 	public TokenFilter getFilterByType(TokenFilterType type, TokenStream stream) {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
+		if ( TokenFilterType.SPECIALCHARS.equals(type)) {
+			return new TokenFilterSpecialChars(stream);
+		}
 		return null;
 	}
 }
