@@ -67,6 +67,12 @@ public class Token {
 	 */
 	protected void merge(Token...tokens) {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
+		StringBuilder strBuilder = new StringBuilder(termText);
+		for (int i = 0; i <tokens.length; i++) {
+			strBuilder.append(" " + tokens[i].getTermText());
+		}
+		termText = strBuilder.toString();
+		
 	}
 	
 	/**
@@ -84,6 +90,6 @@ public class Token {
 	@Override
 	public String toString() {
 		//TODO: YOU MUST IMPLEMENT THIS METHOD
-		return null;
+		return termText;
 	}
 }
