@@ -49,6 +49,27 @@ public class TokenFilterFactory {
 		if ( TokenFilterType.SPECIALCHARS.equals(type)) {
 			return new TokenFilterSpecialChars(stream);
 		}
+		else if (TokenFilterType.ACCENT.equals(type)) {
+			
+		}
+		else if (TokenFilterType.CAPITALIZATION.equals(type)) {
+			
+		}
+		else if (TokenFilterType.DATE.equals(type)) {
+			
+		}
+		else if (TokenFilterType.NUMERIC.equals(type)) {
+			
+		}
+		else if (TokenFilterType.STEMMER.equals(type)) {
+			
+		}
+		else if (TokenFilterType.STOPWORD.equals(type)) {
+			
+		}
+		else if (TokenFilterType.SYMBOL.equals(type)) {
+			
+		}
 		return null;
 	}
 }
