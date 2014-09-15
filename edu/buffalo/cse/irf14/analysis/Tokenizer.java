@@ -50,9 +50,9 @@ public class Tokenizer {
 		try {
 			List<Token> tokenList = new ArrayList<Token>();
 			// Have to check if new tk object need to be created inside for
-			Token tk = new Token();
 			String[] words = str.split(dmeter);
 			for (int i = 0; i < words.length; i++) {
+				Token tk = new Token();
 				tk.setTermText(words[i]);
 				tokenList.add(tk);
 			}
