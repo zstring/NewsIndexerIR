@@ -23,9 +23,20 @@ public class TokenFilterSymbol extends TokenFilter {
 		if (stream.hasNext()) {
 			Token token = stream.next();
 			String tkString = token.toString();
-			char[] tkChar = token.getTermBuffer();
-			tkString.trim().replaceAll("[.!?]*$", "");
-			tkString.trim().replaceAll("'s?$", "");
+			//char[] tkChar = token.getTermBuffer();
+			
+			// Start or End with ' or " or -
+			tkString = tkString.replaceAll("['\"-]*($|\\s)", " ");
+			tkString = tkString.replaceAll("(^|\\s)['\"-]*", " ");
+			
+			// Punctuation
+			tkString = tkString.replaceAll("[.!?]*($|\\s)", " ");
+			
+			// 's
+			tkString = tkString.replaceAll("'s?($|\\s)", " ");
+			tkString = tkString.trim();
+			
+			// Hyphens
 			String input = tkString;
 			int indexGrp2 = 0, indexGrp1 =0;
 			Matcher matcher = Pattern.compile("([a-zA-Z])+(-)+[a-zA-Z]+").matcher(tkString);
@@ -35,24 +46,14 @@ public class TokenFilterSymbol extends TokenFilter {
 				input= 	input.substring(0, indexGrp1) + " " + input.substring(indexGrp2);
 				matcher.reset(input);
 			}
-			/*	int count = 0;
-			for (int i = tkChar.length - 1; i >= 0; i++) {
-				if (count == 0 && (tkChar[i] == '\'' || tkChar[i] == '?' || tkChar[i] == '!' || tkChar[i] == '.')) {
-					tkChar[i] = ' ';
-				}
-				else if (count == 1 && tkChar[i] == '\'' && (tkChar[i+1] == 's'||tkChar[i+1] == 'S')) {
-					tkChar[i] = ' ';
-					tkChar[i+1] = ' ';
-				}
-				else if (tkChar[i] == '-') {
-					if (tkChar[i-1] >= 'a') {
-						
-					}
-				}
-				else {
-					count += 1; 
-				}
-			*/		
+			
+			
+			
+			if ("".equals(tkString)) {
+				stream.remove();
+			}
+			token.setTermText(tkString);
+			return true;
 		}
 		return false;
 	}

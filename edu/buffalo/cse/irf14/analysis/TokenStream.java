@@ -58,6 +58,21 @@ public class TokenStream implements Iterator<Token>{
 		
 	}
 	
+	public boolean hasPrevious() {
+		if (idx > 0) {
+			return true;
+		}
+		return false;
+	}
+	
+	public Token previous() {
+		if (hasPrevious()) {
+			idx -= 1 ;
+			return tokenList.get(idx);
+		}
+		return null;
+	}
+	
 	/**
 	 * Method to remove the current Token from the stream.
 	 * Note that "current" token refers to the Token just returned
@@ -69,6 +84,7 @@ public class TokenStream implements Iterator<Token>{
 		// TODO YOU MUST IMPLEMENT THIS
 		if (idx != -1 && idx < tokenList.size()) {
 			tokenList.remove(idx);
+			idx -= 1;
 		}
 	}
 	
@@ -116,5 +132,18 @@ public class TokenStream implements Iterator<Token>{
 	public void setTokenList(List<Token> list) {
 		tokenList = list;
 	}
+	
+	public int getCurrentIndex() {
+		return idx;
+	}
+	
+	public void setCurrentIndex(int index) {
+		idx = index;
+	}
+	
+	public void insertAt(int index,Token token) {
+		tokenList.add(index, token);
+	}
+	
 	
 }
