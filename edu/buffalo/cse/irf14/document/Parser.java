@@ -12,6 +12,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import edu.buffalo.cse.irf14.analysis.TokenStream;
+
+
+
 /**
  * @author nikhillo
  * Class that parses a given file into a Document
@@ -42,8 +46,7 @@ public class Parser {
 			StringBuilder content = new StringBuilder();
 			//Had to use it because Document.SetField() accepts a String[]
 			String[] strAuthors = null;				
-			List<String> authors = new ArrayList<String>();   
-
+			List<String> authors = new ArrayList<String>();
 			FileReader reader = new FileReader(filename);
 			BufferedReader buff = new BufferedReader(reader);
 			// Had to use it because lists were easily modified.
@@ -78,7 +81,7 @@ public class Parser {
 						flag = 3;
 					}
 					else {
-						content.append("\n" + line);
+						content.append(" " + line);
 					}
 				}
 			}
