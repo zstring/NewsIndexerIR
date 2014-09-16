@@ -29,7 +29,7 @@ public class TokenFilterSymbol extends TokenFilter {
 			tkString = tkString.replaceAll("['\"-]*($|\\s)", " ");
 			tkString = tkString.replaceAll("(^|\\s)['\"-]*", " ");
 			
-			// Punctuation
+			// End with Punctuation
 			tkString = tkString.replaceAll("[.!?]*($|\\s)", " ");
 			
 			// 's
@@ -39,20 +39,20 @@ public class TokenFilterSymbol extends TokenFilter {
 			// Hyphens
 			String input = tkString;
 			int indexGrp2 = 0, indexGrp1 =0;
-			Matcher matcher = Pattern.compile("([a-zA-Z])+(-)+[a-zA-Z]+").matcher(tkString);
+			Matcher matcher = Pattern.compile("(\\s|-|^)([a-zA-Z])+(-)+([a-zA-Z])+(-|$|\\s)").matcher(tkString);
 			while(matcher.find()) {
-				indexGrp1 = matcher.end(1);
-				indexGrp2 = matcher.end(2);
+				indexGrp1 = matcher.end(2);
+				indexGrp2 = matcher.end(3);
 				input= 	input.substring(0, indexGrp1) + " " + input.substring(indexGrp2);
 				matcher.reset(input);
 			}
-			
-			
-			
+			tkString = input;
 			if ("".equals(tkString)) {
 				stream.remove();
+			} else {
+				token.setTermText(tkString);
 			}
-			token.setTermText(tkString);
+			
 			return true;
 		}
 		return false;
