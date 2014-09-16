@@ -12,8 +12,11 @@ public class TokenFilterSpecialChars extends TokenFilter {
 		if (stream.hasNext()) {
 			Token token = stream.next();
 			String tkString = token.toString();
-			String specChar = "@!#$%^&";
-			tkString = tkString.replace(specChar, "");
+			//String specChar = "[^.a-zA-Z0-9- ]";
+			  String specChar = "[^.a-zA-Z0-9- ]";
+			//String specChar = "[~!@#$%^&*()_/\\+<>|=]";
+			//char[] specChar = {'~','!','@','#','$','%','^','&','*'};
+			tkString = tkString.replaceAll(specChar, "");
 			if (!tkString.equals("")) {
 				token.setTermText(tkString);
 			}
