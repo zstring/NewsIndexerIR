@@ -87,6 +87,21 @@ public class TokenStream implements Iterator<Token>{
 			idx -= 1;
 		}
 	}
+	/**
+	 * Method to remove the current Token from the stream.
+	 * Note that "current" token refers to the Token just returned
+	 * by the next method. 
+	 * Must thus be NO-OP when at the beginning of the stream or at the end
+	 */
+	public void removeAt(int index) {
+		// TODO YOU MUST IMPLEMENT THIS
+		if (index != -1 && index < tokenList.size()) {
+			tokenList.remove(index);
+			if (index == idx) {
+				idx -= 1;
+			}
+		}
+	}
 	
 	/**
 	 * Method to reset the stream to bring the iterator back to the beginning
@@ -144,6 +159,24 @@ public class TokenStream implements Iterator<Token>{
 	public void insertAt(int index,Token token) {
 		tokenList.add(index, token);
 	}
-	
-	
+	public Token[] getPrevTokens() {
+		Token[] tkPrevList = new Token[10];
+		int sz = tokenList.size();
+		for (int i = 0; i < 11 && idx - i >= 0 && idx + i < sz; i++) {
+			tkPrevList[i] = tokenList.get(idx + i - 5);
+		}
+		return tkPrevList;
+	}
+
+	/**
+	 * Get the Token at particular Index position
+	 * @param index
+	 * @return
+	 */
+	public Token getTokenAt(int index) {
+		// TODO Auto-generated method stub
+		if (index >= 0 && index < tokenList.size())
+			return tokenList.get(index);
+		return null;
+	}
 }

@@ -56,7 +56,7 @@ public class TokenFilterFactory {
 			
 		}
 		else if (TokenFilterType.DATE.equals(type)) {
-			
+			return new TokenFilterDate(stream);
 		}
 		else if (TokenFilterType.NUMERIC.equals(type)) {
 			
