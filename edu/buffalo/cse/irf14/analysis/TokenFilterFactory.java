@@ -62,7 +62,7 @@ public class TokenFilterFactory {
 			
 		}
 		else if (TokenFilterType.STEMMER.equals(type)) {
-			
+			return new TokenFilterStemmer(stream);
 		}
 		else if (TokenFilterType.STOPWORD.equals(type)) {
 			
