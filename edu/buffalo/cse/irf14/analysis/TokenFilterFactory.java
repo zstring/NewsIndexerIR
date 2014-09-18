@@ -50,7 +50,7 @@ public class TokenFilterFactory {
 			return new TokenFilterSpecialChars(stream);
 		}
 		else if (TokenFilterType.ACCENT.equals(type)) {
-			
+			return new TokenFilterAccent(stream);
 		}
 		else if (TokenFilterType.CAPITALIZATION.equals(type)) {
 			
@@ -59,16 +59,16 @@ public class TokenFilterFactory {
 			return new TokenFilterDate(stream);
 		}
 		else if (TokenFilterType.NUMERIC.equals(type)) {
-			
+			return new TokenFilterNumber(stream);
 		}
 		else if (TokenFilterType.STEMMER.equals(type)) {
 			return new TokenFilterStemmer(stream);
 		}
 		else if (TokenFilterType.STOPWORD.equals(type)) {
-			
+			return new TokenFilterStopWord(stream);
 		}
 		else if (TokenFilterType.SYMBOL.equals(type)) {
-			return new TokenFilterSymbol();
+			return new TokenFilterSymbol(stream);
 		}
 		return null;
 	}
