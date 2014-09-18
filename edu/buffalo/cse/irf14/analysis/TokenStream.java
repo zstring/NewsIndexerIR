@@ -84,7 +84,7 @@ public class TokenStream implements Iterator<Token>{
 		// TODO YOU MUST IMPLEMENT THIS
 		if (idx != -1 && idx < tokenList.size()) {
 			tokenList.remove(idx);
-			idx -= 1;
+			tokenList.add(idx, null);
 		}
 	}
 	/**
