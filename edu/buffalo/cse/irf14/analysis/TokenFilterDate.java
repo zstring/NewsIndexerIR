@@ -45,28 +45,12 @@ public class TokenFilterDate extends TokenFilter {
 					if (retMonth[0].equals("1")) {
 						token.setTermText(retMonth[1]);
 					}
-					//			String month = checkAndExtractDate(tkString);
-					//			if (!month.equals("")) {
-					//				validateAndProcessNeighborTokens(month);
-					//			}
-					//			int tkNum = -1;
-					//			try {
-					//				tkNum = Integer.parseInt(tkString);
-					//			} catch (NumberFormatException e) {
-					//			}
-					//			if (tkNum >= 1000 && tkNum <= 3000) {
-					//				
-					////				String m = prevTokens[2].toString();
-					////				String d = prevTokens[3].toString();
-					////				String fetchedMonthDate = checkAndExtractDate(d);
-					////				token.setTermText(tkString + fetchedMonthDate[1]);
-					//			}
 				}
 			}
 		}
 		return stream.hasNext();
 	}
-	
+
 	/**
 	 * 
 	 * @param str
@@ -94,11 +78,14 @@ public class TokenFilterDate extends TokenFilter {
 				String timeZone = mat.group(6).toLowerCase();
 				if (timeZone.contains("pm")) {
 					hh = hh + 12; //for PM evening time;
+					endString = timeZone.replace("pm", "");
 				}
-				// Do nothing for AM time
+				else if (timeZone.contains("am")) {
+					endString = timeZone.replace("am", "");
+					//Do nothing for AM time
+				}
 			}
 			else {
-				
 				Token nextToken  = stream.getTokenAt(stream.getCurrentIndex() + 1);
 				String nextStr = "";
 				if (nextToken != null) {
@@ -112,13 +99,13 @@ public class TokenFilterDate extends TokenFilter {
 						hh = hh + 12;//for PM evening time;
 						endString = nextStr.replace("pm", "");
 					}
-					else 
+					else {
 						endString = nextStr.replace("am", "");
+					}
 				}
 				if (nextStr.contains("am")) {
 					retTime[0] = "2";
 				}
-				
 				else if (nextStr.contains("pm")) {
 					retTime[0] = "2";
 				}
@@ -160,8 +147,26 @@ public class TokenFilterDate extends TokenFilter {
 					break;
 				}
 			}
-			if (dateAndYear != null)
-				retMonth[1] = dateAndYear[1] + monthIndex + dateAndYear[0];
+			//Structure of dateAndYear Variable 
+			//dateAndYear[0] = last special char of date such as "." ","
+			//dateAndYear[1] = date value such as "1", "2";
+			//dateAndYear[2] = last special char of year such as "." ","
+			//dateAndYear[3] = year value
+			if (dateAndYear != null) {
+				if (!"".equals(dateAndYear[3])) {
+				retMonth[1] = dateAndYear[3] + monthIndex;
+				}
+				else {
+					retMonth[1] = "1900" + monthIndex;
+				}
+				if (!"".equals(dateAndYear[1])) {
+					retMonth[1] += dateAndYear[1];
+				}
+				else {
+					retMonth[1] += "01";
+				}
+				retMonth[1] += dateAndYear[2];
+			}
 		}
 		return retMonth;
 	}
@@ -173,11 +178,11 @@ public class TokenFilterDate extends TokenFilter {
 	 */
 	private String[] processTokensForDate(Token[] tokenList) {
 		// TODO Auto-generated method stub
-		String[] dateAndYear = new String[2];
+		String[] dateAndYear = new String[4];
 		dateAndYear[0] = "01";
 		dateAndYear[1] = "1900";
 		boolean dateFlag = false, yearFlag = false, timeFlag = false;
-		String retDate = "", retYear = "", retTime = "";
+		String[] retDate = null, retYear = null, retTime = null;
 		for (int i = 0; i < 5 && (!dateFlag || !yearFlag); i++) {
 			Token tPrev = tokenList[4 - i];
 			Token tNext = tokenList[i + 6];
@@ -188,14 +193,16 @@ public class TokenFilterDate extends TokenFilter {
 			if (tPrevStr != null && !"".equals(tPrevStr)) {
 				if (!dateFlag) {
 					retDate = checkAndExtractDate(tPrevStr);
-					if (!"".equals(retDate)) {
+					if (retDate != null) {
+					//if (!"".equals(retDate)) {
 						dateFlag = true;
 						stream.removeAt(stream.getCurrentIndex() - i - 1);
 					}
 				}
 				if (!yearFlag) {
 					retYear = checkAndExtractYear(tPrevStr);
-					if (!"".equals(retYear)) {
+					if (retYear != null) {
+					//if (!"".equals(retYear)) {
 						yearFlag = true;
 						stream.removeAt(stream.getCurrentIndex() - i - 1);
 					}
@@ -208,24 +215,40 @@ public class TokenFilterDate extends TokenFilter {
 			if (tNextStr != null && !"".equals(tNextStr)) {
 				if (!dateFlag) {
 					retDate = checkAndExtractDate(tNextStr);
-					if (!"".equals(retDate)) {
+					if (retDate != null) {
+					//if (!"".equals(retDate)) {
 						dateFlag = true;
 						stream.removeAt(stream.getCurrentIndex() + i + 1);
 					}
 				}
 				if (!yearFlag) {
 					retYear = checkAndExtractYear(tNextStr);
-					if (!"".equals(retYear)) {
+					if (retYear != null) {
+					//if (!"".equals(retYear)) {
 						yearFlag = true;
 						stream.removeAt(stream.getCurrentIndex() + i + 1);
 					}
 				}
 			}
 		}
-		if (dateFlag)
-			dateAndYear[0] = retDate;
-		if (yearFlag)
-			dateAndYear[1] = retYear;
+		if (dateFlag && yearFlag) {
+			dateAndYear[0] = retDate[0];
+			dateAndYear[1] = retDate[1];
+			dateAndYear[2] = retYear[0];
+			dateAndYear[3] = retYear[1];
+		}
+		else if (dateFlag) {
+			dateAndYear[0] = retDate[0];
+			dateAndYear[1] = retDate[1];
+			dateAndYear[2] = "";
+			dateAndYear[3] = "";
+		}
+		else if (yearFlag) {
+			dateAndYear[0] = "";
+			dateAndYear[1] = "";
+			dateAndYear[2] = retYear[0];
+			dateAndYear[3] = retYear[1];
+		}
 		return dateAndYear;
 	}
 
@@ -234,70 +257,71 @@ public class TokenFilterDate extends TokenFilter {
 	 * @param tPrevStr
 	 * @return
 	 */
-	private String checkAndExtractYear(String d) {
+	private String[] checkAndExtractYear(String d) {
 		// TODO Auto-generated method stub
-		String retVal = "";
+		String[] retVal = null;
 		String digitRegex = "\\d+";
 		String yearIndex = "1900";
+		String lastChar = "";
 		Matcher mat = Pattern.compile(digitRegex).matcher(d);
 		if (mat.find()) {
 			int beginIndex = mat.start();
 			int endIndex = mat.end();
-			if (d.length() <= endIndex - beginIndex + 1) {
-				d = d.substring(beginIndex, endIndex);
-				int yearVal = Integer.parseInt(d);
+			int len = endIndex - beginIndex + 1;
+			if (d.length() <= len) {
+				String yearStr = d.substring(beginIndex, endIndex);
+				int yearVal = Integer.parseInt(yearStr);
 				//Checking if the integer val of date is valid or not	
 				if (yearVal < 1000 || yearVal > 3000)
 					return retVal;
-				
-				yearIndex = d;
-				retVal = yearIndex;
+				yearIndex = yearStr;
+				if (d.length() == len) {
+					lastChar = d.charAt(d.length() - 1) +  "";
+				}
+				retVal = new String[2];
+				retVal[0] = lastChar;
+				retVal[1] = yearIndex;
 			}
 		}
+		//this character contains the value for date such
+		//1999, or 2000. then output will be
+		//retVal = {",", 1999};
+		//retVal[0] = {".", 2000};
 		return retVal;
 	}
 
-	private String checkAndExtractDate(String d) {
-		String retVal = "";
+	private String[] checkAndExtractDate(String d) {
+		String[] retVal = null;
 		String digitRegex = "\\d+";
 		String dateIndex = "01";
+		String lastChar = "";
 		Matcher mat = Pattern.compile(digitRegex).matcher(d);
 		if (mat.find()) {
 			int beginIndex = mat.start();
 			int endIndex = mat.end();
-			if (d.length() <= endIndex - beginIndex + 1) {
-				d = d.substring(beginIndex, endIndex);
-				int dateVal = Integer.parseInt(d);
-				//Checking if the integer val of date is valid or not	
+			int len = endIndex - beginIndex + 1;
+			if (d.length() <= len) {
+				String dateStr = d.substring(beginIndex, endIndex);
+				int dateVal = Integer.parseInt(dateStr);
+				//Checking if the integer val of date is valid or not
 				if (dateVal < 1 || dateVal > 31)
 					return retVal;
-				dateIndex = d;
+				dateIndex = dateStr;
 				if (dateIndex.length() == 1) {
 					dateIndex = "0" + dateIndex;
 				}
-				retVal = dateIndex;
-			}
-		}
-		return retVal;
-	}
-	
-	private void validateAndProcessNeighborTokens(String month) {
-		Token[] tks = stream.getPrevTokens();
-		int prev = 0, next = 0;
-		boolean flag = true;
-		for (int i = 0; i < 5; i++) {
-			if (tks[4 - i] != null && flag) {
-				String date = checkAndExtractDate(tks[4 - i].toString());
-				if (!date.equals("")) {
-					
+				if (d.length() == len) {
+					lastChar = d.charAt(d.length() - 1) + "";
 				}
-			}
-			if (tks[5 + i] != null && flag) {
-				
-			}
-			if (true) {
-				flag = false;
+				retVal = new String[2];
+				retVal[0] = lastChar;
+				retVal[1] = dateIndex;
 			}
 		}
+		//this character contains the value for date such
+		//19, or 20. then output will be
+		//retVal = {",", 19};
+		//retVal[0] = {".", 20};
+		return retVal;
 	}
 }

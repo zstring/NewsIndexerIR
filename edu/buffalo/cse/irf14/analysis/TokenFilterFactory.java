@@ -68,7 +68,7 @@ public class TokenFilterFactory {
 			
 		}
 		else if (TokenFilterType.SYMBOL.equals(type)) {
-			return new TokenFilterSymbol();
+			return new TokenFilterSymbol(stream);
 		}
 		return null;
 	}
