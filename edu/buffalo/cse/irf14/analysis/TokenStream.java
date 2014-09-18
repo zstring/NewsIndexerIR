@@ -97,9 +97,7 @@ public class TokenStream implements Iterator<Token>{
 		// TODO YOU MUST IMPLEMENT THIS
 		if (index != -1 && index < tokenList.size()) {
 			tokenList.remove(index);
-			if (index == idx) {
-				idx -= 1;
-			}
+			tokenList.add(index, null);
 		}
 	}
 	
@@ -159,12 +157,18 @@ public class TokenStream implements Iterator<Token>{
 	public void insertAt(int index,Token token) {
 		tokenList.add(index, token);
 	}
+	
+	/**
+	 * Return the total 11 tokens 5 prev and 5 next + 1 itself
+	 * @return
+	 */
 	public Token[] getPrevTokens() {
-		Token[] tkPrevList = new Token[10];
+		Token[] tkPrevList = new Token[11];
 		int sz = tokenList.size();
-		for (int i = 0; i < 11 && idx - i >= 0 && idx + i < sz; i++) {
+		for (int i = 4; i >= 0 && idx + i - 5 >= 0; i--)
 			tkPrevList[i] = tokenList.get(idx + i - 5);
-		}
+		for (int i = 0; i < 5 && idx + i + 1 < sz; i++)
+			tkPrevList[i + 6] = tokenList.get(idx + i + 1);
 		return tkPrevList;
 	}
 
