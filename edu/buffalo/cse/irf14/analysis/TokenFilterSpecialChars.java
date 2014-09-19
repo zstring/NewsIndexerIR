@@ -18,6 +18,7 @@ public class TokenFilterSpecialChars extends TokenFilter {
 			//String specChar = "[^.a-zA-Z0-9- ]";
 			//String specChar = "[~!@#$%^&*()_/\\+<>|=]";
 			//char[] specChar = {'~','!','@','#','$','%','^','&','*'};
+			// - sign is included because it is used by the symbol class. Only in the case of alpha-alpha, it is removed becaused of the test case a+b-c.
 			String specChar = "[^\\.\\sa-zA-Z0-9@-]";
 			Matcher matcher = Pattern.compile("(.*[a-zA-Z])(-)([a-zA-Z].*)").matcher(tkString);
 			if (matcher.matches()) {
