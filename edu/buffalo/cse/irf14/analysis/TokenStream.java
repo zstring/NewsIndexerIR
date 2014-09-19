@@ -83,8 +83,8 @@ public class TokenStream implements Iterator<Token>{
 	public void remove() {
 		// TODO YOU MUST IMPLEMENT THIS
 		if (idx != -1 && idx < tokenList.size()) {
-			tokenList.remove(idx);
-			tokenList.add(idx, null);
+			//tokenList.remove(idx);
+			tokenList.set(idx, null);
 		}
 	}
 	/**
@@ -96,11 +96,11 @@ public class TokenStream implements Iterator<Token>{
 	public void removeAt(int index) {
 		// TODO YOU MUST IMPLEMENT THIS
 		if (index != -1 && index < tokenList.size()) {
-			tokenList.remove(index);
-			tokenList.add(index, null);
+			//tokenList.remove(index);
+			//tokenList.add(index, null);
+			tokenList.set(index, null);
 		}
 	}
-	
 	/**
 	 * Method to reset the stream to bring the iterator back to the beginning
 	 * of the stream. Unless the stream has no tokens, hasNext() after calling
