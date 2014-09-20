@@ -297,12 +297,14 @@ public class TokenFilterDate extends TokenFilter {
 				//"ad." or "bc," something like that at MAX
 				if (yearZone.length() <= 3) {
 					yearStr = String.format("%04d", yearVal);
-//					yearStr = String.format("%0"+ (4 - yearStr.length()) +"d%s", 0, yearStr);
+//					yearStr = String.format("%0"+ (4 - yearStr.length())
+//					+"d%s", 0, yearStr);
 					if (!yearZone.contains("bc") && !yearZone.contains("ad")) {
 						//else we have to check the next or prev token
 						//get the respective "AD" "BC" if any.
 						Token tNext = stream.getTokenAt(stream.getCurrentIndex() + 1);
-						yearZone = tNext.toString() == null ? "" : tNext.toString().toLowerCase();
+						if (tNext != null)
+							yearZone = tNext.toString() == null ? "" : tNext.toString().toLowerCase();
 						flagRemoveToken = true;
 					}
 					if (yearZone.contains("bc")) {
@@ -350,6 +352,42 @@ public class TokenFilterDate extends TokenFilter {
 				else {
 					if (d.contains("-")) {
 						String[] hypenYears = d.split("-");
+						if (hypenYears.length == 2) {
+							String finalYear = "";
+							try {
+								String firYearStr = hypenYears[0];
+								Integer firstYear = Integer.parseInt(firYearStr);
+								String secYearStr = hypenYears[1];
+								String remainSecYearStr = "";
+								Matcher mSec = Pattern.compile(digitRegex).matcher(secYearStr);
+								if (mSec.find()) {
+									remainSecYearStr = secYearStr.substring(mSec.end());
+									secYearStr = secYearStr.substring(mSec.start(), mSec.end());
+								}
+								else {
+									//no matches for digit
+									//so just return without processing
+									return null;
+								}
+								int len1 = firYearStr.length();
+								int len2 = secYearStr.length();
+								secYearStr = firYearStr.substring(0, len1 - len2) + secYearStr;
+								secYearStr += remainSecYearStr;
+								String[] retSec = checkAndExtractYear(secYearStr, "year");
+								if (retSec == null) {
+									return null;
+								}
+								String[] retFirst = checkAndExtractYear(firYearStr, "year");
+								if (retFirst == null) {
+									return null;
+								}
+								retVal = new String[2];
+								retVal[0] = retSec[0];
+								retVal[1] = retFirst[1] + "-" + retSec[1];
+							} catch (Exception e) {
+								System.out.println("Just the way program");
+							}
+						}
 					}
 				}
 			}
