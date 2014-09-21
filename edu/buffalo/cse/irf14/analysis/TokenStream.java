@@ -194,4 +194,27 @@ public class TokenStream implements Iterator<Token>{
 			return tokenList.get(index);
 		return null;
 	}
+	/**
+	 * has a token at index - 1.
+	 * @param index
+	 * @return
+	 */
+	public boolean hasPreviousAt(int index) {
+		if (index > 0) {
+			return true;
+		}
+		return false;
+	}
+	/**
+	 * has a token at index + 1
+	 * @param index
+	 * @return
+	 */
+	public boolean hasNextAt(int index) {
+		// TODO YOU MUST IMPLEMENT THIS
+		if (index < tokenList.size() - 1) {
+			return true;
+		}
+		return false;
+	}
 }

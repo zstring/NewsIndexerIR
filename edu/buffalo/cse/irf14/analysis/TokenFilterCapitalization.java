@@ -67,11 +67,21 @@ public class TokenFilterCapitalization extends TokenFilter {
 			//If all the words are capital
 			
 			if (isCap) {
-				List<String> line = getTokenLine(stream);
+				List<Token> line = getTokenLine();
+				boolean flagUpper = true;
 				for (int i = 0; i <= line.size(); i++) {
-					if(!line.equals(line.get(i).toUpperCase())) {
-						tkString = tkString.toLowerCase();
+					String str = line.get(i).toString();
+					if(!str.equals(str.toUpperCase())) {
+						//tkString = tkString.toLowerCase();
+						flagUpper = false;
 						break;
+					}
+				}
+				if (flagUpper) {
+					for (int i = 0; i <= line.size(); i++) {
+						Token tk = line.get(i);
+						String tkStr = tk.toString();
+						tk.setTermText(tkStr.toLowerCase());
 					}
 				}
 			}
@@ -80,23 +90,25 @@ public class TokenFilterCapitalization extends TokenFilter {
 			}
 			else if (isCamel) {
 				int index = stream.getCurrentIndex();
-				String prev =""; 
+				String prev = ""; 
 				//The previous token would already be merged with older tokens
-				if (stream.hasPrevious()) {
-					prev = stream.previous().toString();
-					if (prev.matches(".*\\w*(.|?)$")) {
+				if (stream.hasPreviousAt(index)) {
+					if (stream.getTokenAt(index - 1) != null) {
+						prev = stream.getTokenAt(index - 1).toString();
+					}
+					if (prev.matches(".*\\w*(\\.|\\?)$")) {
 						tkString = tkString.toLowerCase();
-						stream.setCurrentIndex(index);
 					}
 					// will not work if more than two words are merged.
-					else if ((prev.charAt(0) >= 'A' && prev.charAt(0) <='Z') && prev.substring(1).equals(prev.substring(1).toLowerCase())) {
+					else if (prev.matches("(\\s?[A-Z][^A-Z]*(\\s|$))*")) {
+					//else if ((prev.charAt(0) >= 'A' && prev.charAt(0) <='Z') && prev.substring(1).equals(prev.substring(1).toLowerCase())) {
 						tkString = prev + " " + tkString;
-						stream.remove();
+						stream.removeAt(index - 1);
 						index = index - 1;
-						}
-					else {
-						stream.setCurrentIndex(index);
 					}
+				}
+				else {
+					tkString = tkString.toLowerCase();
 				}
 			}
 			token.setTermText(tkString);
@@ -109,31 +121,43 @@ public class TokenFilterCapitalization extends TokenFilter {
 	 * i.e.: <time. . time? ? B-52.> are all valid punctuation. but <avinav...  is-*!? a+.> not valid punctuation.   
 	 * 
 	 */
-	public List<String> getTokenLine(TokenStream tkStream) {
+	public List<Token> getTokenLine() {
 		int currIndex = stream.getCurrentIndex();
-		List<String> tokenLine = new ArrayList<String>();
-		tokenLine.add(stream.getCurrent().toString());
+		List<Token> tokenLine = new ArrayList<Token>();
+		if (stream.getCurrent() != null) 
+			{
+			tokenLine.add(stream.getCurrent());
+			}
 		String prev = "",next = "";
-		while (stream.hasPrevious()) {
-			prev = stream.previous().toString();
-			if (prev.matches(".*\\w*(.|?)$")) {
+		int i = currIndex;
+		while (stream.hasPreviousAt(i)) {
+			Token tk = stream.getTokenAt(i-1);
+			if (tk != null) {
+				prev = tk.toString();
+			}
+			if (prev.matches(".*\\w*(\\.|\\?)$")) {
 				break;
 			}
 			else {
-				tokenLine.add(0,prev);
+				tokenLine.add(0,tk);
 			}
+			i -= 1;
 		}
-		while (stream.hasNext()) {
-			next = stream.next().toString();
+		i = currIndex;
+		while (stream.hasNextAt(i)) {
+			Token tk = stream.getTokenAt(i+1);
+			if ( tk != null ) {
+				next = tk.toString();
+			}
 			if (next.matches(".*\\w*(.|?)$")) {
-				tokenLine.add(next);
+				tokenLine.add(tk);
 				break;
 			}
 			else {
-				tokenLine.add(next);
+				tokenLine.add(tk);
 			}
+			i += 1;
 		}
-		stream.setCurrentIndex(currIndex);
 		return tokenLine;
 	}
 
