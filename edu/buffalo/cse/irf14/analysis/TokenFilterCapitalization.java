@@ -100,7 +100,7 @@ public class TokenFilterCapitalization extends TokenFilter {
 						tkString = tkString.toLowerCase();
 					}
 					// will not work if more than two words are merged.
-					else if (prev.matches("(\\s?[A-Z][^A-Z]*(\\s|$))*")) {
+					else if (prev.matches("(\\s?[A-Z][^A-Z]*(\\s|$))")) {
 					//else if ((prev.charAt(0) >= 'A' && prev.charAt(0) <='Z') && prev.substring(1).equals(prev.substring(1).toLowerCase())) {
 						tkString = prev + " " + tkString;
 						stream.removeAt(index - 1);
