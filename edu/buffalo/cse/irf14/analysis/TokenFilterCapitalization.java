@@ -90,18 +90,26 @@ public class TokenFilterCapitalization extends TokenFilter {
 			}
 			else if (isCamel) {
 				int index = stream.getCurrentIndex();
-				String prev = ""; 
+				String prev = "", prevSub = "";
 				//The previous token would already be merged with older tokens
 				if (stream.hasPreviousAt(index)) {
 					if (stream.getTokenAt(index - 1) != null) {
 						prev = stream.getTokenAt(index - 1).toString();
+						int endWord = prev.length();
+						endWord = prev.indexOf(" ");
+						if (endWord >= 1) {
+							prevSub = prev.substring(1,endWord);	
+						}
+						else {
+							prevSub = prev.substring(1);
+						}
 					}
 					if (prev.matches(".*\\w*(\\.|\\?)$")) {
 						tkString = tkString.toLowerCase();
 					}
 					// will not work if more than two words are merged.
-					else if (prev.matches("(\\s?[A-Z][^A-Z]*(\\s|$))")) {
-					//else if ((prev.charAt(0) >= 'A' && prev.charAt(0) <='Z') && prev.substring(1).equals(prev.substring(1).toLowerCase())) {
+					//else if (prev.matches("(\\s?[A-Z][^A-Z]*(\\s|$))")) {
+					else if ((prev.charAt(0) >= 'A' && prev.charAt(0) <='Z') && prevSub.equals(prevSub.toLowerCase())) {
 						tkString = prev + " " + tkString;
 						stream.removeAt(index - 1);
 						index = index - 1;
