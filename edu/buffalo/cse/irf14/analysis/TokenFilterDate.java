@@ -186,11 +186,13 @@ public class TokenFilterDate extends TokenFilter {
 		dateAndYear[0] = "01";
 		dateAndYear[1] = "1900";
 		boolean dateFlag = false, yearFlag = false, timeFlag = false;
+		boolean checkPrev = false;
 		String[] retDate = null, retYear = null, retTime = null;
 		for (int i = 0; i < 5 && (!dateFlag || !yearFlag); i++) {
 			Token tPrev = tokenList[4 - i];
 			Token tNext = tokenList[i + 6];
 			String tPrevStr = "", tNextStr = "";
+			checkPrev = false;
 			if (tPrev != null) tPrevStr = tPrev.toString();
 			if (tNext != null) tNextStr = tNext.toString();
 			//Step1 check for Date (01-30)
@@ -200,10 +202,11 @@ public class TokenFilterDate extends TokenFilter {
 					if (retDate != null) {
 					//if (!"".equals(retDate)) {
 						dateFlag = true;
+						checkPrev = true;
 						stream.removeAt(stream.getCurrentIndex() - i - 1);
 					}
 				}
-				if (!yearFlag) {
+				if (!yearFlag && !checkPrev) {
 					retYear = checkAndExtractYear(tPrevStr, "date");
 					if (retYear != null) {
 					//if (!"".equals(retYear)) {
@@ -215,17 +218,18 @@ public class TokenFilterDate extends TokenFilter {
 //					/retTime = checkAndExtractTime(tPrevStr);
 				}
 			}
-			
+			checkPrev = false;
 			if (tNextStr != null && !"".equals(tNextStr)) {
 				if (!dateFlag) {
 					retDate = checkAndExtractDate(tNextStr);
 					if (retDate != null) {
 					//if (!"".equals(retDate)) {
 						dateFlag = true;
+						checkPrev = true;
 						stream.removeAt(stream.getCurrentIndex() + i + 1);
 					}
 				}
-				if (!yearFlag) {
+				if (!yearFlag && !checkPrev) {
 					retYear = checkAndExtractYear(tNextStr, "date");
 					if (retYear != null) {
 					//if (!"".equals(retYear)) {
