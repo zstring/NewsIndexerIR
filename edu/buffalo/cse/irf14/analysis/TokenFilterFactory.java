@@ -53,7 +53,7 @@ public class TokenFilterFactory {
 			return new TokenFilterAccent(stream);
 		}
 		else if (TokenFilterType.CAPITALIZATION.equals(type)) {
-			
+			return new TokenFilterCapitalization(stream);
 		}
 		else if (TokenFilterType.DATE.equals(type)) {
 			return new TokenFilterDate(stream);

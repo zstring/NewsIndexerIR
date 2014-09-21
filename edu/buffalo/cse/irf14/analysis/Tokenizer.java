@@ -46,6 +46,9 @@ public class Tokenizer {
 	 */
 	public TokenStream consume(String str) throws TokenizerException {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
+		if (str == null || str.isEmpty()) {
+			throw new TokenizerException();
+		}
 		TokenStream tokenStream = new TokenStream();
 		try {
 			List<Token> tokenList = new ArrayList<Token>();

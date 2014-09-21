@@ -17,10 +17,11 @@ public class TokenStream implements Iterator<Token>{
 	
 	private List<Token> tokenList;
 	private int idx;
-	
+	private boolean isRemoved;
 	public TokenStream() {
 		tokenList = new ArrayList<Token>();
 		idx = -1;
+		isRemoved = false;
 	}
 	
 	
@@ -50,13 +51,13 @@ public class TokenStream implements Iterator<Token>{
 	@Override
 	public Token next() {
 		// TODO YOU MUST IMPLEMENT THIS
+		isRemoved = false;
 		if (hasNext()) {
 			idx += 1;
 			return tokenList.get(idx);
 		}
 		idx = tokenList.size();
 		return null;
-		
 	}
 	
 	public boolean hasPrevious() {
@@ -67,6 +68,7 @@ public class TokenStream implements Iterator<Token>{
 	}
 	
 	public Token previous() {
+		isRemoved = false;
 		if (hasPrevious()) {
 			idx -= 1 ;
 			return tokenList.get(idx);
@@ -83,9 +85,11 @@ public class TokenStream implements Iterator<Token>{
 	@Override
 	public void remove() {
 		// TODO YOU MUST IMPLEMENT THIS
-		if (idx != -1 && idx < tokenList.size()) {
-			//tokenList.remove(idx);
-			tokenList.set(idx, null);
+		if (idx > -1 && idx < tokenList.size()) {
+			tokenList.remove(idx);
+			idx -= 1;
+			isRemoved = true;
+			//tokenList.set(idx, null);
 		}
 	}
 	/**
@@ -110,6 +114,7 @@ public class TokenStream implements Iterator<Token>{
 	public void reset() {
 		//TODO : YOU MUST IMPLEMENT THIS
 		idx = -1;
+		isRemoved = false;
 	}
 	
 	/**
@@ -137,7 +142,7 @@ public class TokenStream implements Iterator<Token>{
 	 */
 	public Token getCurrent() {
 		//TODO: YOU MUST IMPLEMENT THIS
-		if (idx > -1 && idx < tokenList.size()) {
+		if (!isRemoved && idx > -1 && idx < tokenList.size()) {
 			return tokenList.get(idx);
 		}
 		return null;
@@ -157,6 +162,7 @@ public class TokenStream implements Iterator<Token>{
 	
 	public void setCurrentIndex(int index) {
 		idx = index;
+		
 	}
 	
 	public void insertAt(int index,Token token) {
