@@ -24,8 +24,10 @@ public class Token {
 	 * @param text
 	 */
 	protected void setTermText(String text) {
-		termText = text;
-		termBuffer = (termText != null) ? termText.toCharArray() : null;
+		if (text != null) {
+			termText = text;
+			termBuffer = termText.toCharArray();
+		}
 	}
 	
 	/**
@@ -45,8 +47,10 @@ public class Token {
 	 * @param buffer: The buffer to be set
 	 */
 	protected void setTermBuffer(char[] buffer) {
-		termBuffer = buffer;
-		termText = new String(buffer);
+		if (buffer != null) {
+			termBuffer = buffer;
+			termText = new String(buffer);
+		}
 	}
 	
 	/**
@@ -67,11 +71,14 @@ public class Token {
 	 */
 	protected void merge(Token...tokens) {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
-		StringBuilder strBuilder = new StringBuilder(termText);
-		for (int i = 0; i <tokens.length; i++) {
-			strBuilder.append(" " + tokens[i].getTermText());
+		if (tokens != null) {
+			StringBuilder strBuilder = new StringBuilder(termText);
+			for (int i = 0; i <tokens.length; i++) {
+				if (tokens[i] != null)
+					strBuilder.append(" " + tokens[i].getTermText());
+			}
+			termText = strBuilder.toString();
 		}
-		termText = strBuilder.toString();
 		
 	}
 	

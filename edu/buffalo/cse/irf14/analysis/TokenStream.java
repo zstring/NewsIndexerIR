@@ -54,6 +54,7 @@ public class TokenStream implements Iterator<Token>{
 			idx += 1;
 			return tokenList.get(idx);
 		}
+		idx = tokenList.size();
 		return null;
 		
 	}
@@ -122,7 +123,8 @@ public class TokenStream implements Iterator<Token>{
 	 */
 	public void append(TokenStream stream) {
 		//TODO : YOU MUST IMPLEMENT THIS
-		tokenList.addAll(stream.tokenList);
+		if (stream != null)
+			tokenList.addAll(stream.tokenList);
 	}
 	
 	/**
@@ -135,7 +137,10 @@ public class TokenStream implements Iterator<Token>{
 	 */
 	public Token getCurrent() {
 		//TODO: YOU MUST IMPLEMENT THIS
-		return tokenList.get(idx);
+		if (idx > -1 && idx < tokenList.size()) {
+			return tokenList.get(idx);
+		}
+		return null;
 	}
 	
 	public List<Token> getTokenList() {
