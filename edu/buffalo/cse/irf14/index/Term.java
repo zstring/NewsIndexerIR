@@ -64,5 +64,9 @@ public class Term {
 		docFreq += 1;
 	}
 	
+	@Override
+	public String toString() {
+		return "T Id :" + termId + ", T Text :" + termText + ", Totel freq :" + colFreq + ", doc freq :" + docFreq;
+	}
 }
 

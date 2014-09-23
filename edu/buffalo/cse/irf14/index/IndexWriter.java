@@ -28,7 +28,7 @@ public class IndexWriter {
 	private Map<String, Term> termMap;
 	private Map<Integer, String> docDict;
 	private Map<Integer, Map<Integer,Posting>> termIndex;
-	
+
 	public IndexWriter(String indexDir) {
 		//TODO : YOU MUST IMPLEMENT THIS
 		termDict = new HashMap<String, Integer>();
@@ -36,7 +36,7 @@ public class IndexWriter {
 		termIndex = new HashMap<Integer, Map<Integer,Posting>>();
 		termMap = new HashMap<String, Term>();
 	}
-	
+
 	/**
 	 * Method to add the given Document to the index
 	 * This method should take care of reading the filed values, passing
@@ -58,41 +58,45 @@ public class IndexWriter {
 					TokenStream tstream = tkr.consume(str[0]);
 					while (tstream.hasNext()) {
 						Token tk = tstream.next();
-						String tkString = tk.toString();
-						// If new Term
-						if (!termIndex.containsKey(tkString)) {
-							//increment term id
-							termId += 1;
-							Term term = new Term();
-							term.setTermText(tkString);
-							term.setTermId(termId);
-							term.incColFreq();
-							term.incdocFreq();
-							this.termDict.put(tkString, termId);
-							this.termMap.put(tkString, term);
-							Posting posting = new Posting();
-							posting.setDocId(docId);
-							posting.incTermFreq();
-							Map<Integer, Posting> postingsList = new HashMap<Integer, Posting>();
-							postingsList.put(docId, posting);
-							termIndex.put(termId,postingsList);
-						}
-						// If term already exist in index
-						else {
-							Term term = termMap.get(tkString);
-							term.incColFreq();
-							Map<Integer, Posting> postingsList = termIndex.get(tkString);
-							Posting posting = postingsList.get(docId);
-							// If docId already exist in postingList
-							if ( posting != null) {
+						if (tk != null && tk.toString() != null &&
+								!"".equals(tk.toString())) {
+							String tkString = tk.toString();
+							// If new Term
+							Integer tkInt = termDict.get(tkString);
+							if (!termIndex.containsKey(tkInt)) {
+								//increment term id
+								termId += 1;
+								Term term = new Term();
+								term.setTermText(tkString);
+								term.setTermId(termId);
+								term.incColFreq();
+								term.incdocFreq();
+								this.termDict.put(tkString, termId);
+								this.termMap.put(tkString, term);
+								Posting posting = new Posting();
+								posting.setDocId(docId);
 								posting.incTermFreq();
+								Map<Integer, Posting> postingsList = new HashMap<Integer, Posting>();
+								postingsList.put(docId, posting);
+								termIndex.put(termId,postingsList);
 							}
-							// If docId does not exist in postingList
+							// If term already exist in index
 							else {
-								Posting newPosting = new Posting();
-								newPosting.setDocId(docId);
-								newPosting.incTermFreq();
-								postingsList.put(docId,posting);
+								Term term = termMap.get(tkString);
+								term.incColFreq();
+								Map<Integer, Posting> postingsList = termIndex.get(tkInt);
+								Posting posting = postingsList.get(docId);
+								// If docId already exist in postingList
+								if ( posting != null) {
+									posting.incTermFreq();
+								}
+								// If docId does not exist in postingList
+								else {
+									Posting newPosting = new Posting();
+									newPosting.setDocId(docId);
+									newPosting.incTermFreq();
+									postingsList.put(docId, posting);
+								}
 							}
 						}
 					}
@@ -103,9 +107,9 @@ public class IndexWriter {
 			e.printStackTrace();
 		}
 		docId += 1;
-		
+
 	}
-	
+
 	/**
 	 * Method that indicates that all open resources must be closed
 	 * and cleaned and that the entire indexing operation has been completed.

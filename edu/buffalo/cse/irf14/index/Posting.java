@@ -32,5 +32,9 @@ public class Posting {
 	public void incTermFreq() {
 		termFreq += 1;
 	}
-
+	
+	@Override
+	public String toString() {
+		return "Doc Id :" + docId + ", Term Freq :" + termFreq;
+	}
 }
