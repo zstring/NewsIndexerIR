@@ -3,8 +3,15 @@
  */
 package edu.buffalo.cse.irf14.index;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import edu.buffalo.cse.irf14.analysis.Token;
+import edu.buffalo.cse.irf14.analysis.TokenStream;
 import edu.buffalo.cse.irf14.analysis.Tokenizer;
+import edu.buffalo.cse.irf14.analysis.TokenizerException;
 import edu.buffalo.cse.irf14.document.Document;
+import edu.buffalo.cse.irf14.document.FieldNames;
 
 /**
  * @author nikhillo
@@ -15,8 +22,19 @@ public class IndexWriter {
 	 * Default constructor
 	 * @param indexDir : The root directory to be sued for indexing
 	 */
+	private static int docId = 0;
+	private static int termId = 0;
+	private Map<String, Integer> termDict;
+	private Map<String, Term> termMap;
+	private Map<Integer, String> docDict;
+	private Map<Integer, Map<Integer,Posting>> termIndex;
+	
 	public IndexWriter(String indexDir) {
 		//TODO : YOU MUST IMPLEMENT THIS
+		termDict = new HashMap<String, Integer>();
+		docDict = new HashMap<Integer, String>();
+		termIndex = new HashMap<Integer, Map<Integer,Posting>>();
+		termMap = new HashMap<String, Term>();
 	}
 	
 	/**
@@ -29,7 +47,63 @@ public class IndexWriter {
 	 */
 	public void addDocument(Document d) throws IndexerException {
 		//TODO : YOU MUST IMPLEMENT THIS
-		Tokenizer tkr = new Tokenizer();
+		try {
+			if (d != null) {
+				//increment document id
+				docId += 1;
+				docDict.put(docId, d.getField(FieldNames.FILEID)[0]);
+				String[] str = d.getField(FieldNames.CONTENT);
+				if (str.length > 0) {
+					Tokenizer tkr = new Tokenizer();
+					TokenStream tstream = tkr.consume(str[0]);
+					while (tstream.hasNext()) {
+						Token tk = tstream.next();
+						String tkString = tk.toString();
+						// If new Term
+						if (!termIndex.containsKey(tkString)) {
+							//increment term id
+							termId += 1;
+							Term term = new Term();
+							term.setTermText(tkString);
+							term.setTermId(termId);
+							term.incColFreq();
+							term.incdocFreq();
+							this.termDict.put(tkString, termId);
+							this.termMap.put(tkString, term);
+							Posting posting = new Posting();
+							posting.setDocId(docId);
+							posting.incTermFreq();
+							Map<Integer, Posting> postingsList = new HashMap<Integer, Posting>();
+							postingsList.put(docId, posting);
+							termIndex.put(termId,postingsList);
+						}
+						// If term already exist in index
+						else {
+							Term term = termMap.get(tkString);
+							term.incColFreq();
+							Map<Integer, Posting> postingsList = termIndex.get(tkString);
+							Posting posting = postingsList.get(docId);
+							// If docId already exist in postingList
+							if ( posting != null) {
+								posting.incTermFreq();
+							}
+							// If docId does not exist in postingList
+							else {
+								Posting newPosting = new Posting();
+								newPosting.setDocId(docId);
+								newPosting.incTermFreq();
+								postingsList.put(docId,posting);
+							}
+						}
+					}
+				}
+			}
+		} catch (TokenizerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		docId += 1;
+		
 	}
 	
 	/**
