@@ -66,11 +66,7 @@ public class IndexWriter {
 							if (!termIndex.containsKey(tkInt)) {
 								//increment term id
 								termId += 1;
-								Term term = new Term();
-								term.setTermText(tkString);
-								term.setTermId(termId);
-								term.incColFreq();
-								term.incdocFreq();
+								Term term = new Term(tkString,termId);
 								this.termDict.put(tkString, termId);
 								this.termMap.put(tkString, term);
 								Posting posting = new Posting();

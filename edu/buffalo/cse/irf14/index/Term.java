@@ -15,10 +15,17 @@ public class Term {
 	private int termId;
 	
 	public Term() {
-		colFreq = 0;
-		docFreq = 0;
-		termId = 0;
-		termText = "";
+		this.colFreq = 0;
+		this.docFreq = 0;
+		this.termId = 0;
+		this.termText = "";
+	}
+	
+	public Term(String termText, int termId) {
+		this.termId = termId;
+		this.termText = termText;
+		this.colFreq = 1;
+		this.docFreq = 1;
 	}
 	
 	/**
