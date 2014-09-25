@@ -3,6 +3,7 @@
  */
 package edu.buffalo.cse.irf14.index;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -12,6 +13,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.zip.GZIPOutputStream;
 
 import edu.buffalo.cse.irf14.analysis.Token;
 import edu.buffalo.cse.irf14.analysis.TokenStream;
@@ -31,7 +33,7 @@ public class IndexWriter {
 	 */
 	private String indexDir;
 	private BaseIndexer biContent;
-	
+
 	public IndexWriter(String indexDir) {
 		//TODO : YOU MUST IMPLEMENT THIS
 		this.indexDir = indexDir;
@@ -63,9 +65,20 @@ public class IndexWriter {
 		FileOutputStream fo;
 		try {
 			fo = new FileOutputStream(indexDir + java.io.File.separator + "File");
-			ObjectOutputStream oos = new ObjectOutputStream(fo);
+			GZIPOutputStream gzipOut = new GZIPOutputStream(fo);
+			ObjectOutputStream oos = new ObjectOutputStream(gzipOut);
+//			fo = new FileOutputStream(indexDir + java.io.File.separator + "File");
+//			ObjectOutputStream oos = new ObjectOutputStream(fo);
 			oos.writeObject(biContent);
+			oos.writeObject(indexKeys);
+			oos.flush();
 			oos.close();
+//			byte[] bytes = baos.toByteArray();
+//			fo.write(oos);
+//			ObjectOutputStream oos = new ObjectOutputStream(fo);
+//			oos.writeObject(biContent);
+//			oos.writeObject(indexKeys);
+//			oos.close();
 			fo.close();
 			System.out.println("Writing Process Complete");
 		} catch (FileNotFoundException e) {

@@ -3,13 +3,21 @@
  */
 package edu.buffalo.cse.irf14.index;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * @author nikhillo
@@ -17,9 +25,11 @@ import java.util.Map;
  */
 public class IndexReader {
 	
+	private static final boolean Integer = false;
 	private String indexDir;
 	private IndexType type;
 	private BaseIndexer biContent;
+	private Integer[] indexKeys;
 	/**
 	 * Default constructor
 	 * @param indexDir : The root directory from which the index is to be read.
@@ -37,14 +47,20 @@ public class IndexReader {
 	private void indexReaderOpen() {
 		// TODO Auto-generated method stub
 		FileInputStream fi;
-		
+		double start = System.currentTimeMillis();
 		try {
 			fi = new FileInputStream(indexDir + java.io.File.separator + "File");
-			ObjectInputStream ois = new ObjectInputStream(fi);
+			GZIPInputStream gzipIn = new GZIPInputStream(fi);
+			ObjectInputStream ois = new ObjectInputStream(gzipIn);
+//			fi = new FileInputStream(indexDir + java.io.File.separator + "File");
+//			ObjectInputStream ois = new ObjectInputStream(fi);
 			biContent = (BaseIndexer) ois.readObject();
+			indexKeys = (Integer[]) ois.readObject();
 			ois.close();
 			fi.close();
-			System.out.println("Writing Process Complete");
+			System.out.println("Reading Process Complete");
+			double timeSpent = System.currentTimeMillis() - start;
+			System.out.println("Time spent in Reading : " + timeSpent);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Exception in Writer File Not Found");
@@ -66,7 +82,8 @@ public class IndexReader {
 	 */
 	public int getTotalKeyTerms() {
 		//TODO : YOU MUST IMPLEMENT THIS
-		return -1;
+		return biContent.termMap.keySet().size();
+		//return -1;
 	}
 	
 	/**
@@ -76,7 +93,7 @@ public class IndexReader {
 	 */
 	public int getTotalValueTerms() {
 		//TODO: YOU MUST IMPLEMENT THIS
-		return -1;
+		return biContent.docDict.size();
 	}
 	
 	/**
@@ -89,7 +106,22 @@ public class IndexReader {
 	 */
 	public Map<String, Integer> getPostings(String term) {
 		//TODO:YOU MUST IMPLEMENT THIS
-		return null;
+		Integer termId = biContent.termDict.get(term);
+		Map<String, Integer> map = null;
+		if (termId != null) {
+			map = new HashMap<String, Integer>();
+			Map<Integer, Posting> m = biContent.termIndex.get(termId);
+			Map<Integer, String> doc = biContent.docDict;
+			if (m != null) {
+				for (Iterator<Integer> i = m.keySet().iterator(); i.hasNext();) {
+					Integer in = i.next();
+					String docName = doc.get(in);
+					int termFreq = m.get(in).getTermFreq();
+					map.put(docName, termFreq);
+				}
+			}
+		}
+		return map;
 	}
 	
 	/**
@@ -101,7 +133,15 @@ public class IndexReader {
 	 */
 	public List<String> getTopK(int k) {
 		//TODO YOU MUST IMPLEMENT THIS
-		return null;
+		List<String> topKTerms = null;
+		int len = indexKeys.length - 1;
+		if (k > 0)
+			topKTerms = new ArrayList<String>();
+		for (int i = 0; i < k && i <= len; i++) {
+			String termText = biContent.termMap.get(indexKeys[len - i]).getTermText();
+			topKTerms.add(termText);
+		}
+		return topKTerms;
 	}
 	
 	/**
@@ -116,7 +156,12 @@ public class IndexReader {
 	 */
 	public Map<String, Integer> query(String...terms) {
 		//TODO : BONUS ONLY
-		return null;
+		Map<String, Integer> output = getPostings(terms[0]);
+		for (int i = 1; i < terms.length; i++) {
+			Map<String, Integer> m = getPostings(terms[i]);
+			output.keySet().retainAll(m.keySet());
+		}
+		return output;
 	}
 	
 	public static void main(String[] args) {

@@ -15,6 +15,14 @@ public class Posting implements Serializable {
 	private int docId;
 	private int termFreq;
 	
+	public int getDocId() {
+		return docId;
+	}
+
+	public int getTermFreq() {
+		return termFreq;
+	}
+
 	/**
 	 * Instantiate class with documentID = 0.
 	 */

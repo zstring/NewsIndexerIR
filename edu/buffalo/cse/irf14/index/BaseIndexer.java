@@ -6,6 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import edu.buffalo.cse.irf14.analysis.Analyzer;
+import edu.buffalo.cse.irf14.analysis.AnalyzerContent;
+import edu.buffalo.cse.irf14.analysis.AnalyzerFactory;
 import edu.buffalo.cse.irf14.analysis.Token;
 import edu.buffalo.cse.irf14.analysis.TokenStream;
 import edu.buffalo.cse.irf14.analysis.Tokenizer;
@@ -19,10 +22,10 @@ public class BaseIndexer implements Serializable {
 	private static int docId = 0;
 	private static int termId = 0;
 	private IndexType indexerType;
-	private Map<String, Integer> termDict;
-	public Map<Integer, Term> termMap;
-	private Map<Integer, String> docDict;
-	private Map<Integer, Map<Integer,Posting>> termIndex;
+	public Map<String, Integer> termDict;
+	public Map<Integer, String> docDict;
+	public Map<Integer, Term> termMap;	
+	public Map<Integer, Map<Integer, Posting>> termIndex;
 
 	public BaseIndexer(IndexType indexerType) {
 		this.indexerType = indexerType;
@@ -53,9 +56,14 @@ public class BaseIndexer implements Serializable {
 				String[] str = d.getField(FieldNames.CONTENT);
 				if (str.length > 0) {
 					Tokenizer tkr = new Tokenizer();
-					TokenStream tstream = tkr.consume(str[0]);
-					while (tstream.hasNext()) {
-						Token tk = tstream.next();
+					TokenStream tStream = tkr.consume(str[0]);
+					AnalyzerFactory aFactory = AnalyzerFactory.getInstance();
+					Analyzer aContent = aFactory.getAnalyzerForField(FieldNames.CONTENT, tStream);
+					while (aContent.increment()) {
+					}
+					tStream.reset();
+					while (tStream.hasNext()) {
+						Token tk = tStream.next();
 						if (tk != null && tk.toString() != null &&
 								!"".equals(tk.toString())) {
 							String tkString = tk.toString();
