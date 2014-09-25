@@ -67,12 +67,14 @@ public class IndexWriter {
 			oos.writeObject(biContent);
 			oos.close();
 			fo.close();
-			System.out.println("");
+			System.out.println("Writing Process Complete");
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
+			System.out.println("Exception in Writer File Not Found");
 			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
+			System.out.println("Exception in Writer IO Exception");
 			e.printStackTrace();
 		}
 	}

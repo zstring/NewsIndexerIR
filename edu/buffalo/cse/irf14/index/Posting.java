@@ -3,12 +3,15 @@
  */
 package edu.buffalo.cse.irf14.index;
 
+import java.io.Serializable;
+
 /**
  * @author avinav and himanshu
  *
  */
-public class Posting {
+public class Posting implements Serializable {
 	
+	private static final long serialVersionUID = 40L;
 	private int docId;
 	private int termFreq;
 	

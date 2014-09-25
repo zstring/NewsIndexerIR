@@ -3,12 +3,15 @@
  */
 package edu.buffalo.cse.irf14.index;
 
+import java.io.Serializable;
+
 /**
  * @author avinav and himanshu
  *
  */
-public class Term {
+public class Term implements Serializable {
 	
+	private static final long serialVersionUID = 41L;
 	private int colFreq;
 	private int docFreq;
 	public int getColFreq() {

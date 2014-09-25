@@ -3,6 +3,11 @@
  */
 package edu.buffalo.cse.irf14.index;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -11,6 +16,10 @@ import java.util.Map;
  * Class that emulates reading data back from a written index
  */
 public class IndexReader {
+	
+	private String indexDir;
+	private IndexType type;
+	private BaseIndexer biContent;
 	/**
 	 * Default constructor
 	 * @param indexDir : The root directory from which the index is to be read.
@@ -20,8 +29,36 @@ public class IndexReader {
 	 */
 	public IndexReader(String indexDir, IndexType type) {
 		//TODO
+		this.indexDir = indexDir;
+		this.type = type;
+		indexReaderOpen();
 	}
 	
+	private void indexReaderOpen() {
+		// TODO Auto-generated method stub
+		FileInputStream fi;
+		
+		try {
+			fi = new FileInputStream(indexDir + java.io.File.separator + "File");
+			ObjectInputStream ois = new ObjectInputStream(fi);
+			biContent = (BaseIndexer) ois.readObject();
+			ois.close();
+			fi.close();
+			System.out.println("Writing Process Complete");
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			System.out.println("Exception in Writer File Not Found");
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			System.out.println("Exception in Writer IO Exception");
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * Get total number of terms from the "key" dictionary associated with this 
 	 * index. A postings list is always created against the "key" dictionary
@@ -80,5 +117,11 @@ public class IndexReader {
 	public Map<String, Integer> query(String...terms) {
 		//TODO : BONUS ONLY
 		return null;
+	}
+	
+	public static void main(String[] args) {
+		String indexAddr = "/home/inspire/Dropbox/UB/JavaWorkspace/newsindexer/news_training";
+		IndexType type = IndexType.CONTENT;
+		IndexReader ir = new IndexReader(indexAddr, type);
 	}
 }

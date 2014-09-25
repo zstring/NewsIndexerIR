@@ -131,9 +131,11 @@ public class TokenFilterDate extends TokenFilter {
 		String[] dateAndYear = null;
 		boolean flag = false;
 		retMonth[0] = "0";
-		String monthRegex = "(jan)|(feb)|(mar)|(apr)|(may)|(jun)|"
-				+ "(jul)|(aug)|(sep)|(oct)|(nov)|(dec)";
+		String monthRegex = "(january|jan)|(february|feb)|(march|mar)|"
+				+ "(april|apr)|(may)|(june|jun)|(july|jul)|(august|aug)|"
+				+ "(september|sep)|(october|oct)|(november|nov)|(december|dec)";
 		String monthIndex = "01";
+		String monthChar = "";
 		Matcher mat = Pattern.compile(monthRegex,
 				Pattern.CASE_INSENSITIVE).matcher(m);
 		if (mat.find()) {
@@ -143,6 +145,7 @@ public class TokenFilterDate extends TokenFilter {
 					monthIndex = i + "";
 					flag = true;
 					monthIndex = String.format("%02d", i);
+					monthChar = m.substring(mat.end());
 					//monthIndex = String.format("%0"+ (2 - monthIndex.length()) +"d%s", 0, monthIndex);
 					Token[] tokenList = stream.getPrevTokens();
 					//dateAndYear contains Date and Year value at
@@ -156,11 +159,13 @@ public class TokenFilterDate extends TokenFilter {
 			//dateAndYear[1] = date value such as "1", "2";
 			//dateAndYear[2] = last special char of year such as "." ","
 			//dateAndYear[3] = year value
-			if (dateAndYear != null) {
+			if (dateAndYear != null && dateAndYear[0] != null) {
+				
 				if (!"".equals(dateAndYear[3])) {
 				retMonth[1] = dateAndYear[3] + monthIndex;
 				}
 				else {
+					//return null;
 					retMonth[1] = "1900" + monthIndex;
 				}
 				if (!"".equals(dateAndYear[1])) {
@@ -169,7 +174,12 @@ public class TokenFilterDate extends TokenFilter {
 				else {
 					retMonth[1] += "01";
 				}
-				retMonth[1] += dateAndYear[2];
+				if (!dateAndYear[2].isEmpty()) {
+					retMonth[1] += dateAndYear[2];
+				}
+				else {
+					retMonth[1] += monthChar;
+				}
 			}
 		}
 		return retMonth;
@@ -183,8 +193,8 @@ public class TokenFilterDate extends TokenFilter {
 	private String[] processTokensForDate(Token[] tokenList) {
 		// TODO Auto-generated method stub
 		String[] dateAndYear = new String[4];
-		dateAndYear[0] = "01";
-		dateAndYear[1] = "1900";
+//		dateAndYear[0] = "01";
+//		dateAndYear[1] = "1900";
 		boolean dateFlag = false, yearFlag = false, timeFlag = false;
 		boolean checkPrev = false;
 		String[] retDate = null, retYear = null, retTime = null;
@@ -311,6 +321,7 @@ public class TokenFilterDate extends TokenFilter {
 							yearZone = tNext.toString() == null ? "" : tNext.toString().toLowerCase();
 						flagRemoveToken = true;
 					}
+					
 					if (yearZone.contains("bc")) {
 						if (yearZone.length() == 3) {
 							lastChar = yearZone.charAt(yearZone.length() - 1) + "";
