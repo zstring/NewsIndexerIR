@@ -11,6 +11,14 @@ public class Term {
 	
 	private int colFreq;
 	private int docFreq;
+	public int getColFreq() {
+		return colFreq;
+	}
+
+	public int getDocFreq() {
+		return docFreq;
+	}
+
 	private String termText;
 	private int termId;
 	

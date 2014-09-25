@@ -3,8 +3,15 @@
  */
 package edu.buffalo.cse.irf14.index;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import edu.buffalo.cse.irf14.analysis.Token;
 import edu.buffalo.cse.irf14.analysis.TokenStream;
@@ -22,19 +29,13 @@ public class IndexWriter {
 	 * Default constructor
 	 * @param indexDir : The root directory to be sued for indexing
 	 */
-	private static int docId = 0;
-	private static int termId = 0;
-	private Map<String, Integer> termDict;
-	private Map<String, Term> termMap;
-	private Map<Integer, String> docDict;
-	private Map<Integer, Map<Integer,Posting>> termIndex;
-
+	private String indexDir;
+	private BaseIndexer biContent;
+	
 	public IndexWriter(String indexDir) {
 		//TODO : YOU MUST IMPLEMENT THIS
-		termDict = new HashMap<String, Integer>();
-		docDict = new HashMap<Integer, String>();
-		termIndex = new HashMap<Integer, Map<Integer,Posting>>();
-		termMap = new HashMap<String, Term>();
+		this.indexDir = indexDir;
+		this.biContent = new BaseIndexer(IndexType.CONTENT);
 	}
 
 	/**
@@ -47,60 +48,7 @@ public class IndexWriter {
 	 */
 	public void addDocument(Document d) throws IndexerException {
 		//TODO : YOU MUST IMPLEMENT THIS
-		try {
-			if (d != null) {
-				//increment document id
-				docId += 1;
-				docDict.put(docId, d.getField(FieldNames.FILEID)[0]);
-				String[] str = d.getField(FieldNames.CONTENT);
-				if (str.length > 0) {
-					Tokenizer tkr = new Tokenizer();
-					TokenStream tstream = tkr.consume(str[0]);
-					while (tstream.hasNext()) {
-						Token tk = tstream.next();
-						if (tk != null && tk.toString() != null &&
-								!"".equals(tk.toString())) {
-							String tkString = tk.toString();
-							// If new Term
-							Integer tkInt = termDict.get(tkString);
-							if (!termIndex.containsKey(tkInt)) {
-								//increment term id
-								termId += 1;
-								Term term = new Term(tkString,termId);
-								this.termDict.put(tkString, termId);
-								this.termMap.put(tkString, term);
-								Posting posting = new Posting();
-								posting.setDocId(docId);
-								posting.incTermFreq();
-								Map<Integer, Posting> postingsList = new HashMap<Integer, Posting>();
-								postingsList.put(docId, posting);
-								termIndex.put(termId,postingsList);
-							}
-							// If term already exist in index
-							else {
-								Term term = termMap.get(tkString);
-								term.incColFreq();
-								Map<Integer, Posting> postingsList = termIndex.get(tkInt);
-								Posting posting = postingsList.get(docId);
-								// If docId already exist in postingList
-								if ( posting != null) {
-									posting.incTermFreq();
-								}
-								// If docId does not exist in postingList
-								else {
-									Posting newPosting = new Posting(docId);
-									term.incdocFreq();
-									postingsList.put(docId, newPosting);
-								}
-							}
-						}
-					}
-				}
-			}
-		} catch (TokenizerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		biContent.addDocument(d);
 	}
 
 	/**
@@ -110,5 +58,22 @@ public class IndexWriter {
 	 */
 	public void close() throws IndexerException {
 		//TODO
+		Integer[] indexKeys = biContent.getTermKeys().toArray(new Integer[0]);
+		Arrays.sort(indexKeys, biContent.new SortByFreq());
+		FileOutputStream fo;
+		try {
+			fo = new FileOutputStream(indexDir + java.io.File.separator + "File");
+			ObjectOutputStream oos = new ObjectOutputStream(fo);
+			oos.writeObject(biContent);
+			oos.close();
+			fo.close();
+			System.out.println("");
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
