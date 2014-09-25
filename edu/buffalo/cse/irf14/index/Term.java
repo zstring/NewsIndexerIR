@@ -73,7 +73,7 @@ public class Term {
 	
 	@Override
 	public String toString() {
-		return "T Id :" + termId + ", T Text :" + termText + ", Totel freq :" + colFreq + ", doc freq :" + docFreq;
+		return "T.Id :" + termId + ", T.Text :" + termText + ", T.Collection_freq :" + colFreq + ", T.doc_freq :" + docFreq + "\n";
 	}
 }
 

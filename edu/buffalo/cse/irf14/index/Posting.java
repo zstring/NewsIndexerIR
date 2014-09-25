@@ -16,8 +16,13 @@ public class Posting {
 	 * Instantiate class with documentID = 0.
 	 */
 	public Posting() {
-		docId = 0;
-		termFreq = 0;
+		this.docId = 0;
+		this.termFreq = 0;
+	}
+	
+	public Posting(int documentId) {
+		this.docId = documentId;
+		this.termFreq = 1;
 	}
 	/**
 	 * set docId as documentId
@@ -35,6 +40,6 @@ public class Posting {
 	
 	@Override
 	public String toString() {
-		return "Doc Id :" + docId + ", Term Freq :" + termFreq;
+		return "[ Doc Id :" + docId + ", Term Freq :" + termFreq + " ]";
 	}
 }

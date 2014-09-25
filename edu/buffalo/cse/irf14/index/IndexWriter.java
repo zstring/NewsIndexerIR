@@ -88,10 +88,9 @@ public class IndexWriter {
 								}
 								// If docId does not exist in postingList
 								else {
-									Posting newPosting = new Posting();
-									newPosting.setDocId(docId);
-									newPosting.incTermFreq();
-									postingsList.put(docId, posting);
+									Posting newPosting = new Posting(docId);
+									term.incdocFreq();
+									postingsList.put(docId, newPosting);
 								}
 							}
 						}
@@ -102,8 +101,6 @@ public class IndexWriter {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		docId += 1;
-
 	}
 
 	/**

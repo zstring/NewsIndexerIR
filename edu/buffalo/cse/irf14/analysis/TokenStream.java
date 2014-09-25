@@ -153,7 +153,9 @@ public class TokenStream implements Iterator<Token>{
 	}
 	
 	public void setTokenList(List<Token> list) {
-		tokenList = list;
+		if (list != null) {
+			tokenList = list;
+		}
 	}
 	
 	public int getCurrentIndex() {
@@ -161,12 +163,15 @@ public class TokenStream implements Iterator<Token>{
 	}
 	
 	public void setCurrentIndex(int index) {
-		idx = index;
-		
+		if (index >= 0 && index < tokenList.size()) {
+			idx = index;
+		}
 	}
 	
 	public void insertAt(int index,Token token) {
-		tokenList.add(index, token);
+		if (index >= 0 && index < tokenList.size()) {
+			tokenList.add(index, token);			
+		}
 	}
 	
 	/**
@@ -190,8 +195,9 @@ public class TokenStream implements Iterator<Token>{
 	 */
 	public Token getTokenAt(int index) {
 		// TODO Auto-generated method stub
-		if (index >= 0 && index < tokenList.size())
+		if (index >= 0 && index < tokenList.size()) {
 			return tokenList.get(index);
+		}
 		return null;
 	}
 	/**
@@ -200,7 +206,7 @@ public class TokenStream implements Iterator<Token>{
 	 * @return
 	 */
 	public boolean hasPreviousAt(int index) {
-		if (index > 0) {
+		if (index > 0 && index <= tokenList.size()) {
 			return true;
 		}
 		return false;
@@ -212,7 +218,7 @@ public class TokenStream implements Iterator<Token>{
 	 */
 	public boolean hasNextAt(int index) {
 		// TODO YOU MUST IMPLEMENT THIS
-		if (index < tokenList.size() - 1) {
+		if (index >= -1 && index < tokenList.size() - 1) {
 			return true;
 		}
 		return false;

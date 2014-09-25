@@ -47,19 +47,26 @@ public class Tokenizer {
 	public TokenStream consume(String str) throws TokenizerException {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
 		if (str == null || str.isEmpty()) {
+			// WHAT IF ONLY spaces are present in str??
 			throw new TokenizerException();
 		}
-		TokenStream tokenStream = new TokenStream();
+		TokenStream tokenStream = null;
 		try {
 			List<Token> tokenList = new ArrayList<Token>();
 			// Have to check if new tk object need to be created inside for
 			String[] words = str.split(dmeter);
 			for (int i = 0; i < words.length; i++) {
-				Token tk = new Token();
-				tk.setTermText(words[i]);
-				tokenList.add(tk);
+				String word = words[i].trim();
+				if (!word.isEmpty()) {
+					Token tk = new Token();
+					tk.setTermText(word);
+					tokenList.add(tk);
+				}
 			}
-			tokenStream.setTokenList(tokenList);
+			if (!tokenList.isEmpty()) {
+				tokenStream = new TokenStream();
+				tokenStream.setTokenList(tokenList);
+			}
 		} catch (Exception e) {
 			throw new TokenizerException();
 		}
