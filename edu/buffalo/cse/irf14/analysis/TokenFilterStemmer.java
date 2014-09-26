@@ -12,30 +12,32 @@ public class TokenFilterStemmer extends TokenFilter {
 	public TokenFilterStemmer(TokenStream stream) {
 		super(stream);
 	}
-	
+
 	@Override
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stu
-		if (stream.hasNext()||this.isAnalyzer) {
-			Token tk;
-			if(!this.isAnalyzer) {
-				tk = stream.next();
+		if (stream.hasNext() || this.isAnalyzer) {
+			Token token;
+			if (!this.isAnalyzer) {
+				token = stream.next();
 			}
 			else {
-				tk = stream.getCurrent();
+				token = stream.getCurrent();
 			}
-			String tkText = tk.getTermText();
-			if (tkText != null && tkText.length() > 1) {
-				String alphaRegex = "[a-zA-Z]+";
-				Matcher mat = Pattern.compile(alphaRegex).matcher(tkText);
-				if (mat.matches()) {
-					Stemmer stemmer = new Stemmer();
-					char[] tkTextChar = tkText.toCharArray();
-					stemmer.add(tkTextChar, tkTextChar.length);
-					stemmer.stem();
-					String stemString = stemmer.toString();
-					if (!tkText.equals(stemString)) {
-						tk.setTermText(stemString);
+			if (token != null) {
+				String tkText = token.getTermText();
+				if (tkText != null && tkText.length() > 1) {
+					String alphaRegex = "[a-zA-Z]+";
+					Matcher mat = Pattern.compile(alphaRegex).matcher(tkText);
+					if (mat.matches()) {
+						Stemmer stemmer = new Stemmer();
+						char[] tkTextChar = tkText.toCharArray();
+						stemmer.add(tkTextChar, tkTextChar.length);
+						stemmer.stem();
+						String stemString = stemmer.toString();
+						if (!tkText.equals(stemString)) {
+							token.setTermText(stemString);
+						}
 					}
 				}
 			}

@@ -56,49 +56,51 @@ public class BaseIndexer implements Serializable {
 				String[] str = d.getField(FieldNames.CONTENT);
 				if (str.length > 0) {
 					Tokenizer tkr = new Tokenizer();
-					TokenStream tStream = tkr.consume(str[0]);
-					AnalyzerFactory aFactory = AnalyzerFactory.getInstance();
-					Analyzer aContent = aFactory.getAnalyzerForField(FieldNames.CONTENT, tStream);
-					while (aContent.increment()) {
-					}
-					tStream.reset();
-					while (tStream.hasNext()) {
-						Token tk = tStream.next();
-						if (tk != null && tk.toString() != null &&
-								!"".equals(tk.toString())) {
-							String tkString = tk.toString();
-							// If new Term
-							Integer tkInt = termDict.get(tkString);
-							if (!termIndex.containsKey(tkInt)) {
-								//increment term id
-								termId += 1;
-								Term term = new Term(tkString, termId);
-								this.termDict.put(tkString, termId);
-								this.termMap.put(termId, term);
-								Posting posting = new Posting();
-								posting.setDocId(docId);
-								posting.incTermFreq();
-								Map<Integer, Posting> postingsList =
-										new HashMap<Integer, Posting>();
-								postingsList.put(docId, posting);
-								termIndex.put(termId, postingsList);
-							}
-							// If term already exist in index
-							else {
-								Term term = termMap.get(tkInt);
-								term.incColFreq();
-								Map<Integer, Posting> postingsList =
-										termIndex.get(tkInt);
-								Posting posting = postingsList.get(docId);
-								// If docId already exist in postingList
-								if ( posting != null) {
+					if (!str[0].trim().isEmpty()) {
+						TokenStream tStream = tkr.consume(str[0]);
+						AnalyzerFactory aFactory = AnalyzerFactory.getInstance();
+						Analyzer aContent = aFactory.getAnalyzerForField(FieldNames.CONTENT, tStream);
+						while (aContent.increment()) {
+						}
+						tStream.reset();
+						while (tStream.hasNext()) {
+							Token tk = tStream.next();
+							if (tk != null && tk.toString() != null &&
+									!"".equals(tk.toString())) {
+								String tkString = tk.toString();
+								// If new Term
+								Integer tkInt = termDict.get(tkString);
+								if (!termIndex.containsKey(tkInt)) {
+									//increment term id
+									termId += 1;
+									Term term = new Term(tkString, termId);
+									this.termDict.put(tkString, termId);
+									this.termMap.put(termId, term);
+									Posting posting = new Posting();
+									posting.setDocId(docId);
 									posting.incTermFreq();
+									Map<Integer, Posting> postingsList =
+											new HashMap<Integer, Posting>();
+									postingsList.put(docId, posting);
+									termIndex.put(termId, postingsList);
 								}
-								// If docId does not exist in postingList
+								// If term already exist in index
 								else {
-									Posting newPosting = new Posting(docId);
-									term.incdocFreq();
-									postingsList.put(docId, newPosting);
+									Term term = termMap.get(tkInt);
+									term.incColFreq();
+									Map<Integer, Posting> postingsList =
+											termIndex.get(tkInt);
+									Posting posting = postingsList.get(docId);
+									// If docId already exist in postingList
+									if ( posting != null) {
+										posting.incTermFreq();
+									}
+									// If docId does not exist in postingList
+									else {
+										Posting newPosting = new Posting(docId);
+										term.incdocFreq();
+										postingsList.put(docId, newPosting);
+									}
 								}
 							}
 						}

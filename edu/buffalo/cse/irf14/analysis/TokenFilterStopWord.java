@@ -13,7 +13,7 @@ public class TokenFilterStopWord extends TokenFilter{
 		super(stream);
 		// TODO Auto-generated constructor stub
 	}
-	
+
 	private static final String stopWords;
 	static {
 		stopWords = ",a,about,above,after,again,against,all,am,an,and,any,are,aren't,as,at,"
@@ -29,17 +29,19 @@ public class TokenFilterStopWord extends TokenFilter{
 	@Override
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stub
-		if (stream.hasNext()||this.isAnalyzer) {
+		if (stream.hasNext() || this.isAnalyzer) {
 			Token token;
-			if(!this.isAnalyzer) {
+			if (!this.isAnalyzer) {
 				token = stream.next();
 			}
 			else {
 				token = stream.getCurrent();
 			}
-			String tkString = token.toString();
-			if (stopWords.contains(","+tkString.toLowerCase()+",")) {
-				stream.remove();
+			if (token != null) {
+				String tkString = token.toString();
+				if (stopWords.contains(","+tkString.toLowerCase()+",")) {
+					stream.remove();
+				}
 			}
 		}
 		return stream.hasNext();

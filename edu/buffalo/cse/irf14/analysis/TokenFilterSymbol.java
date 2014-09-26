@@ -17,7 +17,7 @@ public class TokenFilterSymbol extends TokenFilter {
 	public TokenFilterSymbol(TokenStream stream) {
 		super(stream);
 	}
-	
+
 	private static final Map<String, String> contractions;
 	static {
 		Map<String,String> tempMap = new HashMap<String, String>();
@@ -122,59 +122,60 @@ public class TokenFilterSymbol extends TokenFilter {
 	@Override
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stub
-		if (stream.hasNext()||this.isAnalyzer) {
+		if (stream.hasNext() || this.isAnalyzer) {
 			Token token;
-			if(!this.isAnalyzer) {
+			if (!this.isAnalyzer) {
 				token = stream.next();
 			}
 			else {
 				token = stream.getCurrent();
 			}
-			String tkString = token.toString();
-			
-			//char[] tkChar = token.getTermBuffer();
-			// Word Contractions
-			if (contractions.containsKey(tkString.toLowerCase())) {
-				boolean upper = false;
-				StringBuilder builder = new StringBuilder(contractions.get(tkString.toLowerCase())); 
-				if (tkString.equals(tkString.toUpperCase())) {
-					upper = true;
+			if (token != null) {
+				String tkString = token.toString();
+				//char[] tkChar = token.getTermBuffer();
+				// Word Contractions
+				if (contractions.containsKey(tkString.toLowerCase())) {
+					boolean upper = false;
+					StringBuilder builder = new StringBuilder(contractions.get(tkString.toLowerCase()));
+					if (tkString.equals(tkString.toUpperCase())) {
+						upper = true;
+					}
+					else if (tkString.charAt(0) >= 'A' && tkString.charAt(0) <= 'Z'){
+						builder.setCharAt(0, (char) (builder.charAt(0) - 32));
+					}
+					tkString = builder.toString();
+					if (upper) tkString = tkString.toUpperCase();
 				}
-				else if (tkString.charAt(0) >= 'A' && tkString.charAt(0) <= 'Z'){
-					builder.setCharAt(0, (char) (builder.charAt(0) - 32));
+
+				// Start or End with ' or " or -
+				tkString = tkString.replaceAll("['\"-]*($|\\s)", " ");
+				tkString = tkString.replaceAll("(^|\\s)['\"-]*", " ");
+
+				// End with Punctuation
+				tkString = tkString.replaceAll("[.!?]*($|\\s)", " ");
+
+				// 's
+				//tkString = tkString.replaceAll("'s?($|\\s)", " ");
+				tkString = tkString.replaceAll("'s?($|\\s)","");
+				tkString = tkString.replaceAll("'","");
+				tkString = tkString.trim();
+
+				// Hyphens
+				String input = tkString;
+				int indexGrp2 = 0, indexGrp1 =0;
+				Matcher matcher = Pattern.compile("(\\s|-|^)([a-zA-Z])+(-)+([a-zA-Z])+(-|$|\\s)").matcher(tkString);
+				while(matcher.find()) {
+					indexGrp1 = matcher.end(2);
+					indexGrp2 = matcher.end(3);
+					input= 	input.substring(0, indexGrp1) + " " + input.substring(indexGrp2);
+					matcher.reset(input);
 				}
-				tkString = builder.toString();
-				if (upper) tkString = tkString.toUpperCase();
-			}
-			
-			// Start or End with ' or " or -
-			tkString = tkString.replaceAll("['\"-]*($|\\s)", " ");
-			tkString = tkString.replaceAll("(^|\\s)['\"-]*", " ");
-			
-			// End with Punctuation
-			tkString = tkString.replaceAll("[.!?]*($|\\s)", " ");
-			
-			// 's
-			//tkString = tkString.replaceAll("'s?($|\\s)", " ");
-			tkString = tkString.replaceAll("'s?($|\\s)","");
-			tkString = tkString.replaceAll("'","");
-			tkString = tkString.trim();
-			
-			// Hyphens
-			String input = tkString;
-			int indexGrp2 = 0, indexGrp1 =0;
-			Matcher matcher = Pattern.compile("(\\s|-|^)([a-zA-Z])+(-)+([a-zA-Z])+(-|$|\\s)").matcher(tkString);
-			while(matcher.find()) {
-				indexGrp1 = matcher.end(2);
-				indexGrp2 = matcher.end(3);
-				input= 	input.substring(0, indexGrp1) + " " + input.substring(indexGrp2);
-				matcher.reset(input);
-			}
-			tkString = input;
-			if ("".equals(tkString)) {
-				stream.remove();
-			} else {
-				token.setTermText(tkString);
+				tkString = input;
+				if ("".equals(tkString)) {
+					stream.remove();
+				} else {
+					token.setTermText(tkString);
+				}
 			}
 		}
 		return stream.hasNext();

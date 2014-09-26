@@ -12,24 +12,25 @@ public class TokenFilterSpecialChars extends TokenFilter {
 	@Override
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stub
-		if (stream.hasNext()||this.isAnalyzer) {
+		if (stream.hasNext() || this.isAnalyzer) {
 			Token token;
-			if(!this.isAnalyzer) {
+			if (!this.isAnalyzer) {
 				token = stream.next();
 			}
 			else {
 				token = stream.getCurrent();
 			}
-			String tkString = token.toString();
-			// - sign is included because it is used by the symbol class. Only in the case of alpha-alpha, it is removed becaused of the test case a+b-c.
-			//String specChar = "[^\\.\\sa-zA-Z0-9@-]";
-			String specChar = "[^\\.\\sa-zA-Z0-9-]";
-			Matcher matcher = Pattern.compile("(.*[a-zA-Z])(-)([a-zA-Z].*)").matcher(tkString);
-			if (matcher.matches()) {
-				tkString = matcher.group(1)+matcher.group(3);
-			}
-			tkString = tkString.replaceAll(specChar, "");
-			/*if (tkString.matches(".*\\w@\\w.*")) {
+			if (token != null) {
+				String tkString = token.toString();
+				// - sign is included because it is used by the symbol class. Only in the case of alpha-alpha, it is removed becaused of the test case a+b-c.
+				//String specChar = "[^\\.\\sa-zA-Z0-9@-]";
+				String specChar = "[^\\.\\sa-zA-Z0-9-]";
+				Matcher matcher = Pattern.compile("(.*[a-zA-Z])(-)([a-zA-Z].*)").matcher(tkString);
+				if (matcher.matches()) {
+					tkString = matcher.group(1)+matcher.group(3);
+				}
+				tkString = tkString.replaceAll(specChar, "");
+				/*if (tkString.matches(".*\\w@\\w.*")) {
 				int posAt = tkString.indexOf('@');
 				String splitString = tkString.substring(posAt+1);
 				tkString = tkString.substring(0,posAt);
@@ -40,17 +41,17 @@ public class TokenFilterSpecialChars extends TokenFilter {
 					//intentionally not moved the stream to next index so
 					//that it does not interfere with other filters in chain
 				}
-				
+
 			}
 			else if (tkString.matches("@")){
 				tkString = tkString.replaceAll("@", "");	
 			}*/
-			
-			if (!tkString.equals("")) {
-				token.setTermText(tkString);
-			}
-			else {
-				stream.remove();
+				if (!tkString.equals("")) {
+					token.setTermText(tkString);
+				}
+				else {
+					stream.remove();
+				}
 			}
 		}
 		return stream.hasNext();

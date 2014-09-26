@@ -32,9 +32,9 @@ public class TokenFilterAccent extends TokenFilter{
 	@Override
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stub
-		if (stream.hasNext()||this.isAnalyzer) {
+		if (stream.hasNext() || this.isAnalyzer) {
 			Token t;
-			if(!this.isAnalyzer) {
+			if (!this.isAnalyzer) {
 				t = stream.next();
 			}
 			else {
@@ -50,7 +50,6 @@ public class TokenFilterAccent extends TokenFilter{
 				}
 			}
 		}
-		
 		return stream.hasNext();
 	}
 

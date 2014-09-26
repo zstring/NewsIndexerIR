@@ -26,8 +26,14 @@ public class TokenFilterDate extends TokenFilter {
 	@Override
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stub
-		if (stream.hasNext()) {
-			Token token = stream.next();
+		if (stream.hasNext() || this.isAnalyzer) {
+			Token token;
+			if (!this.isAnalyzer) {
+				token = stream.next();
+			}
+			else {
+				token = stream.getCurrent();
+			}
 			if (token != null) {
 				String tkString = token.toString();
 				if (tkString != null && !tkString.equals("")) {
@@ -400,7 +406,7 @@ public class TokenFilterDate extends TokenFilter {
 								retVal[0] = retSec[0];
 								retVal[1] = retFirst[1] + "-" + retSec[1];
 							} catch (Exception e) {
-								System.out.println("Just the way program");
+								//System.out.println("Just the way program");
 							}
 						}
 					}
