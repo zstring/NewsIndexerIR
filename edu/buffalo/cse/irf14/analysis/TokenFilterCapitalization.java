@@ -162,7 +162,7 @@ public class TokenFilterCapitalization extends TokenFilter {
 			if ( tk != null ) {
 				next = tk.toString();
 			}
-			if (next.matches(".*\\w*(.|?)$")) {
+			if (next.matches(".*\\w*(\\.|\\?)$")) {
 				tokenLine.add(tk);
 				break;
 			}

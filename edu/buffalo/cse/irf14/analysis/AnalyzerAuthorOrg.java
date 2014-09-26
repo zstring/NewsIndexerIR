@@ -15,6 +15,8 @@ public class AnalyzerAuthorOrg implements Analyzer {
 	public AnalyzerAuthorOrg(TokenStream stream) {
 		// TODO Auto-generated constructor stub
 		this.stream = stream;
+		int noOfFilters = 1;
+		this.filter = new TokenFilter[noOfFilters];
 		TokenFilterFactory tfFactory = TokenFilterFactory.getInstance();
 		this.filter[0] = tfFactory.getFilterByType
 				(TokenFilterType.CAPITALIZATION, stream);

@@ -174,5 +174,6 @@ public class IndexReader {
 		String indexAddr = "/home/inspire/Dropbox/UB/JavaWorkspace/newsindexer/news_training";
 		IndexType type = IndexType.CONTENT;
 		IndexReader ir = new IndexReader(indexAddr, type);
+		System.out.println(ir.type);
 	}
 }
