@@ -16,7 +16,7 @@ public class TokenFilterCapitalization extends TokenFilter {
 		super(stream);
 		// TODO Auto-generated constructor stub
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see edu.buffalo.cse.irf14.analysis.Analyzer#increment()
@@ -40,138 +40,140 @@ public class TokenFilterCapitalization extends TokenFilter {
 	@Override
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stub
-		if (stream.hasNext()||this.isAnalyzer) {
+		if (stream.hasNext() || this.isAnalyzer) {
 			Token token;
-			if(!this.isAnalyzer) {
+			if (!this.isAnalyzer) {
 				token = stream.next();
 			}
 			else {
 				token = stream.getCurrent();
 			}
-			String tkString = token.toString();
-			char[] tkChar = token.getTermBuffer();
-			boolean isCamel = true, isCap = false, isSpecialCap = false;
-			if (!(tkChar[0] >= 'a' && tkChar[0] <= 'z')) {
-				isCap = true;
-			}
-			// isCamel Should be false if the token begins with a special char
-			if(!(tkChar[0] >= 'A' && tkChar[0] <= 'Z')) {
-				isCamel = false;
-			}
-			
-			for (int i =1; i<tkChar.length; i++) {
-				if (tkChar[i] >= 'A' && tkChar[i] <= 'Z') {
-					isSpecialCap = true;
-				}
-				// isCap should not be false if special character occurs
-				else if (tkChar[i] >= 'a' && tkChar[i] <= 'z'){
-					isCap = false;
-					//not breaking the loop(by checking isSpecialCap) intentionally 
-				}
-			}
-			
-			//If all the words are capital
-			
-			if (isCap) {
-				List<Token> line = getTokenLine();
-				boolean flagUpper = true;
-				for (int i = 0; i <= line.size(); i++) {
-					String str = line.get(i).toString();
-					if(!str.equals(str.toUpperCase())) {
-						//tkString = tkString.toLowerCase();
-						flagUpper = false;
-						break;
+			if (token != null) {
+				String tkString = token.toString();
+				if (tkString != null && !tkString.isEmpty()) {
+					char[] tkChar = token.getTermBuffer();
+					boolean isCamel = true, isCap = false, isSpecialCap = false;
+					if (!(tkChar[0] >= 'a' && tkChar[0] <= 'z')) {
+						isCap = true;
 					}
-				}
-				if (flagUpper) {
-					for (int i = 0; i <= line.size(); i++) {
-						Token tk = line.get(i);
-						String tkStr = tk.toString();
-						tk.setTermText(tkStr.toLowerCase());
+					// isCamel Should be false if the token begins with a special char
+					if(!(tkChar[0] >= 'A' && tkChar[0] <= 'Z')) {
+						isCamel = false;
 					}
-				}
-			}
-			else if (isSpecialCap) {
-				//do nothing
-			}
-			else if (isCamel) {
-				int index = stream.getCurrentIndex();
-				String prev = "", prevSub = "";
-				//The previous token would already be merged with older tokens
-				if (stream.hasPreviousAt(index)) {
-					if (stream.getTokenAt(index - 1) != null) {
-						prev = stream.getTokenAt(index - 1).toString();
-						int endWord = prev.length();
-						endWord = prev.indexOf(" ");
-						if (endWord >= 1) {
-							prevSub = prev.substring(1,endWord);	
+					for (int i =1; i<tkChar.length; i++) {
+						if (tkChar[i] >= 'A' && tkChar[i] <= 'Z') {
+							isSpecialCap = true;
 						}
-						else {
-							prevSub = prev.substring(1);
+						// isCap should not be false if special character occurs
+						else if (tkChar[i] >= 'a' && tkChar[i] <= 'z'){
+							isCap = false;
+							//not breaking the loop(by checking isSpecialCap) intentionally 
 						}
 					}
-					if (prev.matches(".*\\w*(\\.|\\?)$")) {
-						tkString = tkString.toLowerCase();
+					//If all the words are capital
+					if (isCap) {
+						List<Token> line = getTokenLine();
+						boolean flagUpper = true;
+						for (int i = 0; i <= line.size(); i++) {
+							String str = line.get(i).toString();
+							if(!str.equals(str.toUpperCase())) {
+								//tkString = tkString.toLowerCase();
+								flagUpper = false;
+								break;
+							}
+						}
+						if (flagUpper) {
+							for (int i = 0; i <= line.size(); i++) {
+								Token tk = line.get(i);
+								String tkStr = tk.toString();
+								tk.setTermText(tkStr.toLowerCase());
+							}
+						}
 					}
-					// will not work if more than two words are merged.
-					//else if (prev.matches("(\\s?[A-Z][^A-Z]*(\\s|$))")) {
-					else if ((prev.charAt(0) >= 'A' && prev.charAt(0) <='Z') && prevSub.equals(prevSub.toLowerCase())) {
-						tkString = prev + " " + tkString;
-						stream.removeAt(index - 1);
-						index = index - 1;
+					else if (isSpecialCap) {
+						//do nothing
 					}
+					else if (isCamel) {
+						int index = stream.getCurrentIndex();
+						String prev = "", prevSub = "";
+						//The previous token would already be merged with older tokens
+						if (stream.hasPreviousAt(index)) {
+							if (stream.getTokenAt(index - 1) != null) {
+								prev = stream.getTokenAt(index - 1).toString();
+								int endWord = prev.length();
+								endWord = prev.indexOf(" ");
+								if (endWord >= 1) {
+									prevSub = prev.substring(1,endWord);	
+								}
+								else {
+									prevSub = prev.substring(1);
+								}
+							}
+							if (prev.matches(".*\\w*(\\.|\\?)$")) {
+								tkString = tkString.toLowerCase();
+							}
+							//							 will not work if more than two words are merged.
+//							else if (prev.matches("(\\s?[A-Z][^A-Z]*(\\s|$))")) {
+								else if ((prev.charAt(0) >= 'A' && prev.charAt(0) <='Z') 
+										&& prevSub.equals(prevSub.toLowerCase())) {
+									tkString = prev + " " + tkString;
+									stream.removeAt(index - 1);
+									index = index - 1;
+								}
+							}
+							else {
+								tkString = tkString.toLowerCase();
+							}
+						}
+						token.setTermText(tkString);
+					}
+				}
+			}
+			return stream.hasNext();
+		}
+
+		/* If previous/next token ends with . or ? and previous characters are words, then it means a punctuation mark
+		 * i.e.: <time. . time? ? B-52.> are all valid punctuation. but <avinav...  is-*!? a+.> not valid punctuation.   
+		 * 
+		 */
+		public List<Token> getTokenLine() {
+			int currIndex = stream.getCurrentIndex();
+			List<Token> tokenLine = new ArrayList<Token>();
+			if (stream.getCurrent() != null) 
+			{
+				tokenLine.add(stream.getCurrent());
+			}
+			String prev = "",next = "";
+			int i = currIndex;
+			while (stream.hasPreviousAt(i)) {
+				Token tk = stream.getTokenAt(i-1);
+				if (tk != null) {
+					prev = tk.toString();
+				}
+				if (prev.matches(".*\\w*(\\.|\\?)$")) {
+					break;
 				}
 				else {
-					tkString = tkString.toLowerCase();
+					tokenLine.add(0,tk);
 				}
+				i -= 1;
 			}
-			token.setTermText(tkString);
+			i = currIndex;
+			while (stream.hasNextAt(i)) {
+				Token tk = stream.getTokenAt(i+1);
+				if ( tk != null ) {
+					next = tk.toString();
+				}
+				if (next.matches(".*\\w*(\\.|\\?)$")) {
+					tokenLine.add(tk);
+					break;
+				}
+				else {
+					tokenLine.add(tk);
+				}
+				i += 1;
+			}
+			return tokenLine;
 		}
-		return stream.hasNext();
-	}
-	
-	/* If previous/next token ends with . or ? and previous characters are words, then it means a punctuation mark
-	 * i.e.: <time. . time? ? B-52.> are all valid punctuation. but <avinav...  is-*!? a+.> not valid punctuation.   
-	 * 
-	 */
-	public List<Token> getTokenLine() {
-		int currIndex = stream.getCurrentIndex();
-		List<Token> tokenLine = new ArrayList<Token>();
-		if (stream.getCurrent() != null) 
-			{
-			tokenLine.add(stream.getCurrent());
-			}
-		String prev = "",next = "";
-		int i = currIndex;
-		while (stream.hasPreviousAt(i)) {
-			Token tk = stream.getTokenAt(i-1);
-			if (tk != null) {
-				prev = tk.toString();
-			}
-			if (prev.matches(".*\\w*(\\.|\\?)$")) {
-				break;
-			}
-			else {
-				tokenLine.add(0,tk);
-			}
-			i -= 1;
-		}
-		i = currIndex;
-		while (stream.hasNextAt(i)) {
-			Token tk = stream.getTokenAt(i+1);
-			if ( tk != null ) {
-				next = tk.toString();
-			}
-			if (next.matches(".*\\w*(\\.|\\?)$")) {
-				tokenLine.add(tk);
-				break;
-			}
-			else {
-				tokenLine.add(tk);
-			}
-			i += 1;
-		}
-		return tokenLine;
-	}
 
-}
+	}
