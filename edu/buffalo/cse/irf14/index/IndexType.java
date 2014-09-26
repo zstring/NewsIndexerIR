@@ -8,5 +8,5 @@ package edu.buffalo.cse.irf14.index;
  *
  */
 public enum IndexType {
-	TERM, AUTHOR, CATEGORY, PLACE, CONTENT
+	TERM, AUTHOR, CATEGORY, PLACE
 };

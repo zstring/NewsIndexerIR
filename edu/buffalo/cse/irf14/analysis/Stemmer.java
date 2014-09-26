@@ -1,5 +1,9 @@
 package edu.buffalo.cse.irf14.analysis;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 /*
 
    Porter stemmer in Java. The original paper is in
@@ -34,7 +38,6 @@ package edu.buffalo.cse.irf14.analysis;
 
 */
 
-import java.io.*;
 
 /**
   * Stemmer, implementing the Porter Stemming Algorithm

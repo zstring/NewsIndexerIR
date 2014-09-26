@@ -1,10 +1,10 @@
 package edu.buffalo.cse.irf14.analysis;
 
-public class AnalyzerContent implements Analyzer {
+public class AnalyzerTerm implements Analyzer {
 	private TokenStream stream;
 	private TokenFilter[] filter;
 	
-	public AnalyzerContent(TokenStream stream) {
+	public AnalyzerTerm(TokenStream stream) {
 		// TODO Auto-generated constructor stub
 		this.stream = stream;
 		TokenFilterFactory tfFactory = TokenFilterFactory.getInstance();

@@ -41,7 +41,7 @@ public class AnalyzerFactory {
 	public Analyzer getAnalyzerForField(FieldNames name, TokenStream stream) {
 		//TODO : YOU NEED TO IMPLEMENT THIS METHOD
 		if (FieldNames.CONTENT.equals(name)) {
-			return new AnalyzerContent(stream);
+			return new AnalyzerTerm(stream);
 		}
 		else if (FieldNames.AUTHOR.equals(name)) {
 			return new AnalyzerAuthor(stream);

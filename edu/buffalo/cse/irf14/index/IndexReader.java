@@ -172,7 +172,7 @@ public class IndexReader {
 	
 	public static void main(String[] args) {
 		String indexAddr = "/home/inspire/Dropbox/UB/JavaWorkspace/newsindexer/news_training";
-		IndexType type = IndexType.CONTENT;
+		IndexType type = IndexType.TERM;
 		IndexReader ir = new IndexReader(indexAddr, type);
 		System.out.println(ir.type);
 	}
