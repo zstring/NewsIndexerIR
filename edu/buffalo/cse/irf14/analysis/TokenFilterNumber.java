@@ -57,10 +57,10 @@ public class TokenFilterNumber extends TokenFilter{
 				if (tkString.matches(datePattern)) {
 					isDate = true;
 				}
-				else if (stream.getTokenAt(currIndex+1).toString().matches(datePatternNextToken+"|"+monthPattern)) {
+				else if (stream.hasNext() && stream.getTokenAt(currIndex + 1).toString().matches(datePatternNextToken+"|"+monthPattern)) {
 					isDate = true;
 				}
-				else if (stream.getTokenAt(currIndex-1).toString().matches(monthPattern)) {
+				else if (stream.hasPrevious() && stream.getTokenAt(currIndex-1).toString().matches(monthPattern)) {
 					isDate = true;
 				}
 				else if(tkString.matches("\\W[12]\\d{3}\\W")) {
