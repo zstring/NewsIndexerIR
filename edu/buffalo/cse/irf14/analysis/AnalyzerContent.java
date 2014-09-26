@@ -8,8 +8,8 @@ public class AnalyzerContent implements Analyzer {
 		// TODO Auto-generated constructor stub
 		this.stream = stream;
 		TokenFilterFactory tfFactory = TokenFilterFactory.getInstance();
-		TokenFilterType[] filters = {TokenFilterType.STOPWORD,TokenFilterType.ACCENT, TokenFilterType.SYMBOL,	
-				TokenFilterType.STEMMER, TokenFilterType.CAPITALIZATION,TokenFilterType.DATE,
+		TokenFilterType[] filters = {TokenFilterType.STOPWORD,TokenFilterType.ACCENT, //TokenFilterType.SYMBOL,	
+				TokenFilterType.STEMMER, //TokenFilterType.CAPITALIZATION,TokenFilterType.DATE,
 				TokenFilterType.NUMERIC,TokenFilterType.SPECIALCHARS,
 				};
 //		TokenFilterType[] filters = {TokenFilterType.STEMMER};

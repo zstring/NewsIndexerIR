@@ -53,21 +53,20 @@ public class BaseIndexer implements Serializable {
 				//increment document id
 				docId += 1;
 				docDict.put(docId, d.getField(FieldNames.FILEID)[0]);
-				String[] str = d.getField(FieldNames.CONTENT);
-				if (str.length > 0) {
+				String strContent = d.getField(FieldNames.CONTENT)[0];
+				if (!strContent.trim().isEmpty()) {
 					Tokenizer tkr = new Tokenizer();
-					if (!str[0].trim().isEmpty()) {
-						TokenStream tStream = tkr.consume(str[0]);
-						AnalyzerFactory aFactory = AnalyzerFactory.getInstance();
-						Analyzer aContent = aFactory.getAnalyzerForField(FieldNames.CONTENT, tStream);
-						while (aContent.increment()) {
-						}
-						tStream.reset();
-						while (tStream.hasNext()) {
-							Token tk = tStream.next();
-							if (tk != null && tk.toString() != null &&
-									!"".equals(tk.toString())) {
-								String tkString = tk.toString();
+					TokenStream tStream = tkr.consume(strContent);
+					AnalyzerFactory aFactory = AnalyzerFactory.getInstance();
+					Analyzer aContent = aFactory.getAnalyzerForField(FieldNames.CONTENT, tStream);
+					while (aContent.increment()) {
+					}
+					tStream.reset();
+					while (tStream.hasNext()) {
+						Token tk = tStream.next();
+						if (tk != null) {
+							String tkString = tk.toString();
+							if (tkString != null && !tkString.isEmpty()) {
 								// If new Term
 								Integer tkInt = termDict.get(tkString);
 								if (!termIndex.containsKey(tkInt)) {

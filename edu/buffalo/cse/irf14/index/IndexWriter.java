@@ -32,12 +32,18 @@ public class IndexWriter {
 	 * @param indexDir : The root directory to be sued for indexing
 	 */
 	private String indexDir;
-	private BaseIndexer biContent;
+	private BaseIndexer biAuthor;
+	private BaseIndexer biCategory;
+	private BaseIndexer biPlace;
+	private BaseIndexer biTerm;
 
 	public IndexWriter(String indexDir) {
 		//TODO : YOU MUST IMPLEMENT THIS
 		this.indexDir = indexDir;
-		this.biContent = new BaseIndexer(IndexType.CONTENT);
+		this.biAuthor = new BaseIndexer(IndexType.AUTHOR);
+		this.biCategory = new BaseIndexer(IndexType.CATEGORY);
+		this.biPlace = new BaseIndexer(IndexType.PLACE);
+		this.biTerm = new BaseIndexer(IndexType.TERM);
 	}
 
 	/**
@@ -50,7 +56,7 @@ public class IndexWriter {
 	 */
 	public void addDocument(Document d) throws IndexerException {
 		//TODO : YOU MUST IMPLEMENT THIS
-		biContent.addDocument(d);
+		biTerm.addDocument(d);
 	}
 
 	/**
@@ -60,23 +66,21 @@ public class IndexWriter {
 	 */
 	public void close() throws IndexerException {
 		//TODO
-		Integer[] indexKeys = biContent.getTermKeys().toArray(new Integer[0]);
-		Arrays.sort(indexKeys, biContent.new SortByFreq());
+		Integer[] indexKeys = biTerm.getTermKeys().toArray(new Integer[0]);
+		Arrays.sort(indexKeys, biTerm.new SortByFreq());
 		FileOutputStream fo;
 		try {
 			fo = new FileOutputStream(indexDir + java.io.File.separator + "File");
 			GZIPOutputStream gzipOut = new GZIPOutputStream(fo);
 			ObjectOutputStream oos = new ObjectOutputStream(gzipOut);
-//			fo = new FileOutputStream(indexDir + java.io.File.separator + "File");
-//			ObjectOutputStream oos = new ObjectOutputStream(fo);
-			oos.writeObject(biContent);
+			oos.writeObject(biTerm);
 			oos.writeObject(indexKeys);
 			oos.flush();
 			oos.close();
-//			byte[] bytes = baos.toByteArray();
-//			fo.write(oos);
+//			fo = new FileOutputStream(indexDir + java.io.File.separator + "File");
 //			ObjectOutputStream oos = new ObjectOutputStream(fo);
-//			oos.writeObject(biContent);
+//			ObjectOutputStream oos = new ObjectOutputStream(fo);
+//			oos.writeObject(biTerm);
 //			oos.writeObject(indexKeys);
 //			oos.close();
 			fo.close();

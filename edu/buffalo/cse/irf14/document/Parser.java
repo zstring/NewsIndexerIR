@@ -28,7 +28,7 @@ public class Parser {
 	 */
 	public static Document parse(String filename) throws ParserException {
 		// TODO YOU MUST IMPLEMENT THIS
-		if (filename == null || "".equals(filename)) {
+		if (filename == null || filename.isEmpty()) {
 			throw new ParserException();
 		}
 		Document d = new Document();
@@ -53,7 +53,7 @@ public class Parser {
 
 			while ((line = buff.readLine()) != null) {
 				line = line.trim();
-				if (!line.equals("")) {
+				if (!line.isEmpty()) {
 					//Parse the first line as titile.
 					if (flag == 0) {
 						d.setField(FieldNames.TITLE,line);
@@ -101,12 +101,10 @@ public class Parser {
 	 * @return the extracted place, date and content from that line
 	 */
 	public static List<String> extractPlaceAndDate(String line) {
-		
 		List<String> extract = new ArrayList<String>();
 		String place = "", date = "", content = "";
 		try {
 			if (line.contains("-")) {
-				
 				content = line.substring(line.indexOf("-")+1);
 				line = line.substring(0,line.indexOf("-"));
 				String months = "(jan)|(feb)|(mar)|(apr)|(may)|(jun)|"
@@ -115,7 +113,7 @@ public class Parser {
 						Pattern.CASE_INSENSITIVE).matcher(line);
 				int monthIndex = -1;
 				if (mat.find()) {
-					monthIndex = mat.start();				
+					monthIndex = mat.start();
 				}
 				if (monthIndex == -1) {
 					place = line.trim();
@@ -130,7 +128,7 @@ public class Parser {
 			}
 		} catch (Exception e) {
 			e.printStackTrace(System.out);
-		} 
+		}
 		extract.add(place);
 		extract.add(date);
 		extract.add(content);
@@ -174,7 +172,7 @@ public class Parser {
 				}
 			}
 			if (orgName != null) {
-				//Setting it as y so that calling function know that the last 
+				//Setting it as y so that calling function know that the last
 				//element is organization name.
 				authors.set(0, "y");
 				authors.add(orgName);
