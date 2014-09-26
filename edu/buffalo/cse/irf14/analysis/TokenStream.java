@@ -100,10 +100,16 @@ public class TokenStream implements Iterator<Token>{
 	 */
 	public void removeAt(int index) {
 		// TODO YOU MUST IMPLEMENT THIS
-		if (index != -1 && index < tokenList.size()) {
-			//tokenList.remove(index);
+		if (index > -1 && index < tokenList.size()) {
+			tokenList.remove(index);
+			if (index < idx) {
+				idx -= 1; 
+			}
+			else if (index == idx) {
+				idx -= 1;
+				isRemoved = true;
+			}
 			//tokenList.add(index, null);
-			tokenList.set(index, null);
 		}
 	}
 	/**
