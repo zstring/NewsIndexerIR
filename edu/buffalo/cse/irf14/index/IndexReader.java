@@ -160,7 +160,13 @@ public class IndexReader {
 		for (int i = 1; i < terms.length; i++) {
 			Map<String, Integer> m = getPostings(terms[i]);
 			output.keySet().retainAll(m.keySet());
+			for (Iterator<String> it = output.keySet().iterator(); it.hasNext();) {
+				String in = it.next();
+				Integer freq = output.get(in) + m.get(in);
+				output.put(in, freq);
+			}
 		}
+		if (output.isEmpty()) return null;
 		return output;
 	}
 	
