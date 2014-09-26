@@ -52,8 +52,7 @@ public class TokenFilterSpecialChars extends TokenFilter {
 			else {
 				stream.remove();
 			}
-			return true;
 		}
-		return false;
+		return stream.hasNext();
 	}
 }

@@ -126,9 +126,8 @@ public class TokenFilterCapitalization extends TokenFilter {
 				}
 			}
 			token.setTermText(tkString);
-			return true;
 		}
-		return false;
+		return stream.hasNext();
 	}
 	
 	/* If previous/next token ends with . or ? and previous characters are words, then it means a punctuation mark

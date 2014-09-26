@@ -3,6 +3,9 @@
  */
 package edu.buffalo.cse.irf14.analysis;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * @author avinav and himanshu
  *
@@ -33,20 +36,32 @@ public class TokenFilterNumber extends TokenFilter{
 			boolean isDate = false;
 			String datePattern = "(\\W[AapP].?[mM].?\\W)|(\\W[bB].?[cC].?\\W)|(\\W[Aa].?[dD].?\\W)";
 			String datePatternNextToken = "((^|\\s)[AapP].?[mM].?\\W)|((^|\\s)[bB].?[cC].?\\W)|((\\s|^)[Aa].?[dD].?\\W)";
-			String monthPattern = "((jan)|(feb)|(mar)|(apr)|(may)|(jun)|"
-					+ "(jul)|(aug)|(sep)|(oct)|(nov)|(dec))";
+			String monthPattern = "((january)|(february)|(march)|(april)|(may)|(june)|"
+					+ "(july)|(august)|(september)|(october)|(november)|(december))";
 			String tkString = token.toString();
-			if (tkString.matches(".*[0-9].*")) {
+			int currIndex = stream.getCurrentIndex();
+			/*Matcher matcher = Pattern.compile("[(A-Za-z)(\\d)(,\\.)(\\W)]+",Pattern.CASE_INSENSITIVE).matcher(tkString);
+			if (matcher.matches()) {
+				
+			}*/
+			/*if (stream.getTokenAt(currIndex+1).toString().matches(datePatternNextToken+"|"+monthPattern)) {
+				isDate = true;
+			}
+			else if (stream.getTokenAt(currIndex - 1).toString().matches(monthPattern)) {
+				isDate = true;
+			}
+			if (tkString.matches("^[a-zA-z]*[0-9]^[a-zA-Z]*")) {
+				
+			}*/
+			if (tkString.matches("[^a-zA-z]*[0-9][^a-zA-Z]*")) {
 				if (tkString.matches(datePattern)) {
 					isDate = true;
 				}
-				else if (stream.next().toString().matches(datePatternNextToken+"|"+monthPattern)) {
+				else if (stream.getTokenAt(currIndex+1).toString().matches(datePatternNextToken+"|"+monthPattern)) {
 					isDate = true;
-					stream.previous();
 				}
-				else if (stream.previous().toString().matches(monthPattern)) {
+				else if (stream.getTokenAt(currIndex-1).toString().matches(monthPattern)) {
 					isDate = true;
-					stream.next();
 				}
 				else if(tkString.matches("\\W[12]\\d{3}\\W")) {
 					isDate = true;
@@ -61,9 +76,8 @@ public class TokenFilterNumber extends TokenFilter{
 			else {
 				token.setTermText(tkString);
 			}
-			return true;
 		}
-		return false;
+		return stream.hasNext();
 	}
 
 }

@@ -176,9 +176,7 @@ public class TokenFilterSymbol extends TokenFilter {
 			} else {
 				token.setTermText(tkString);
 			}
-			
-			return true;
 		}
-		return false;
+		return stream.hasNext();
 	}
 }

@@ -41,9 +41,8 @@ public class TokenFilterStopWord extends TokenFilter{
 			if (stopWords.contains(","+tkString.toLowerCase()+",")) {
 				stream.remove();
 			}
-			return true;
 		}
-		return false;
+		return stream.hasNext();
 	}
 
 }
