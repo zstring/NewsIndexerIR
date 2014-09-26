@@ -60,7 +60,7 @@ public class TokenFilterCapitalization extends TokenFilter {
 					if(!(tkChar[0] >= 'A' && tkChar[0] <= 'Z')) {
 						isCamel = false;
 					}
-					for (int i =1; i<tkChar.length; i++) {
+					for (int i =1; i < tkChar.length; i++) {
 						if (tkChar[i] >= 'A' && tkChar[i] <= 'Z') {
 							isSpecialCap = true;
 						}
@@ -74,7 +74,7 @@ public class TokenFilterCapitalization extends TokenFilter {
 					if (isCap) {
 						List<Token> line = getTokenLine();
 						boolean flagUpper = true;
-						for (int i = 0; i <= line.size(); i++) {
+						for (int i = 0; i < line.size(); i++) {
 							String str = line.get(i).toString();
 							if(!str.equals(str.toUpperCase())) {
 								//tkString = tkString.toLowerCase();
@@ -83,7 +83,7 @@ public class TokenFilterCapitalization extends TokenFilter {
 							}
 						}
 						if (flagUpper) {
-							for (int i = 0; i <= line.size(); i++) {
+							for (int i = 0; i < line.size(); i++) {
 								Token tk = line.get(i);
 								String tkStr = tk.toString();
 								tk.setTermText(tkStr.toLowerCase());
