@@ -12,36 +12,19 @@ import java.io.Serializable;
 public class Posting implements Serializable {
 	
 	private static final long serialVersionUID = 40L;
-	private int docId;
 	private int termFreq;
-	
-	public int getDocId() {
-		return docId;
-	}
 
 	public int getTermFreq() {
 		return termFreq;
 	}
 
 	/**
-	 * Instantiate class with documentID = 0.
+	 * Instantiate class.
 	 */
 	public Posting() {
-		this.docId = 0;
-		this.termFreq = 0;
-	}
-	
-	public Posting(int documentId) {
-		this.docId = documentId;
 		this.termFreq = 1;
 	}
-	/**
-	 * set docId as documentId
-	 * @param documentId
-	 */
-	public void setDocId(int documentId) {
-		this.docId = documentId;
-	}
+
 	/**
 	 * Increment term frequency of this posting
 	 */
@@ -51,6 +34,6 @@ public class Posting implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "[ Doc Id :" + docId + ", Term Freq :" + termFreq + " ]";
+		return "[Term Freq :" + termFreq + " ]";
 	}
 }

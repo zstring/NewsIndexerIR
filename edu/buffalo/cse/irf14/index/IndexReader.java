@@ -93,7 +93,9 @@ public class IndexReader {
 	 */
 	public int getTotalValueTerms() {
 		//TODO: YOU MUST IMPLEMENT THIS
-		return biContent.docDict.size();
+		//return biContent.t
+//		return biContent.docDict.size();
+		return -1;
 	}
 	
 	/**
@@ -109,17 +111,18 @@ public class IndexReader {
 		Integer termId = biContent.termDict.get(term);
 		Map<String, Integer> map = null;
 		if (termId != null) {
-			map = new HashMap<String, Integer>();
-			Map<Integer, Posting> m = biContent.termIndex.get(termId);
-			Map<Integer, String> doc = biContent.docDict;
-			if (m != null) {
-				for (Iterator<Integer> i = m.keySet().iterator(); i.hasNext();) {
-					Integer in = i.next();
-					String docName = doc.get(in);
-					int termFreq = m.get(in).getTermFreq();
-					map.put(docName, termFreq);
-				}
-			}
+			map = new HashMap<String, Integer>(biContent.termMap.get(termId).getPosting());
+//			map = new HashMap<String, Integer>();
+//			Map<Integer, Posting> m = biContent.termIndex.get(termId);
+//			Map<Integer, String> doc = biContent.docDict;
+//			if (m != null) {
+//				for (Iterator<Integer> i = m.keySet().iterator(); i.hasNext();) {
+//					Integer in = i.next();
+//					String docName = doc.get(in);
+//					int termFreq = m.get(in).getTermFreq();
+//					map.put(docName, termFreq);
+//				}
+//			}
 		}
 		return map;
 	}

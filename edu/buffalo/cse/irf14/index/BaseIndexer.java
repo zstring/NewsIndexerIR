@@ -23,15 +23,15 @@ public class BaseIndexer implements Serializable {
 	private static int termId = 0;
 	private IndexType indexerType;
 	public Map<String, Integer> termDict;
-	public Map<Integer, String> docDict;
+//	public Map<Integer, String> docDict;
 	public Map<Integer, Term> termMap;	
-	public Map<Integer, Map<Integer, Posting>> termIndex;
+//	public Map<Integer, Map<Integer, Posting>> termIndex;
 
 	public BaseIndexer(IndexType indexerType) {
 		this.indexerType = indexerType;
 		termDict = new HashMap<String, Integer>();
-		docDict = new HashMap<Integer, String>();
-		termIndex = new HashMap<Integer, Map<Integer,Posting>>();
+//		docDict = new HashMap<Integer, String>();
+//		termIndex = new HashMap<Integer, Map<Integer,Posting>>();
 		termMap = new HashMap<Integer, Term>();
 	}
 
@@ -52,8 +52,15 @@ public class BaseIndexer implements Serializable {
 			if (d != null) {
 				//increment document id
 				docId += 1;
-				docDict.put(docId, d.getField(FieldNames.FILEID)[0]);
-				String strContent = d.getField(FieldNames.CONTENT)[0];
+				String docTerm = "";
+				if (d.getField(FieldNames.FILEID).length > 0) {
+					docTerm = d.getField(FieldNames.FILEID)[0];
+				}
+//				docDict.put(docId, d.getField(FieldNames.FILEID)[0]);
+				String strContent = "";
+				if (d.getField(FieldNames.CONTENT).length > 0) {
+					strContent = d.getField(FieldNames.CONTENT)[0];
+				}
 				if (!strContent.trim().isEmpty()) {
 					Tokenizer tkr = new Tokenizer();
 					TokenStream tStream = tkr.consume(strContent);
@@ -69,37 +76,39 @@ public class BaseIndexer implements Serializable {
 							if (tkString != null && !tkString.isEmpty()) {
 								// If new Term
 								Integer tkInt = termDict.get(tkString);
-								if (!termIndex.containsKey(tkInt)) {
+								if (!termMap.containsKey(tkInt)) {
+//								if (!termIndex.containsKey(tkInt)) {
 									//increment term id
 									termId += 1;
-									Term term = new Term(tkString, termId);
+									Term term = new Term(tkString, termId, docTerm);
 									this.termDict.put(tkString, termId);
 									this.termMap.put(termId, term);
-									Posting posting = new Posting();
-									posting.setDocId(docId);
-									posting.incTermFreq();
-									Map<Integer, Posting> postingsList =
+//									Posting posting = new Posting();
+//									posting.setDocId(docId);
+//									posting.incTermFreq();
+//									Map<Integer, Posting> postingsList =
 											new HashMap<Integer, Posting>();
-									postingsList.put(docId, posting);
-									termIndex.put(termId, postingsList);
+//									postingsList.put(docId, posting);
+//									termIndex.put(termId, postingsList);
 								}
 								// If term already exist in index
 								else {
 									Term term = termMap.get(tkInt);
-									term.incColFreq();
-									Map<Integer, Posting> postingsList =
-											termIndex.get(tkInt);
-									Posting posting = postingsList.get(docId);
+									term.addOrUpdateDoc(docTerm);
+//									term.incColFreq();
+//									Map<Integer, Posting> postingsList =
+//											termIndex.get(tkInt);
+//									Posting posting = postingsList.get(docId);
 									// If docId already exist in postingList
-									if ( posting != null) {
-										posting.incTermFreq();
-									}
+//									if ( posting != null) {
+//										posting.incTermFreq();
+//									}
 									// If docId does not exist in postingList
-									else {
-										Posting newPosting = new Posting(docId);
-										term.incdocFreq();
-										postingsList.put(docId, newPosting);
-									}
+//									else {
+//										Posting newPosting = new Posting(docId);
+//										term.incdocFreq();
+//										postingsList.put(docId, newPosting);
+//									}
 								}
 							}
 						}
