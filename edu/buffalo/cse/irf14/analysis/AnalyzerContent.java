@@ -12,6 +12,7 @@ public class AnalyzerContent implements Analyzer {
 				TokenFilterType.SYMBOL,	TokenFilterType.STEMMER,TokenFilterType.CAPITALIZATION,
 				TokenFilterType.DATE,TokenFilterType.NUMERIC,TokenFilterType.SPECIALCHARS,
 				};
+		this.filter = new TokenFilter[filters.length];
 		for (int i = 0; i < filters.length; i++) {
 			this.filter[i] = tfFactory.getFilterByType(filters[i],
 					stream);
