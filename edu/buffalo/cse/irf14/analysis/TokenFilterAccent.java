@@ -32,8 +32,14 @@ public class TokenFilterAccent extends TokenFilter{
 	@Override
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stub
-		if (stream.hasNext()) {
-			Token t = stream.next();
+		if (stream.hasNext()||this.isAnalyzer) {
+			Token t;
+			if(!this.isAnalyzer) {
+				t = stream.next();
+			}
+			else {
+				t = stream.getCurrent();
+			}
 			if (t != null) {
 				String tString = t.getTermText();
 				if (tString != null && !tString.equals("")) {

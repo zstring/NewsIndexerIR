@@ -43,6 +43,25 @@ public class AnalyzerFactory {
 		if (FieldNames.CONTENT.equals(name)) {
 			return new AnalyzerContent(stream);
 		}
+		else if (FieldNames.AUTHOR.equals(name)) {
+			return new AnalyzerAuthor(stream);
+		}
+		else if (FieldNames.AUTHORORG.equals(name)) {
+			return new AnalyzerAuthorOrg(stream);
+		}
+		else if (FieldNames.TITLE.equals(name)) {
+			return new AnalyzerTitle(stream);
+		}
+		else if (FieldNames.PLACE.equals(name)) {
+			return new AnalyzerPlace(stream);
+		}
+		else if (FieldNames.NEWSDATE.equals(name)) {
+			return new AnalyzerNewsDate(stream);
+		}
+		else if (FieldNames.CATEGORY.equals(name)) {
+			return new AnalyzerCategory(stream);
+		}
+		
 		return null;
 	}
 }

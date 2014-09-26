@@ -22,8 +22,14 @@ public class TokenFilterNumber extends TokenFilter{
 		 * 4. if 1,2,3 fails. isDate = false. Is number 4 digit and between 1000 and 3000
 		 * 5. if 1,2,3,4 fails: remove number digits only. if empty string remains, remove token. 
 		 */
-		if (stream.hasNext()) {
-			Token token = stream.next();
+		if (stream.hasNext()||this.isAnalyzer) {
+			Token token;
+			if(!this.isAnalyzer) {
+				token = stream.next();
+			}
+			else {
+				token = stream.getCurrent();
+			}
 			boolean isDate = false;
 			String datePattern = "(\\W[AapP].?[mM].?\\W)|(\\W[bB].?[cC].?\\W)|(\\W[Aa].?[dD].?\\W)";
 			String datePatternNextToken = "((^|\\s)[AapP].?[mM].?\\W)|((^|\\s)[bB].?[cC].?\\W)|((\\s|^)[Aa].?[dD].?\\W)";

@@ -13,6 +13,7 @@ package edu.buffalo.cse.irf14.analysis;
  */
 public abstract class TokenFilter implements Analyzer {
 	protected TokenStream stream;
+	protected boolean isAnalyzer = false;
 	/**
 	 * Default constructor, creates an instance over the given
 	 * TokenStream
@@ -30,5 +31,9 @@ public abstract class TokenFilter implements Analyzer {
 			stream.reset();
 		}
 		return stream;
+	}
+	
+	public void setIsAnalyzer(boolean isAnalyzer) {
+		this.isAnalyzer = isAnalyzer;
 	}
 }

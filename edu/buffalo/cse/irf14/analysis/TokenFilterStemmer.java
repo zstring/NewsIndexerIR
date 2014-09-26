@@ -16,8 +16,14 @@ public class TokenFilterStemmer extends TokenFilter {
 	@Override
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stu
-		if (stream.hasNext()) {
-			Token tk = stream.next();
+		if (stream.hasNext()||this.isAnalyzer) {
+			Token tk;
+			if(!this.isAnalyzer) {
+				tk = stream.next();
+			}
+			else {
+				tk = stream.getCurrent();
+			}
 			String tkText = tk.getTermText();
 			if (tkText != null && tkText.length() > 1) {
 				String alphaRegex = "[a-zA-Z]+";

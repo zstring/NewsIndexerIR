@@ -29,8 +29,14 @@ public class TokenFilterStopWord extends TokenFilter{
 	@Override
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stub
-		if (stream.hasNext()) {
-			Token token = stream.next();
+		if (stream.hasNext()||this.isAnalyzer) {
+			Token token;
+			if(!this.isAnalyzer) {
+				token = stream.next();
+			}
+			else {
+				token = stream.getCurrent();
+			}
 			String tkString = token.toString();
 			if (stopWords.contains(","+tkString.toLowerCase()+",")) {
 				stream.remove();

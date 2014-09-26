@@ -12,20 +12,24 @@ public class TokenFilterSpecialChars extends TokenFilter {
 	@Override
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stub
-		if (stream.hasNext()) {
-			Token token = stream.next();
+		if (stream.hasNext()||this.isAnalyzer) {
+			Token token;
+			if(!this.isAnalyzer) {
+				token = stream.next();
+			}
+			else {
+				token = stream.getCurrent();
+			}
 			String tkString = token.toString();
-			//String specChar = "[^.a-zA-Z0-9- ]";
-			//String specChar = "[~!@#$%^&*()_/\\+<>|=]";
-			//char[] specChar = {'~','!','@','#','$','%','^','&','*'};
 			// - sign is included because it is used by the symbol class. Only in the case of alpha-alpha, it is removed becaused of the test case a+b-c.
-			String specChar = "[^\\.\\sa-zA-Z0-9@-]";
+			//String specChar = "[^\\.\\sa-zA-Z0-9@-]";
+			String specChar = "[^\\.\\sa-zA-Z0-9-]";
 			Matcher matcher = Pattern.compile("(.*[a-zA-Z])(-)([a-zA-Z].*)").matcher(tkString);
 			if (matcher.matches()) {
 				tkString = matcher.group(1)+matcher.group(3);
 			}
 			tkString = tkString.replaceAll(specChar, "");
-			if (tkString.matches(".*\\w@\\w.*")) {
+			/*if (tkString.matches(".*\\w@\\w.*")) {
 				int posAt = tkString.indexOf('@');
 				String splitString = tkString.substring(posAt+1);
 				tkString = tkString.substring(0,posAt);
@@ -40,7 +44,7 @@ public class TokenFilterSpecialChars extends TokenFilter {
 			}
 			else if (tkString.matches("@")){
 				tkString = tkString.replaceAll("@", "");	
-			}
+			}*/
 			
 			if (!tkString.equals("")) {
 				token.setTermText(tkString);
