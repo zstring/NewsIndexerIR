@@ -14,11 +14,17 @@ import java.util.regex.Pattern;
  *
  */
 public class TokenFilterSymbol extends TokenFilter {
-	private Pattern pattSym;
+	private static Pattern pattSym, pattPunc, pattSingle;
+	static {
+		pattSym = Pattern.compile("(-|^)([a-zA-Z])+(-)+([a-zA-Z])+(-|$)");
+		pattPunc = Pattern.compile("(^| )['\"-]*|([-'\"\\.!\\?]*|'s)($| )");
+		pattSingle = Pattern.compile("'");
+	}
 	public TokenFilterSymbol(TokenStream stream) {
 		super(stream);
-		String regex = "(-|^)([a-zA-Z])+(-)+([a-zA-Z])+(-|$)";
-		pattSym = Pattern.compile(regex);
+//		String regex = "(-|^)([a-zA-Z])+(-)+([a-zA-Z])+(-|$)";
+//		pattSym = Pattern.compile(regex);
+//		pattSym1 = Pattern.compile("(^| )['\"-]*|([-'\"\\.!\\?]*|'s)($| )");
 	}
 
 	private static final Map<String, String> contractions;
@@ -157,12 +163,13 @@ public class TokenFilterSymbol extends TokenFilter {
 
 				// End with Punctuation
 //				tkString = tkString.replaceAll("[\\.!\\?]*($|\\s)", " ");
-
-				tkString = tkString.replaceAll("(^| )['\"-]*|([-'\"\\.!\\?]*|'s)($| )", " ");
+				tkString = pattPunc.matcher(tkString).replaceAll(" ");
+//				tkString = tkString.replaceAll("(^| )['\"-]*|([-'\"\\.!\\?]*|'s)($| )", " ");
 				// 's
 				//tkString = tkString.replaceAll("'s?($|\\s)", " ");
 //				tkString = tkString.replaceAll("'s?($|\\s)","");
-				tkString = tkString.replaceAll("'","");
+				tkString = pattSingle.matcher(tkString).replaceAll("");
+//				tkString = tkString.replaceAll("'","");
 				tkString = tkString.trim();
 
 				// Hyphens

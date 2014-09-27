@@ -13,11 +13,13 @@ import java.util.regex.Pattern;
  *
  */
 public class TokenFilterCapitalization extends TokenFilter {
-	private Pattern pattCap;
+	private static Pattern pattCap;
+	static {
+		pattCap = Pattern.compile(".*\\w*(\\.|\\?)$");
+	}
 
 	public TokenFilterCapitalization(TokenStream stream) {
 		super(stream);
-		pattCap = Pattern.compile(".*\\w*(\\.|\\?)$");
 		// TODO Auto-generated constructor stub
 	}
 

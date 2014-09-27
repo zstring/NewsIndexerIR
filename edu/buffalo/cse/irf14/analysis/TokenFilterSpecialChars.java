@@ -4,11 +4,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TokenFilterSpecialChars extends TokenFilter {
-	private Pattern pattSpChar;
+	private static Pattern pattSpChar, pattSpCharRem;
+	static {
+		pattSpChar = Pattern.compile("(.*[a-zA-Z])(-)([a-zA-Z].*)");
+		pattSpCharRem = Pattern.compile("[^\\.\\sa-zA-Z0-9-]");
+	}
 
 	public TokenFilterSpecialChars(TokenStream stream) {
 		super(stream);
-		pattSpChar = Pattern.compile("(.*[a-zA-Z])(-)([a-zA-Z].*)");
 	}
 
 	@Override
@@ -32,7 +35,8 @@ public class TokenFilterSpecialChars extends TokenFilter {
 				if (matcher.matches()) {
 					tkString = matcher.group(1)+matcher.group(3);
 				}
-				tkString = tkString.replaceAll(specChar, "");
+				tkString = pattSpCharRem.matcher(tkString).replaceAll("");
+//				tkString = tkString.replaceAll(specChar, "");
 				/*if (tkString.matches(".*\\w@\\w.*")) {
 				int posAt = tkString.indexOf('@');
 				String splitString = tkString.substring(posAt+1);
