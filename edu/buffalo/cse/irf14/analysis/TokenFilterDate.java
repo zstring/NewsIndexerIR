@@ -178,7 +178,7 @@ public class TokenFilterDate extends TokenFilter {
 					}
 					monthChar = m.substring(mat.end());
 					//monthIndex = String.format("%0"+ (2 - monthIndex.length()) +"d%s", 0, monthIndex);
-					Token[] tokenList = stream.getPrevTokens();
+					Token[] tokenList = stream.getPrevTokens(2);
 					//dateAndYear contains Date and Year value at
 					//0 and 1 position respectively
 					dateAndYear = processTokensForDate(tokenList);
