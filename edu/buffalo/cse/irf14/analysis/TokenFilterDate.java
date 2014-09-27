@@ -62,16 +62,19 @@ public class TokenFilterDate extends TokenFilter {
 						token.setTermText(retTime);
 						if (retVal.equals("2")) {
 							stream.removeAt(stream.getCurrentIndex() + 1);
+							token.setDate(true);
 						}
 						return stream.hasNext();
 					}
 					String[] retMonth = checkAndExtractMonth(tkString);
 					if (retMonth[0].equals("1")) {
 						token.setTermText(retMonth[1]);
+						token.setDate(true);
 						return stream.hasNext();
 					}
 					String[] retYear = checkAndExtractYear(tkString, "year");
 					if (retYear != null) {
+						token.setDate(true);
 						token.setTermText(retYear[1] + retYear[0]);
 					}
 				}

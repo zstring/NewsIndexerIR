@@ -3,16 +3,11 @@
  */
 package edu.buffalo.cse.irf14.index;
 
-import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 import java.util.zip.GZIPOutputStream;
 
 import edu.buffalo.cse.irf14.analysis.Token;

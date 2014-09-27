@@ -156,7 +156,11 @@ public class BaseIndexer implements Serializable {
 			// TODO Auto-generated method stub
 			Term term1 = termMap.get(o1);
 			Term term2 = termMap.get(o2);
-			return term1.getColFreq() - term2.getColFreq();
+			int diff = term1.getColFreq() - term2.getColFreq();
+			if (diff < 0) return -1;
+			else if (diff > 0) return 1;
+			else 
+				return term1.getTermText().compareTo(term2.getTermText());
 		}
 	}
 }

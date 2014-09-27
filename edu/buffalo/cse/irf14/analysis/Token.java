@@ -12,10 +12,20 @@ package edu.buffalo.cse.irf14.analysis;
  * You are encouraged to add more data structures and fields as you deem fit. 
  */
 public class Token {
+	public boolean isDate() {
+		return isDate;
+	}
+
+	public void setDate(boolean isDate) {
+		this.isDate = isDate;
+	}
+
 	//The backing string representation -- can contain extraneous information
 	private String termText;
 	//The char array backing termText
 	private char[] termBuffer;
+	
+	private boolean isDate;
 	
 	/**
 	 * Method to set the termText to given text.
@@ -28,6 +38,7 @@ public class Token {
 			termText = text;
 			termBuffer = termText.toCharArray();
 		}
+		isDate = false;
 	}
 	
 	/**
