@@ -16,8 +16,22 @@ public class TokenFilterDate extends TokenFilter {
 	 * call the super constructor to initialize tokenstream object
 	 * @param stream
 	 */
+	private Pattern pattMonth;
+	private Pattern pattTime;
+	private Pattern pattYear;
+	private Pattern pattAMPM;
 	public TokenFilterDate(TokenStream stream) {
 		super(stream);
+		String monthRegex = "(january|jan)|(february|feb)|(march|mar)|"
+				+ "(april|apr)|(may)|(june|jun)|(july|jul)|(august|aug)|"
+				+ "(september|sep)|(october|oct)|(november|nov)|(december|dec)";
+		pattMonth = Pattern.compile(monthRegex);
+		String timeRegex = "(\\d{1,2})(:(\\d{1,2}))(:(\\d{1,2}))? ?([aApP][mM].{0,5})?";
+		pattTime = Pattern.compile(timeRegex);
+		String digitRegex = "\\d+";
+		pattYear = Pattern.compile(digitRegex);
+		String ampmRegex = "(am|pm)[^\\w^\\d]?";
+		pattAMPM = Pattern.compile(ampmRegex);
 	}
 
 	/* (non-Javadoc)
@@ -36,7 +50,7 @@ public class TokenFilterDate extends TokenFilter {
 			}
 			if (token != null) {
 				String tkString = token.toString();
-				if (tkString != null && !tkString.equals("")) {
+				if (tkString != null && !tkString.isEmpty()) {
 					String[] tTime = checkAndExtractTime(tkString);
 					String retVal = tTime[0];
 					String retTime = tTime[1];
@@ -73,8 +87,7 @@ public class TokenFilterDate extends TokenFilter {
 		//False identify that there is no AM/PM attached to time string
 		//and look for next tokens to identify AM/PM;
 		retTime[0] = "0";
-		String timeRegex = "(\\d{1,2})(:(\\d{1,2}))(:(\\d{1,2}))?\\s?([aApP][mM].{0,5})?";
-		Matcher mat = Pattern.compile(timeRegex).matcher(str);
+		Matcher mat = pattTime.matcher(str);
 		String finalTime = "";
 		if (mat.matches()) {
 			retTime[0] = "1";
@@ -102,7 +115,9 @@ public class TokenFilterDate extends TokenFilter {
 				if (nextToken != null) {
 					nextStr = nextToken.getTermText();
 				}
-				Matcher match = Pattern.compile("(am|pm)[^\\w^\\d]?", Pattern.CASE_INSENSITIVE).matcher(nextStr);
+				nextStr = nextStr.toLowerCase();
+				//Matcher match = Pattern.compile("(am|pm)[^\\w^\\d]?", Pattern.CASE_INSENSITIVE).matcher(nextStr);
+				Matcher match = pattAMPM.matcher(nextStr);
 				if (match.matches()) {
 					retTime[0] = "2";
 					String val = match.group(1).toLowerCase();
@@ -137,20 +152,23 @@ public class TokenFilterDate extends TokenFilter {
 		String[] dateAndYear = null;
 		boolean flag = false;
 		retMonth[0] = "0";
-		String monthRegex = "(january|jan)|(february|feb)|(march|mar)|"
-				+ "(april|apr)|(may)|(june|jun)|(july|jul)|(august|aug)|"
-				+ "(september|sep)|(october|oct)|(november|nov)|(december|dec)";
+		m = m.toLowerCase();
+//		String monthRegex = "(january|jan)|(february|feb)|(march|mar)|"
+//				+ "(april|apr)|(may)|(june|jun)|(july|jul)|(august|aug)|"
+//				+ "(september|sep)|(october|oct)|(november|nov)|(december|dec)";
+		String monthRegex = "(jan)";
 		String monthIndex = "01";
 		String monthChar = "";
-		Matcher mat = Pattern.compile(monthRegex,
-				Pattern.CASE_INSENSITIVE).matcher(m);
+//		Matcher mat = Pattern.compile(monthRegex).matcher(m);
+		Matcher mat = pattMonth.matcher(m);
 		if (mat.find()) {
 			retMonth[0] = "1";
 			for (int i = 1; i <= 12; i++) {
 				if (mat.group(i) != null) {
-					monthIndex = i + "";
 					flag = true;
-					monthIndex = String.format("%02d", i);
+					if (i <= 9) {
+						monthIndex = "0" + i;
+					}
 					monthChar = m.substring(mat.end());
 					//monthIndex = String.format("%0"+ (2 - monthIndex.length()) +"d%s", 0, monthIndex);
 					Token[] tokenList = stream.getPrevTokens();
@@ -204,7 +222,7 @@ public class TokenFilterDate extends TokenFilter {
 		boolean dateFlag = false, yearFlag = false, timeFlag = false;
 		boolean checkPrev = false;
 		String[] retDate = null, retYear = null, retTime = null;
-		for (int i = 0; i < 5 && (!dateFlag || !yearFlag); i++) {
+		for (int i = 0; i < 2 && (!dateFlag || !yearFlag); i++) {
 			Token tPrev = tokenList[4 - i];
 			Token tNext = tokenList[i + 6];
 			String tPrevStr = "", tNextStr = "";
@@ -284,9 +302,8 @@ public class TokenFilterDate extends TokenFilter {
 	private String[] checkAndExtractYear(String d, String type) {
 		// TODO Auto-generated method stub
 		String[] retVal = null;
-		String digitRegex = "\\d+";
 		String lastChar = "";
-		Matcher mat = Pattern.compile(digitRegex).matcher(d);
+		Matcher mat = pattYear.matcher(d);
 		if (mat.find()) {
 			int beginIndex = mat.start();
 			int endIndex = mat.end();
@@ -380,7 +397,7 @@ public class TokenFilterDate extends TokenFilter {
 								Integer firstYear = Integer.parseInt(firYearStr);
 								String secYearStr = hypenYears[1];
 								String remainSecYearStr = "";
-								Matcher mSec = Pattern.compile(digitRegex).matcher(secYearStr);
+								Matcher mSec = pattYear.matcher(secYearStr);
 								if (mSec.find()) {
 									remainSecYearStr = secYearStr.substring(mSec.end());
 									secYearStr = secYearStr.substring(mSec.start(), mSec.end());
@@ -422,10 +439,10 @@ public class TokenFilterDate extends TokenFilter {
 
 	private String[] checkAndExtractDate(String d) {
 		String[] retVal = null;
-		String digitRegex = "\\d+";
 		String dateIndex = "01";
 		String lastChar = "";
-		Matcher mat = Pattern.compile(digitRegex).matcher(d);
+		//Matcher mat = Pattern.compile(digitRegex).matcher(d);
+		Matcher mat = pattYear.matcher(d);
 		if (mat.find()) {
 			int beginIndex = mat.start();
 			int endIndex = mat.end();

@@ -187,10 +187,10 @@ public class TokenStream implements Iterator<Token>{
 	public Token[] getPrevTokens() {
 		Token[] tkPrevList = new Token[11];
 		int sz = tokenList.size();
-		for (int i = 4; i >= 0 && idx + i - 5 >= 0; i--)
-			tkPrevList[i] = tokenList.get(idx + i - 5);
-		for (int i = 0; i < 5 && idx + i + 1 < sz; i++)
-			tkPrevList[i + 6] = tokenList.get(idx + i + 1);
+		for (int i = 1; i >= 0 && idx + i - 2 >= 0; i--)
+			tkPrevList[i] = tokenList.get(idx + i - 2);
+		for (int i = 0; i <= 1 && idx + i + 1 < sz; i++)
+			tkPrevList[i + 2] = tokenList.get(idx + i + 1);
 		return tkPrevList;
 	}
 
