@@ -116,16 +116,16 @@ public class BaseIndexer implements Serializable {
 				while (aContent.increment()) {
 				}
 				tStream.reset();
+				if(tStream.hasNext() && !isDocCounted) {
+					this.documentSet.add(docTerm);
+					isDocCounted = true;
+				}
+
 				while (tStream.hasNext()) {
 					Token tk = tStream.next();
 					if (tk != null) {
 						String tkString = tk.toString();
 						if (tkString != null && !tkString.isEmpty()) {
-							if (!isDocCounted) {
-//								docId += 1;
-								this.documentSet.add(docTerm);
-								isDocCounted = true;
-							}
 							// If new Term
 							Integer tkInt = termDict.get(tkString);
 							if (tkInt == null) {
