@@ -21,6 +21,15 @@ import edu.buffalo.cse.irf14.analysis.TokenStream;
  * Class that parses a given file into a Document
  */
 public class Parser {
+	private static Pattern pattMonth;
+	private static Pattern pattAuthor;
+	static {
+		String months = "(jan)|(feb)|(mar)|(apr)|(may)|(jun)|"
+				+ "(jul)|(aug)|(sep)|(oct)|(nov)|(dec)";
+		pattMonth = Pattern.compile(months, Pattern.CASE_INSENSITIVE);
+		String regex = " (by) | (and) |,|</author>";
+		pattAuthor = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+	}
 	/** Static method to parse the given file into the Document object.
 	 * @param filename : The fully qualified filename to be parsed
 	 * @return The parsed and fully loaded Document object
@@ -107,10 +116,7 @@ public class Parser {
 			if (line.contains("-")) {
 				content = line.substring(line.indexOf("-")+1);
 				line = line.substring(0,line.indexOf("-"));
-				String months = "(jan)|(feb)|(mar)|(apr)|(may)|(jun)|"
-						+ "(jul)|(aug)|(sep)|(oct)|(nov)|(dec)";
-				Matcher mat = Pattern.compile(months,
-						Pattern.CASE_INSENSITIVE).matcher(line);
+				Matcher mat = pattMonth.matcher(line);
 				int monthIndex = -1;
 				if (mat.find()) {
 					monthIndex = mat.start();
@@ -146,8 +152,7 @@ public class Parser {
 			String orgName = null;
 			//if first element = n, there is no organization name in the list
 			authors.add("n");
-			String regex = " (by) | (and) |,|</author>";
-			Matcher mat = Pattern.compile(regex, Pattern.CASE_INSENSITIVE).matcher(line);
+			Matcher mat = pattAuthor.matcher(line);
 			while (mat.find()) {
 				if (mat.group().equalsIgnoreCase(" by ")) {
 					authorStartIndex = mat.end();

@@ -5,12 +5,15 @@ import java.util.regex.Pattern;
 
 public class TokenFilterStemmer extends TokenFilter {
 
+	private Pattern pattAlpha;
 	/**
 	 * parameterized constructor calling super constructor
 	 * @param stream
 	 */
 	public TokenFilterStemmer(TokenStream stream) {
 		super(stream);
+		String alphaRegex = "[a-zA-Z]+";
+		pattAlpha = Pattern.compile(alphaRegex);
 	}
 
 	@Override
@@ -27,8 +30,7 @@ public class TokenFilterStemmer extends TokenFilter {
 			if (token != null) {
 				String tkText = token.getTermText();
 				if (tkText != null && tkText.length() > 1) {
-					String alphaRegex = "[a-zA-Z]+";
-					Matcher mat = Pattern.compile(alphaRegex).matcher(tkText);
+					Matcher mat = pattAlpha.matcher(tkText);
 					if (mat.matches()) {
 						Stemmer stemmer = new Stemmer();
 						char[] tkTextChar = tkText.toCharArray();

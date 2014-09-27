@@ -16,12 +16,11 @@ public class TokenFilterDate extends TokenFilter {
 	 * call the super constructor to initialize tokenstream object
 	 * @param stream
 	 */
-	private Pattern pattMonth;
-	private Pattern pattTime;
-	private Pattern pattYear;
-	private Pattern pattAMPM;
-	public TokenFilterDate(TokenStream stream) {
-		super(stream);
+	private static Pattern pattMonth;
+	private static Pattern pattTime;
+	private static Pattern pattYear;
+	private static Pattern pattAMPM;
+	static {
 		String monthRegex = "(january|jan)|(february|feb)|(march|mar)|"
 				+ "(april|apr)|(may)|(june|jun)|(july|jul)|(august|aug)|"
 				+ "(september|sep)|(october|oct)|(november|nov)|(december|dec)";
@@ -32,6 +31,9 @@ public class TokenFilterDate extends TokenFilter {
 		pattYear = Pattern.compile(digitRegex);
 		String ampmRegex = "(am|pm)[^\\w^\\d]?";
 		pattAMPM = Pattern.compile(ampmRegex);
+	}
+	public TokenFilterDate(TokenStream stream) {
+		super(stream);
 	}
 
 	/* (non-Javadoc)
