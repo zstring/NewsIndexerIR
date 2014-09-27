@@ -14,8 +14,11 @@ import java.util.regex.Pattern;
  *
  */
 public class TokenFilterSymbol extends TokenFilter {
+	private Pattern pattSym;
 	public TokenFilterSymbol(TokenStream stream) {
 		super(stream);
+		String regex = "(-|^)([a-zA-Z])+(-)+([a-zA-Z])+(-|$)";
+		pattSym = Pattern.compile(regex);
 	}
 
 	private static final Map<String, String> contractions;
@@ -137,33 +140,37 @@ public class TokenFilterSymbol extends TokenFilter {
 				if (contractions.containsKey(tkString.toLowerCase())) {
 					boolean upper = false;
 					StringBuilder builder = new StringBuilder(contractions.get(tkString.toLowerCase()));
-					if (tkString.equals(tkString.toUpperCase())) {
+					String tkStringUpper = tkString.toUpperCase();
+					if (tkString.equals(tkStringUpper)) {
 						upper = true;
 					}
 					else if (tkString.charAt(0) >= 'A' && tkString.charAt(0) <= 'Z'){
 						builder.setCharAt(0, (char) (builder.charAt(0) - 32));
 					}
 					tkString = builder.toString();
-					if (upper) tkString = tkString.toUpperCase();
+					if (upper) tkString = tkStringUpper;
 				}
 
 				// Start or End with ' or " or -
-				tkString = tkString.replaceAll("['\"-]*($|\\s)", " ");
-				tkString = tkString.replaceAll("(^|\\s)['\"-]*", " ");
+//				tkString = tkString.replaceAll("['\"-]*($|\\s)", " ");
+//				tkString = tkString.replaceAll("(^|\\s)['\"-]*", " ");
 
 				// End with Punctuation
-				tkString = tkString.replaceAll("[.!?]*($|\\s)", " ");
+//				tkString = tkString.replaceAll("[\\.!\\?]*($|\\s)", " ");
 
+				tkString = tkString.replaceAll("(^| )['\"-]*|([-'\"\\.!\\?]*|'s)($| )", " ");
 				// 's
 				//tkString = tkString.replaceAll("'s?($|\\s)", " ");
-				tkString = tkString.replaceAll("'s?($|\\s)","");
+//				tkString = tkString.replaceAll("'s?($|\\s)","");
 				tkString = tkString.replaceAll("'","");
 				tkString = tkString.trim();
 
 				// Hyphens
 				String input = tkString;
 				int indexGrp2 = 0, indexGrp1 =0;
-				Matcher matcher = Pattern.compile("(\\s|-|^)([a-zA-Z])+(-)+([a-zA-Z])+(-|$|\\s)").matcher(tkString);
+				//Matcher matcher = Pattern.compile("(\\s|-|^)([a-zA-Z])+(-)+([a-zA-Z])+(-|$|\\s)").matcher(tkString);
+				//Matcher matcher = Pattern.compile("(-|^)([a-zA-Z])+(-)+([a-zA-Z])+(-|$)").matcher(tkString);
+				Matcher matcher = pattSym.matcher(tkString);
 				while(matcher.find()) {
 					indexGrp1 = matcher.end(2);
 					indexGrp2 = matcher.end(3);

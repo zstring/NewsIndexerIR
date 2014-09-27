@@ -5,15 +5,19 @@ package edu.buffalo.cse.irf14.analysis;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author avinav sharan and himanshu sharma
  *
  */
 public class TokenFilterCapitalization extends TokenFilter {
+	private Pattern pattCap;
 
 	public TokenFilterCapitalization(TokenStream stream) {
 		super(stream);
+		pattCap = Pattern.compile(".*\\w*(\\.|\\?)$");
 		// TODO Auto-generated constructor stub
 	}
 
@@ -109,7 +113,8 @@ public class TokenFilterCapitalization extends TokenFilter {
 									prevSub = prev.substring(1);
 								}
 							}
-							if (prev.matches(".*\\w*(\\.|\\?)$")) {
+							//if (prev.matches(".*\\w*(\\.|\\?)$")) {
+							if (pattCap.matcher(prev).matches()) {
 								tkString = tkString.toLowerCase();
 							}
 							//							 will not work if more than two words are merged.
@@ -150,7 +155,8 @@ public class TokenFilterCapitalization extends TokenFilter {
 				if (tk != null) {
 					prev = tk.toString();
 				}
-				if (prev.matches(".*\\w*(\\.|\\?)$")) {
+				//if (prev.matches(".*\\w*(\\.|\\?)$")) {
+				if (pattCap.matcher(prev).matches()) {
 					break;
 				}
 				else {
@@ -165,7 +171,8 @@ public class TokenFilterCapitalization extends TokenFilter {
 				if ( tk != null ) {
 					next = tk.toString();
 				}
-				if (next.matches(".*\\w*(\\.|\\?)$")) {
+				//if (next.matches(".*\\w*(\\.|\\?)$")) {
+				if (pattCap.matcher(next).matches()) {
 					tokenLine.add(tk);
 					break;
 				}
