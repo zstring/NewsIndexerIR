@@ -21,14 +21,9 @@ public class TokenFilterStemmer extends TokenFilter {
 	@Override
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stu
-		if (stream.hasNext() || this.isAnalyzer) {
+		if (stream.hasNext()) {
 			Token token;
-			if (!this.isAnalyzer) {
-				token = stream.next();
-			}
-			else {
-				token = stream.getCurrent();
-			}
+			token = stream.next();
 			if (token != null) {
 				String tkText = token.getTermText();
 				if (tkText != null && tkText.length() > 1) {

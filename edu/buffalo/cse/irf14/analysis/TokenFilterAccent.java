@@ -12,18 +12,18 @@ import java.text.Normalizer;
 public class TokenFilterAccent extends TokenFilter{
 
 	private static final String tab00c0 = "AAAAAAACEEEEIIII" +
-		    "DNOOOOO\u00d7\u00d8UUUUYI\u00df" +
-		    "aaaaaaaceeeeiiii" +
-		    "\u00f0nooooo\u00f7\u00f8uuuuy\u00fey" +
-		    "AaAaAaCcCcCcCcDd" +
-		    "DdEeEeEeEeEeGgGg" +
-		    "GgGgHhHhIiIiIiIi" +
-		    "IiJjJjKkkLlLlLlL" +
-		    "lLlNnNnNnnNnOoOo" +
-		    "OoOoRrRrRrSsSsSs" +
-		    "SsTtTtTtUuUuUuUu" +
-		    "UuUuWwYyYZzZzZzF";
-	
+			"DNOOOOO\u00d7\u00d8UUUUYI\u00df" +
+			"aaaaaaaceeeeiiii" +
+			"\u00f0nooooo\u00f7\u00f8uuuuy\u00fey" +
+			"AaAaAaCcCcCcCcDd" +
+			"DdEeEeEeEeEeGgGg" +
+			"GgGgHhHhIiIiIiIi" +
+			"IiJjJjKkkLlLlLlL" +
+			"lLlNnNnNnnNnOoOo" +
+			"OoOoRrRrRrSsSsSs" +
+			"SsTtTtTtUuUuUuUu" +
+			"UuUuWwYyYZzZzZzF";
+
 	public TokenFilterAccent(TokenStream stream) {
 		super(stream);
 		// TODO Auto-generated constructor stub
@@ -32,20 +32,15 @@ public class TokenFilterAccent extends TokenFilter{
 	@Override
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stub
-		if (stream.hasNext() || this.isAnalyzer) {
+		if (stream.hasNext()) {
 			Token t;
-			if (!this.isAnalyzer) {
-				t = stream.next();
-			}
-			else {
-				t = stream.getCurrent();
-			}
+			t = stream.next();
 			if (t != null) {
 				String tString = t.getTermText();
 				if (tString != null && !tString.equals("")) {
 					tString = processString(tString);
-//					tString = Normalizer.normalize(tString, Normalizer.Form.NFD);
-//					tString = tString.replaceAll("[^\\p{ASCII}]", "");
+					//					tString = Normalizer.normalize(tString, Normalizer.Form.NFD);
+					//					tString = tString.replaceAll("[^\\p{ASCII}]", "");
 					t.setTermText(tString);
 				}
 			}

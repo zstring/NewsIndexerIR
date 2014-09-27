@@ -11,7 +11,7 @@ public class AnalyzerPlace implements Analyzer {
 
 	private TokenStream stream;
 	private TokenFilter filter[];
-	
+
 	public AnalyzerPlace(TokenStream stream) {
 		// TODO Auto-generated constructor stub
 		this.stream = stream;
@@ -20,9 +20,8 @@ public class AnalyzerPlace implements Analyzer {
 		TokenFilterFactory tfFactory = TokenFilterFactory.getInstance();
 		this.filter[0] = tfFactory.getFilterByType
 				(TokenFilterType.CAPITALIZATION, stream);
-		this.filter[0].setIsAnalyzer(true);
 	}
-	
+
 	@Override
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stub
@@ -38,6 +37,5 @@ public class AnalyzerPlace implements Analyzer {
 		// TODO Auto-generated method stub
 		return stream;
 	}
-	
 
 }

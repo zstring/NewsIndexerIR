@@ -22,9 +22,6 @@ public class TokenFilterSymbol extends TokenFilter {
 	}
 	public TokenFilterSymbol(TokenStream stream) {
 		super(stream);
-//		String regex = "(-|^)([a-zA-Z])+(-)+([a-zA-Z])+(-|$)";
-//		pattSym = Pattern.compile(regex);
-//		pattSym1 = Pattern.compile("(^| )['\"-]*|([-'\"\\.!\\?]*|'s)($| )");
 	}
 
 	private static final Map<String, String> contractions;
@@ -131,17 +128,11 @@ public class TokenFilterSymbol extends TokenFilter {
 	@Override
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stub
-		if (stream.hasNext() || this.isAnalyzer) {
+		if (stream.hasNext()) {
 			Token token;
-			if (!this.isAnalyzer) {
-				token = stream.next();
-			}
-			else {
-				token = stream.getCurrent();
-			}
+			token = stream.next();
 			if (token != null) {
 				String tkString = token.toString();
-				//char[] tkChar = token.getTermBuffer();
 				// Word Contractions
 				if (contractions.containsKey(tkString.toLowerCase())) {
 					boolean upper = false;
@@ -158,25 +149,14 @@ public class TokenFilterSymbol extends TokenFilter {
 				}
 
 				// Start or End with ' or " or -
-//				tkString = tkString.replaceAll("['\"-]*($|\\s)", " ");
-//				tkString = tkString.replaceAll("(^|\\s)['\"-]*", " ");
-
 				// End with Punctuation
-//				tkString = tkString.replaceAll("[\\.!\\?]*($|\\s)", " ");
 				tkString = pattPunc.matcher(tkString).replaceAll(" ");
-//				tkString = tkString.replaceAll("(^| )['\"-]*|([-'\"\\.!\\?]*|'s)($| )", " ");
-				// 's
-				//tkString = tkString.replaceAll("'s?($|\\s)", " ");
-//				tkString = tkString.replaceAll("'s?($|\\s)","");
 				tkString = pattSingle.matcher(tkString).replaceAll("");
-//				tkString = tkString.replaceAll("'","");
 				tkString = tkString.trim();
 
 				// Hyphens
 				String input = tkString;
 				int indexGrp2 = 0, indexGrp1 =0;
-				//Matcher matcher = Pattern.compile("(\\s|-|^)([a-zA-Z])+(-)+([a-zA-Z])+(-|$|\\s)").matcher(tkString);
-				//Matcher matcher = Pattern.compile("(-|^)([a-zA-Z])+(-)+([a-zA-Z])+(-|$)").matcher(tkString);
 				Matcher matcher = pattSym.matcher(tkString);
 				while(matcher.find()) {
 					indexGrp1 = matcher.end(2);

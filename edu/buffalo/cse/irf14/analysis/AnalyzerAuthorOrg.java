@@ -8,10 +8,9 @@ package edu.buffalo.cse.irf14.analysis;
  *
  */
 public class AnalyzerAuthorOrg implements Analyzer {
-
 	private TokenStream stream;
 	private TokenFilter[] filter;
-	
+
 	public AnalyzerAuthorOrg(TokenStream stream) {
 		// TODO Auto-generated constructor stub
 		this.stream = stream;
@@ -20,8 +19,8 @@ public class AnalyzerAuthorOrg implements Analyzer {
 		TokenFilterFactory tfFactory = TokenFilterFactory.getInstance();
 		this.filter[0] = tfFactory.getFilterByType
 				(TokenFilterType.CAPITALIZATION, stream);
-		this.filter[0].setIsAnalyzer(true);
 	}
+
 	@Override
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stub

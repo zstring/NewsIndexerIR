@@ -26,7 +26,7 @@ public class AnalyzerFactory {
 		//TODO: YOU NEED TO IMPLEMENT THIS METHOD
 		return aFactory;
 	}
-	
+
 	/**
 	 * Returns a fully constructed and chained {@link Analyzer} instance
 	 * for a given {@link FieldNames} field
