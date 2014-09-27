@@ -131,8 +131,8 @@ public class TokenFilterCapitalization extends TokenFilter {
 							else {
 								tkString = tkString.toLowerCase();
 							}
-						}
 						token.setTermText(tkString);
+						}
 					}
 				}
 			}
