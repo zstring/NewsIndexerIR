@@ -71,6 +71,10 @@ public class IndexWriter {
 		//TODO
 		String[] fileNames = {"AUTHOR", "CATEGORY", "PLACE", "TERM"};
 		Integer[][] termIndexKeys = new Integer[4][]; 
+		biAuthor.setDocNum();
+		biCategory.setDocNum();
+		biPlace.setDocNum();
+		biTerm.setDocNum();
 		termIndexKeys[0] = biAuthor.getTermKeys().toArray(new Integer[0]);
 		termIndexKeys[1] = biCategory.getTermKeys().toArray(new Integer[0]);
 		termIndexKeys[2] = biPlace.getTermKeys().toArray(new Integer[0]);

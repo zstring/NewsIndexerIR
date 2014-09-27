@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,6 +31,7 @@ public class BaseIndexer implements Serializable {
 	private transient AnalyzerFactory aFactory;
 	public Map<String, Integer> termDict;
 	public Map<Integer, Term> termMap;
+	public transient Set<String> documentSet;
 
 
 	public BaseIndexer(IndexType indexerType) {
@@ -53,6 +55,7 @@ public class BaseIndexer implements Serializable {
 		}
 		termDict = new HashMap<String, Integer>();
 		termMap = new HashMap<Integer, Term>();
+		documentSet = new HashSet<String>();
 	}
 
 	public Set<Integer> getTermKeys() {
@@ -61,6 +64,14 @@ public class BaseIndexer implements Serializable {
 	
 	public int getDocNum() {
 		return docId;
+	}
+	public void setDocNum() {
+		if (this.documentSet != null) {
+			this.docId = this.documentSet.size();
+		}
+		else {
+			this.docId = 0;
+		}
 	}
 	
 	/**
@@ -111,12 +122,13 @@ public class BaseIndexer implements Serializable {
 						String tkString = tk.toString();
 						if (tkString != null && !tkString.isEmpty()) {
 							if (!isDocCounted) {
-								docId += 1;
+//								docId += 1;
+								this.documentSet.add(docTerm);
 								isDocCounted = true;
 							}
 							// If new Term
 							Integer tkInt = termDict.get(tkString);
-							if (!termMap.containsKey(tkInt)) {
+							if (tkInt == null) {
 								//increment term id
 								termId += 1;
 								Term term = new Term(tkString, termId, docTerm);
