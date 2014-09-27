@@ -144,8 +144,8 @@ public class TokenFilterCapitalization extends TokenFilter {
 				tokenLine.add(stream.getCurrent());
 			}
 			String prev = "",next = "";
-			int i = currIndex;
-			while (stream.hasPreviousAt(i)) {
+			int i = currIndex, lineThreshold = 0;
+			while (stream.hasPreviousAt(i)&&(lineThreshold++ < 10)) {
 				Token tk = stream.getTokenAt(i-1);
 				if (tk != null) {
 					prev = tk.toString();
@@ -159,7 +159,8 @@ public class TokenFilterCapitalization extends TokenFilter {
 				i -= 1;
 			}
 			i = currIndex;
-			while (stream.hasNextAt(i)) {
+			lineThreshold = 0;
+			while (stream.hasNextAt(i)&&(lineThreshold++ < 10)) {
 				Token tk = stream.getTokenAt(i+1);
 				if ( tk != null ) {
 					next = tk.toString();
