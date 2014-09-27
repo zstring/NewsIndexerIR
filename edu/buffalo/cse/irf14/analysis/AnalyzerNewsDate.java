@@ -14,19 +14,30 @@ public class AnalyzerNewsDate implements Analyzer {
 	public AnalyzerNewsDate(TokenStream stream) {
 		// TODO Auto-generated constructor stub
 		this.stream = stream;
-		int noOfFilters = 1;
-		this.filter = new TokenFilter[noOfFilters];
 		TokenFilterFactory tfFactory = TokenFilterFactory.getInstance();
-		this.filter[0] = tfFactory.getFilterByType
-				(TokenFilterType.CAPITALIZATION, stream);
+		TokenFilterType[] filters = {TokenFilterType.STOPWORD,TokenFilterType.ACCENT,
+				TokenFilterType.SYMBOL, TokenFilterType.STEMMER, TokenFilterType.CAPITALIZATION,
+				TokenFilterType.DATE, TokenFilterType.NUMERIC, TokenFilterType.SPECIALCHARS
+				};
+		this.filter = new TokenFilter[filters.length];
+		for (int i = 0; i < filters.length; i++) {
+			this.filter[i] = tfFactory.getFilterByType(filters[i],
+					stream);
+		}
 	}
 
 	@Override
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stub
 		if (stream.hasNext()) {
-			stream.next();
-			return filter[0].increment();
+			int i;
+			for (i = 0; i < filter.length; i++) {
+				while(filter[i].increment()) {
+				}
+				if (i != filter.length - 1) {
+					stream.reset();
+				}
+			}
 		}
 		return false;
 	}
