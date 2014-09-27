@@ -61,7 +61,6 @@ public class AnalyzerFactory {
 		else if (FieldNames.CATEGORY.equals(name)) {
 			return new AnalyzerCategory(stream);
 		}
-		
 		return null;
 	}
 }

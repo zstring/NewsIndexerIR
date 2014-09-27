@@ -3,32 +3,26 @@
  */
 package edu.buffalo.cse.irf14.index;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 /**
  * @author nikhillo
  * Class that emulates reading data back from a written index
  */
 public class IndexReader {
-	
-	private static final boolean Integer = false;
+
 	private String indexDir;
 	private IndexType type;
-	private BaseIndexer biContent;
+	private BaseIndexer bi;
 	private Integer[] indexKeys;
 	/**
 	 * Default constructor
@@ -48,13 +42,26 @@ public class IndexReader {
 		// TODO Auto-generated method stub
 		FileInputStream fi;
 		double start = System.currentTimeMillis();
+		String fileName = "";
 		try {
-			fi = new FileInputStream(indexDir + java.io.File.separator + "File");
+			if (IndexType.AUTHOR.equals(type)) {
+				fileName = "AUTHOR";
+			}
+			else if (IndexType.CATEGORY.equals(type)) {
+				fileName = "CATEGORY";
+			}
+			else if (IndexType.PLACE.equals(type)) {
+				fileName = "PLACE";
+			}
+			else if (IndexType.TERM.equals(type)) {
+				fileName = "TERM";
+			}
+			fi = new FileInputStream(indexDir + java.io.File.separator + fileName);
 			GZIPInputStream gzipIn = new GZIPInputStream(fi);
 			ObjectInputStream ois = new ObjectInputStream(gzipIn);
 //			fi = new FileInputStream(indexDir + java.io.File.separator + "File");
 //			ObjectInputStream ois = new ObjectInputStream(fi);
-			biContent = (BaseIndexer) ois.readObject();
+			bi = (BaseIndexer) ois.readObject();
 			indexKeys = (Integer[]) ois.readObject();
 			ois.close();
 			fi.close();
@@ -82,7 +89,7 @@ public class IndexReader {
 	 */
 	public int getTotalKeyTerms() {
 		//TODO : YOU MUST IMPLEMENT THIS
-		return biContent.termMap.keySet().size();
+		return bi.termMap.keySet().size();
 		//return -1;
 	}
 	
@@ -93,11 +100,10 @@ public class IndexReader {
 	 */
 	public int getTotalValueTerms() {
 		//TODO: YOU MUST IMPLEMENT THIS
-		//return biContent.t
-//		return biContent.docDict.size();
-		return -1;
+		//return bi.t
+		return bi.getDocNum();
 	}
-	
+
 	/**
 	 * Method to get the postings for a given term. You can assume that
 	 * the raw string that is used to query would be passed through the same
@@ -108,13 +114,13 @@ public class IndexReader {
 	 */
 	public Map<String, Integer> getPostings(String term) {
 		//TODO:YOU MUST IMPLEMENT THIS
-		Integer termId = biContent.termDict.get(term);
+		Integer termId = bi.termDict.get(term);
 		Map<String, Integer> map = null;
 		if (termId != null) {
-			map = new HashMap<String, Integer>(biContent.termMap.get(termId).getPosting());
+			map = new HashMap<String, Integer>(bi.termMap.get(termId).getPosting());
 //			map = new HashMap<String, Integer>();
-//			Map<Integer, Posting> m = biContent.termIndex.get(termId);
-//			Map<Integer, String> doc = biContent.docDict;
+//			Map<Integer, Posting> m = bi.termIndex.get(termId);
+//			Map<Integer, String> doc = bi.docDict;
 //			if (m != null) {
 //				for (Iterator<Integer> i = m.keySet().iterator(); i.hasNext();) {
 //					Integer in = i.next();
@@ -141,7 +147,7 @@ public class IndexReader {
 		if (k > 0)
 			topKTerms = new ArrayList<String>();
 		for (int i = 0; i < k && i <= len; i++) {
-			String termText = biContent.termMap.get(indexKeys[len - i]).getTermText();
+			String termText = bi.termMap.get(indexKeys[len - i]).getTermText();
 			topKTerms.add(termText);
 		}
 		return topKTerms;

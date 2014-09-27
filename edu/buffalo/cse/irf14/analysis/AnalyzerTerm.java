@@ -17,7 +17,7 @@ public class AnalyzerTerm implements Analyzer {
 		for (int i = 0; i < filters.length; i++) {
 			this.filter[i] = tfFactory.getFilterByType(filters[i],
 					stream);
-			this.filter[i].setIsAnalyzer(true);
+//			this.filter[i].setIsAnalyzer(true);
 		}
 	}
 	@Override
@@ -25,12 +25,15 @@ public class AnalyzerTerm implements Analyzer {
 		// TODO Auto-generated method stub
 		
 		if (stream.hasNext()) {
-			stream.next();
+//			stream.next();
 			int i;
-			for (i = 0; i < filter.length - 1; i++) {
-				filter[i].increment();
+			for (i = 0; i < filter.length; i++) {
+				while(filter[i].increment()) {
+				}
+				if (i != filter.length - 1)
+					stream.reset();
 			}
-			return filter[i].increment();
+//			return filter[i].increment();
 		}
 		return false;
 	}

@@ -1,8 +1,10 @@
 package edu.buffalo.cse.irf14.index;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,25 +21,44 @@ import edu.buffalo.cse.irf14.document.FieldNames;
 public class BaseIndexer implements Serializable {
 
 	private static final long serialVersionUID = 42L;
-	private static int docId = 0;
-	private static int termId = 0;
+	private int docId = 0;
+	private int termId = 0;
+	private boolean isDocCounted;
 	private IndexType indexerType;
+	private List<FieldNames> fieldName;
 	public Map<String, Integer> termDict;
-//	public Map<Integer, String> docDict;
-	public Map<Integer, Term> termMap;	
-//	public Map<Integer, Map<Integer, Posting>> termIndex;
+	public Map<Integer, Term> termMap;
+
 
 	public BaseIndexer(IndexType indexerType) {
 		this.indexerType = indexerType;
+		this.isDocCounted = false;
+		fieldName = new ArrayList<FieldNames>();
+		if (IndexType.AUTHOR.equals(indexerType)) {
+			fieldName.add(FieldNames.AUTHOR);
+		}
+		else if (IndexType.CATEGORY.equals(indexerType)) {
+			fieldName.add(FieldNames.CATEGORY);
+		}
+		else if (IndexType.PLACE.equals(indexerType)) {
+			fieldName.add(FieldNames.PLACE);
+		}
+		else if (IndexType.TERM.equals(indexerType)) {
+			fieldName.add(FieldNames.TITLE);
+			fieldName.add(FieldNames.CONTENT);
+		}
 		termDict = new HashMap<String, Integer>();
-//		docDict = new HashMap<Integer, String>();
-//		termIndex = new HashMap<Integer, Map<Integer,Posting>>();
 		termMap = new HashMap<Integer, Term>();
 	}
 
 	public Set<Integer> getTermKeys() {
 		return termMap.keySet();
 	}
+	
+	public int getDocNum() {
+		return docId;
+	}
+	
 	/**
 	 * Method to add the given Document to the index
 	 * This method should take care of reading the filed values, passing
@@ -50,74 +71,68 @@ public class BaseIndexer implements Serializable {
 		//TODO : YOU MUST IMPLEMENT THIS
 		try {
 			if (d != null) {
-				//increment document id
-				docId += 1;
+				isDocCounted = false;
 				String docTerm = "";
 				if (d.getField(FieldNames.FILEID).length > 0) {
 					docTerm = d.getField(FieldNames.FILEID)[0];
 				}
-//				docDict.put(docId, d.getField(FieldNames.FILEID)[0]);
 				String strContent = "";
-				if (d.getField(FieldNames.CONTENT).length > 0) {
-					strContent = d.getField(FieldNames.CONTENT)[0];
-				}
-				if (!strContent.trim().isEmpty()) {
-					Tokenizer tkr = new Tokenizer();
-					TokenStream tStream = tkr.consume(strContent);
-					AnalyzerFactory aFactory = AnalyzerFactory.getInstance();
-					Analyzer aContent = aFactory.getAnalyzerForField(FieldNames.CONTENT, tStream);
-					while (aContent.increment()) {
+				for (int i = 0; i < fieldName.size(); i++) {
+					FieldNames fn = fieldName.get(i);
+					if (d.getField(fn) != null && d.getField(fn).length > 0) {
+						strContent = d.getField(fn)[0].trim();
+						createIndex(strContent, fn, docTerm);
 					}
-					tStream.reset();
-					while (tStream.hasNext()) {
-						Token tk = tStream.next();
-						if (tk != null) {
-							String tkString = tk.toString();
-							if (tkString != null && !tkString.isEmpty()) {
-								// If new Term
-								Integer tkInt = termDict.get(tkString);
-								if (!termMap.containsKey(tkInt)) {
-//								if (!termIndex.containsKey(tkInt)) {
-									//increment term id
-									termId += 1;
-									Term term = new Term(tkString, termId, docTerm);
-									this.termDict.put(tkString, termId);
-									this.termMap.put(termId, term);
-//									Posting posting = new Posting();
-//									posting.setDocId(docId);
-//									posting.incTermFreq();
-//									Map<Integer, Posting> postingsList =
-											new HashMap<Integer, Posting>();
-//									postingsList.put(docId, posting);
-//									termIndex.put(termId, postingsList);
-								}
-								// If term already exist in index
-								else {
-									Term term = termMap.get(tkInt);
-									term.addOrUpdateDoc(docTerm);
-//									term.incColFreq();
-//									Map<Integer, Posting> postingsList =
-//											termIndex.get(tkInt);
-//									Posting posting = postingsList.get(docId);
-									// If docId already exist in postingList
-//									if ( posting != null) {
-//										posting.incTermFreq();
-//									}
-									// If docId does not exist in postingList
-//									else {
-//										Posting newPosting = new Posting(docId);
-//										term.incdocFreq();
-//										postingsList.put(docId, newPosting);
-//									}
-								}
+				}
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void createIndex (String strContent, FieldNames fn, String docTerm) {
+		if (!strContent.isEmpty()) {
+			Tokenizer tkr = new Tokenizer();
+			TokenStream tStream;
+			try {
+				tStream = tkr.consume(strContent);
+				AnalyzerFactory aFactory = AnalyzerFactory.getInstance();
+				Analyzer aContent = aFactory.getAnalyzerForField
+						(fn, tStream);
+				while (aContent.increment()) {
+				}
+				tStream.reset();
+				while (tStream.hasNext()) {
+					Token tk = tStream.next();
+					if (tk != null) {
+						String tkString = tk.toString();
+						if (tkString != null && !tkString.isEmpty()) {
+							if (!isDocCounted) {
+								docId += 1;
+								isDocCounted = true;
+							}
+							// If new Term
+							Integer tkInt = termDict.get(tkString);
+							if (!termMap.containsKey(tkInt)) {
+								//increment term id
+								termId += 1;
+								Term term = new Term(tkString, termId, docTerm);
+								this.termDict.put(tkString, termId);
+								this.termMap.put(termId, term);
+							}
+							// If term already exist in index
+							else {
+								Term term = termMap.get(tkInt);
+								term.addOrUpdateDoc(docTerm);
 							}
 						}
 					}
 				}
+			} catch (TokenizerException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-		} catch (TokenizerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 

@@ -56,6 +56,9 @@ public class IndexWriter {
 	 */
 	public void addDocument(Document d) throws IndexerException {
 		//TODO : YOU MUST IMPLEMENT THIS
+		biAuthor.addDocument(d);
+		biCategory.addDocument(d);
+		biPlace.addDocument(d);
 		biTerm.addDocument(d);
 	}
 
@@ -66,23 +69,52 @@ public class IndexWriter {
 	 */
 	public void close() throws IndexerException {
 		//TODO
-		Integer[] indexKeys = biTerm.getTermKeys().toArray(new Integer[0]);
-		Arrays.sort(indexKeys, biTerm.new SortByFreq());
+		String[] fileNames = {"AUTHOR", "CATEGORY", "PLACE", "TERM"};
+		Integer[][] termIndexKeys = new Integer[4][]; 
+		termIndexKeys[0] = biAuthor.getTermKeys().toArray(new Integer[0]);
+		termIndexKeys[1] = biCategory.getTermKeys().toArray(new Integer[0]);
+		termIndexKeys[2] = biPlace.getTermKeys().toArray(new Integer[0]);
+		termIndexKeys[3] = biTerm.getTermKeys().toArray(new Integer[0]);
+		Arrays.sort(termIndexKeys[0], biAuthor.new SortByFreq());
+		Arrays.sort(termIndexKeys[1], biCategory.new SortByFreq());
+		Arrays.sort(termIndexKeys[2], biPlace.new SortByFreq());
+		Arrays.sort(termIndexKeys[3], biTerm.new SortByFreq());
 		FileOutputStream fo;
 		try {
-			fo = new FileOutputStream(indexDir + java.io.File.separator + "File");
+			fo = new FileOutputStream(indexDir + java.io.File.separator + fileNames[0]);
 			GZIPOutputStream gzipOut = new GZIPOutputStream(fo);
 			ObjectOutputStream oos = new ObjectOutputStream(gzipOut);
-			oos.writeObject(biTerm);
-			oos.writeObject(indexKeys);
+			oos.writeObject(biAuthor);
+			oos.writeObject(termIndexKeys[0]);
 			oos.flush();
 			oos.close();
-//			fo = new FileOutputStream(indexDir + java.io.File.separator + "File");
-//			ObjectOutputStream oos = new ObjectOutputStream(fo);
-//			ObjectOutputStream oos = new ObjectOutputStream(fo);
-//			oos.writeObject(biTerm);
-//			oos.writeObject(indexKeys);
-//			oos.close();
+			fo.close();
+
+			fo = new FileOutputStream(indexDir + java.io.File.separator + fileNames[1]);
+			gzipOut = new GZIPOutputStream(fo);
+			oos = new ObjectOutputStream(gzipOut);
+			oos.writeObject(biCategory);
+			oos.writeObject(termIndexKeys[1]);
+			oos.flush();
+			oos.close();
+			fo.close();
+
+			fo = new FileOutputStream(indexDir + java.io.File.separator + fileNames[2]);
+			gzipOut = new GZIPOutputStream(fo);
+			oos = new ObjectOutputStream(gzipOut);
+			oos.writeObject(biPlace);
+			oos.writeObject(termIndexKeys[2]);
+			oos.flush();
+			oos.close();
+			fo.close();
+
+			fo = new FileOutputStream(indexDir + java.io.File.separator + fileNames[3]);
+			gzipOut = new GZIPOutputStream(fo);
+			oos = new ObjectOutputStream(gzipOut);
+			oos.writeObject(biTerm);
+			oos.writeObject(termIndexKeys[3]);
+			oos.flush();
+			oos.close();
 			fo.close();
 			System.out.println("Writing Process Complete");
 		} catch (FileNotFoundException e) {

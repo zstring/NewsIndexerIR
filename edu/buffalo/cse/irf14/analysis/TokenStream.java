@@ -103,7 +103,7 @@ public class TokenStream implements Iterator<Token>{
 		if (index > -1 && index < tokenList.size()) {
 			tokenList.remove(index);
 			if (index < idx) {
-				idx -= 1; 
+				idx -= 1;
 			}
 			else if (index == idx) {
 				idx -= 1;
