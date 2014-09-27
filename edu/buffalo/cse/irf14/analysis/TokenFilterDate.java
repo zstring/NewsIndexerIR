@@ -6,6 +6,8 @@ package edu.buffalo.cse.irf14.analysis;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import edu.buffalo.cse.irf14.analysis.test.TFRuleBaseTest;
+
 /**
  * @author inspire
  *
@@ -171,6 +173,9 @@ public class TokenFilterDate extends TokenFilter {
 					if (i <= 9) {
 						monthIndex = "0" + i;
 					}
+					else {
+						monthIndex = i + "";
+					}
 					monthChar = m.substring(mat.end());
 					//monthIndex = String.format("%0"+ (2 - monthIndex.length()) +"d%s", 0, monthIndex);
 					Token[] tokenList = stream.getPrevTokens();
@@ -221,12 +226,13 @@ public class TokenFilterDate extends TokenFilter {
 		String[] dateAndYear = new String[4];
 //		dateAndYear[0] = "01";
 //		dateAndYear[1] = "1900";
+		int varDistancePrev = 0, varDistanceNext = 0;
 		boolean dateFlag = false, yearFlag = false, timeFlag = false;
 		boolean checkPrev = false;
 		String[] retDate = null, retYear = null, retTime = null;
 		for (int i = 0; i < 2 && (!dateFlag || !yearFlag); i++) {
-			Token tPrev = tokenList[4 - i];
-			Token tNext = tokenList[i + 6];
+			Token tPrev = tokenList[1 - i];
+			Token tNext = tokenList[i + 2];
 			String tPrevStr = "", tNextStr = "";
 			checkPrev = false;
 			if (tPrev != null) tPrevStr = tPrev.toString();
@@ -239,7 +245,9 @@ public class TokenFilterDate extends TokenFilter {
 					//if (!"".equals(retDate)) {
 						dateFlag = true;
 						checkPrev = true;
-						stream.removeAt(stream.getCurrentIndex() - i - 1);
+//						stream.remove(tPrev);
+						stream.removeAt(stream.getCurrentIndex() - i - 1 + varDistancePrev);
+						varDistancePrev++;
 					}
 				}
 				if (!yearFlag && !checkPrev) {
@@ -247,7 +255,9 @@ public class TokenFilterDate extends TokenFilter {
 					if (retYear != null) {
 					//if (!"".equals(retYear)) {
 						yearFlag = true;
-						stream.removeAt(stream.getCurrentIndex() - i - 1);
+//						stream.remove(tPrev);
+						stream.removeAt(stream.getCurrentIndex() - i - 1 + varDistancePrev);
+						varDistancePrev++;
 					}
 				}
 				if (!timeFlag) {
@@ -262,7 +272,9 @@ public class TokenFilterDate extends TokenFilter {
 					//if (!"".equals(retDate)) {
 						dateFlag = true;
 						checkPrev = true;
-						stream.removeAt(stream.getCurrentIndex() + i + 1);
+//						stream.remove(tNext);
+						stream.removeAt(stream.getCurrentIndex() + i + 1 - varDistanceNext);
+						varDistanceNext++;
 					}
 				}
 				if (!yearFlag && !checkPrev) {
@@ -270,7 +282,9 @@ public class TokenFilterDate extends TokenFilter {
 					if (retYear != null) {
 					//if (!"".equals(retYear)) {
 						yearFlag = true;
-						stream.removeAt(stream.getCurrentIndex() + i + 1);
+//						stream.remove(tNext);
+						stream.removeAt(stream.getCurrentIndex() + i + 1 - varDistanceNext);
+						varDistanceNext++;
 					}
 				}
 			}

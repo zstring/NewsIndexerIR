@@ -97,7 +97,7 @@ public class Parser {
 			d.setField(FieldNames.CONTENT, content.toString());	
 			buff.close();
 		} catch (Exception e) {
-			System.out.println("Error Occurred " + e.getMessage());
+			System.out.println("Error Occurred in Parser" + e.getMessage());
 			throw new ParserException();
 		}
 		return d;

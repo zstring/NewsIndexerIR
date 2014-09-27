@@ -26,6 +26,8 @@ public class BaseIndexer implements Serializable {
 	private boolean isDocCounted;
 	private IndexType indexerType;
 	private List<FieldNames> fieldName;
+	private transient Tokenizer tkr;
+	private transient AnalyzerFactory aFactory;
 	public Map<String, Integer> termDict;
 	public Map<Integer, Term> termMap;
 
@@ -33,6 +35,8 @@ public class BaseIndexer implements Serializable {
 	public BaseIndexer(IndexType indexerType) {
 		this.indexerType = indexerType;
 		this.isDocCounted = false;
+		tkr = new Tokenizer();
+		aFactory = AnalyzerFactory.getInstance();
 		fieldName = new ArrayList<FieldNames>();
 		if (IndexType.AUTHOR.equals(indexerType)) {
 			fieldName.add(FieldNames.AUTHOR);
@@ -93,11 +97,9 @@ public class BaseIndexer implements Serializable {
 
 	public void createIndex (String strContent, FieldNames fn, String docTerm) {
 		if (!strContent.isEmpty()) {
-			Tokenizer tkr = new Tokenizer();
 			TokenStream tStream;
 			try {
 				tStream = tkr.consume(strContent);
-				AnalyzerFactory aFactory = AnalyzerFactory.getInstance();
 				Analyzer aContent = aFactory.getAnalyzerForField
 						(fn, tStream);
 				while (aContent.increment()) {

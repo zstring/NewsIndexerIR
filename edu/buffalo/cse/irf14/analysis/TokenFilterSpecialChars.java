@@ -5,9 +5,12 @@ import java.util.regex.Pattern;
 
 public class TokenFilterSpecialChars extends TokenFilter {
 	private static Pattern pattSpChar, pattSpCharRem;
+	private static Matcher matSpChar, matSpCharRem;
 	static {
 		pattSpChar = Pattern.compile("(.*[a-zA-Z])(-)([a-zA-Z].*)");
 		pattSpCharRem = Pattern.compile("[^\\.\\sa-zA-Z0-9-]");
+		matSpChar = pattSpChar.matcher("");
+		matSpCharRem = pattSpCharRem.matcher("");
 	}
 
 	public TokenFilterSpecialChars(TokenStream stream) {
@@ -31,11 +34,13 @@ public class TokenFilterSpecialChars extends TokenFilter {
 				//String specChar = "[^\\.\\sa-zA-Z0-9@-]";
 				String specChar = "[^\\.\\sa-zA-Z0-9-]";
 				//Matcher matcher = Pattern.compile("(.*[a-zA-Z])(-)([a-zA-Z].*)").matcher(tkString);
-				Matcher matcher = pattSpChar.matcher(tkString);
-				if (matcher.matches()) {
-					tkString = matcher.group(1)+matcher.group(3);
+//				Matcher matcher = pattSpChar.matcher(tkString);
+				matSpChar.reset(tkString);
+				if (matSpChar.matches()) {
+					tkString = matSpChar.group(1) + matSpChar.group(3);
 				}
-				tkString = pattSpCharRem.matcher(tkString).replaceAll("");
+				matSpCharRem.reset(tkString);
+				tkString = matSpCharRem.replaceAll("");
 //				tkString = tkString.replaceAll(specChar, "");
 				/*if (tkString.matches(".*\\w@\\w.*")) {
 				int posAt = tkString.indexOf('@');

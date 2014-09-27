@@ -92,6 +92,12 @@ public class TokenStream implements Iterator<Token>{
 			//tokenList.set(idx, null);
 		}
 	}
+	
+
+	public void remove(Object token) {
+		// TODO YOU MUST IMPLEMENT THIS
+		tokenList.remove(token);
+	}
 	/**
 	 * Method to remove the current Token from the stream.
 	 * Note that "current" token refers to the Token just returned
