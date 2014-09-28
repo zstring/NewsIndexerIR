@@ -50,23 +50,25 @@ public class TokenFilterNumber extends TokenFilter{
 					matIsNum.reset(tkString);
 					if (matIsNum.matches()) {
 						//				if (pattIsNum.matcher(tkString).matches()) {
-						Token[] prevTokens = stream.getPrevTokens(2);
-						StringBuilder prevTokenString = new StringBuilder("");
-						for (int i = 0; i < prevTokens.length; i++) {
-							if (prevTokens[i] != null) {
-								prevTokenString.append(prevTokens[i].toString().toLowerCase()+" ");
+						if (matIsDigit.reset(tkString).matches()) {
+							Token[] prevTokens = stream.getPrevTokens(2);
+							StringBuilder prevTokenString = new StringBuilder("");
+							for (int i = 0; i < prevTokens.length; i++) {
+								if (prevTokens[i] != null) {
+									prevTokenString.append(prevTokens[i].toString().toLowerCase()+" ");
+								}
+							}
+
+							if (matDate.reset(prevTokenString).find()) {
+								//					if (pattDate.matcher(prevTokenString).find()) {
+								isDate = true;
+							}
+							else if (matMonth.reset(prevTokenString).find()) {
+								//					else if (pattMonth.matcher(prevTokenString).find()) {
+								isDate = true;
 							}
 						}
-
-						if (matDate.reset(prevTokenString).find()) {
-							//					if (pattDate.matcher(prevTokenString).find()) {
-							isDate = true;
-						}
-						else if (matMonth.reset(prevTokenString).find()) {
-							//					else if (pattMonth.matcher(prevTokenString).find()) {
-							isDate = true;
-						}
-						else {
+						if (!isDate){
 							//						tkString = pattNumRem.matcher(tkString).replaceAll("");
 							tkString = matNumRem.reset(tkString).replaceAll("");
 						}
