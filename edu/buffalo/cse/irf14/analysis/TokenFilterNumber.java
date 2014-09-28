@@ -3,6 +3,7 @@
  */
 package edu.buffalo.cse.irf14.analysis;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -10,16 +11,25 @@ import java.util.regex.Pattern;
  *
  */
 public class TokenFilterNumber extends TokenFilter{
-	private static Pattern pattIsNum, pattDate, pattMonth, pattNumRem;
+//	private static Pattern pattIsNum, pattDate, pattMonth, pattNumRem;
+	private static Matcher matIsNum, matDate, matMonth, matNumRem;
 	static {
-		pattIsNum = Pattern.compile("[^a-zA-z]*[0-9][^a-zA-Z]*");
-		pattDate = Pattern.compile("[0-9 ]?[AapP]\\.?[mM]\\.?(\\W|$)|"
-				+ "[0-9 ]?[bB]\\.?[cC]\\.?(\\W|$)|[0-9 ]?[Aa]\\.?[dD]\\.?(\\W|$)");
+//		pattIsNum = Pattern.compile("[^a-zA-z]*[0-9][^a-zA-Z]*");
+//		pattDate = Pattern.compile("[0-9 ]?[AapP]\\.?[mM]\\.?(\\W|$)|"
+//				+ "[0-9 ]?[bB]\\.?[cC]\\.?(\\W|$)|[0-9 ]?[Aa]\\.?[dD]\\.?(\\W|$)");
+//		//		pattYear = Pattern.compile("\\W[12]\\d{3}\\W");
+//		pattNumRem = Pattern.compile("(,|\\.)?[0-9]");
+//		pattMonth = Pattern.compile("january|february|march|april|may|june|"
+//				+ "july|august|september|october|november|december|jan|feb|mar|apr"
+//				+ "|jun|jul|aug|sep|nov|dec");
+		matIsNum = Pattern.compile("[^a-zA-z]*[0-9][^a-zA-Z]*").matcher("");
+		matDate = Pattern.compile("[0-9 ]?[AapP]\\.?[mM]\\.?(\\W|$)|"
+				+ "[0-9 ]?[bB]\\.?[cC]\\.?(\\W|$)|[0-9 ]?[Aa]\\.?[dD]\\.?(\\W|$)").matcher("");
 		//		pattYear = Pattern.compile("\\W[12]\\d{3}\\W");
-		pattNumRem = Pattern.compile("(,|\\.)?[0-9]");
-		pattMonth = Pattern.compile("january|february|march|april|may|june|"
+		matNumRem = Pattern.compile("(,|\\.)?[0-9]").matcher("");
+		matMonth = Pattern.compile("january|february|march|april|may|june|"
 				+ "july|august|september|october|november|december|jan|feb|mar|apr"
-				+ "|jun|jul|aug|sep|nov|dec");
+				+ "|jun|jul|aug|sep|nov|dec").matcher("");
 
 	}
 	public TokenFilterNumber(TokenStream stream) {
@@ -39,11 +49,13 @@ public class TokenFilterNumber extends TokenFilter{
 		if (stream.hasNext()) {
 			Token token;
 			token = stream.next();
-			if (!token.isDate() && !token.isTime() && token != null) {
+			if (token != null && !token.isDate() && !token.isTime()) {
 				boolean isDate = false;
 				String tkString = token.toString();
 				int currIndex = stream.getCurrentIndex();
-				if (pattIsNum.matcher(tkString).matches()) {
+				matIsNum.reset(tkString);
+				if (matIsNum.matches()) {
+//				if (pattIsNum.matcher(tkString).matches()) {
 					Token[] prevTokens = stream.getPrevTokens(2);
 					StringBuilder prevTokenString = new StringBuilder("");
 					for (int i = 0; i < prevTokens.length; i++) {
@@ -51,14 +63,18 @@ public class TokenFilterNumber extends TokenFilter{
 							prevTokenString.append(prevTokens[i].toString().toLowerCase()+" ");
 						}
 					}
-					if (pattDate.matcher(prevTokenString).find()) {
+					
+					if (matDate.reset(prevTokenString).find()) {
+//					if (pattDate.matcher(prevTokenString).find()) {
 						isDate = true;
 					}
-					else if (pattMonth.matcher(prevTokenString).find()) {
+					else if (matMonth.reset(prevTokenString).find()) {
+//					else if (pattMonth.matcher(prevTokenString).find()) {
 						isDate = true;
 					}
 					else {
-						tkString = pattNumRem.matcher(tkString).replaceAll("");
+//						tkString = pattNumRem.matcher(tkString).replaceAll("");
+						tkString = matNumRem.reset(tkString).replaceAll("");
 					}
 				}
 				if ("".equals(tkString.trim())) {
