@@ -50,8 +50,9 @@ public class TokenFilterDate extends TokenFilter {
 		//String ampmRegex = "(am|pm)[^\\w^\\d]?";
 		String ampmRegex = "((p)|(a))\\.?m(\\.)?(,)?";
 		matAMPM = Pattern.compile(ampmRegex).matcher("");
-		String adbcRegex = "((a)|(b))\\.?((d)|(c))(\\.)?(,)?";
-		matADBC = Pattern.compile(ampmRegex).matcher("");
+		//String adbcRegex = "((a)|(b))\\.?((d)|(c))(\\.)?(,)?";
+		String adbcRegex = "((a\\.?d)|(b\\.?c))(,|\\.)?";
+		matADBC = Pattern.compile(adbcRegex).matcher("");
 
 	}
 	public TokenFilterDate(TokenStream stream) {
@@ -268,19 +269,22 @@ public class TokenFilterDate extends TokenFilter {
 				else {
 					retMonth[1] = "01";
 				}
-				lastChar = dateAndYear[0];
+				if (dateAndYear[4].equals("1")) {
+					lastChar = dateAndYear[0];;
+				}
+				else if (dateAndYear[4].equals("2")) {
+					lastChar = dateAndYear[2];
+				}
+				else {
+					lastChar = monthChar;
+				}
+				
 				if (!"".equals(dateAndYear[3])) {
 					retMonth[1] = dateAndYear[3] + monthIndex + retMonth[1];
-					if (!dateAndYear[2].isEmpty()){
-						lastChar = dateAndYear[2];
-					}
 				}
 				else {
 					//return null;
 					retMonth[1] = "1900" + monthIndex + retMonth[1];
-				}
-				if (!dateAndYear[4].equals("1")) {
-					lastChar = monthChar;
 				}
 				int prevIndex = stream.getCurrentIndex() - 1;
 				Token prev = stream.getTokenAt(prevIndex);
@@ -367,7 +371,7 @@ public class TokenFilterDate extends TokenFilter {
 						yearFlag = true;
 						stream.removeAt(stream.getCurrentIndex() + i + 1 - varDistanceNext);
 						varDistanceNext++;
-						dateAndYear[4] = "1";
+						dateAndYear[4] = "2";
 					}
 				}
 			}
@@ -432,11 +436,52 @@ public class TokenFilterDate extends TokenFilter {
 				//checking the length of remaining string yearZone
 				//is less than three as it can have only have
 				//"ad." or "bc," something like that at MAX
-				if (yearZone.length() <= 3) {
+				
+				if (!yearZone.contains("-")) {
 					yearStr = String.format("%04d", yearVal);
 					//					yearStr = String.format("%0"+ (4 - yearStr.length())
 					//					+"d%s", 0, yearStr);
-					if (!yearZone.contains("bc") && !yearZone.contains("ad")) {
+					
+					//String adbcRegex = "((a\\.?d)|(b\\.?c))(,|.)?";
+					matADBC.reset(yearZone);
+					if (matADBC.matches()) {
+						if (matADBC.group(2) != null) {
+							flagYear = true;
+						}
+						else if (matADBC.group(3) != null) {
+							//Added minus sign to for "BC";
+							yearStr = "-" + yearStr;
+							flagYear = true;
+						}
+						if (matADBC.groupCount() > 3 && matADBC.group(4) != null) {
+							lastChar = matADBC.group(4);// + "";
+						}
+					}
+					else {
+						//else we have to check the next or prev token
+						//get the respective "AD" "BC" if any.
+						Token tNext = stream.getTokenAt(stream.getCurrentIndex() + 1);
+						if (tNext != null)
+							yearZone = tNext.toString() == null ? "" : tNext.toString().toLowerCase();
+						flagRemoveToken = true;
+						matADBC.reset(yearZone);
+						if (matADBC.matches()) {
+							if (matADBC.group(2) != null) {
+								flagYear = true;
+							}
+							else if (matADBC.group(3) != null) {
+								//Added minus sign to for "BC";
+								yearStr = "-" + yearStr;
+								flagYear = true;
+							}
+							if (matADBC.groupCount() > 3 && matADBC.group(4) != null) {
+								lastChar = matADBC.group(4);// + "";
+							}
+						}
+					}
+					
+					
+					/*if (!yearZone.contains("bc") && !yearZone.contains("ad")) {
 						//else we have to check the next or prev token
 						//get the respective "AD" "BC" if any.
 						Token tNext = stream.getTokenAt(stream.getCurrentIndex() + 1);
@@ -460,6 +505,10 @@ public class TokenFilterDate extends TokenFilter {
 						}
 						flagYear = true;
 					}
+					*/
+					
+					
+					
 					//flagYear true means current token contains
 					//the AD or BC with the year value combined
 					//e.g. 1999AD or 500BC.
