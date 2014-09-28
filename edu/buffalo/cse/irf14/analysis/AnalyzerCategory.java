@@ -16,21 +16,20 @@ public class AnalyzerCategory implements Analyzer {
 		// TODO Auto-generated constructor stub
 		this.stream = stream;
 		TokenFilterFactory tfFactory = TokenFilterFactory.getInstance();
-		TokenFilterType[] filters = {TokenFilterType.STOPWORD,TokenFilterType.ACCENT,
+		/*TokenFilterType[] filters = {TokenFilterType.STOPWORD,TokenFilterType.ACCENT,
 				TokenFilterType.SYMBOL, TokenFilterType.STEMMER, TokenFilterType.CAPITALIZATION,
-				TokenFilterType.DATE, TokenFilterType.NUMERIC, TokenFilterType.SPECIALCHARS
 				};
 		this.filter = new TokenFilter[filters.length];
 		for (int i = 0; i < filters.length; i++) {
 			this.filter[i] = tfFactory.getFilterByType(filters[i],
 					stream);
-			}
+			}*/
 		}
 
 	@Override
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stub
-		if (stream.hasNext()) {
+		/*if (stream.hasNext()) {
 			int i;
 			for (i = 0; i < filter.length; i++) {
 				while(filter[i].increment()) {
@@ -39,7 +38,7 @@ public class AnalyzerCategory implements Analyzer {
 					stream.reset();
 				}
 			}
-		}
+		}*/
 		return false;
 	}
 
