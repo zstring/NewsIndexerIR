@@ -14,16 +14,77 @@ import java.util.regex.Pattern;
  *
  */
 public class TokenFilterSymbol extends TokenFilter {
-//	private static Pattern pattSym, pattPunc, pattSingle;
-	private static Matcher matSym, matPunc, matSingle;
+	//	private static Pattern pattSym, pattPunc, pattSingle;
+	private static Matcher matSym, matPunc, matSingle, matIsWord;
 	static {
 		matSym = Pattern.compile("(-|^)([a-zA-Z])+(-)+([a-zA-Z])+(-|$)").matcher("");
 		matPunc = Pattern.compile("(^| )['\"-]*|([-'\"\\.!\\?]*|'s)($| )").matcher("");
 		matSingle = Pattern.compile("'").matcher("");
+		matIsWord = Pattern.compile("[\\w]*").matcher("");
 	}
 	public TokenFilterSymbol(TokenStream stream) {
 		super(stream);
 	}
+
+	@Override
+	public boolean increment() throws TokenizerException {
+		// TODO Auto-generated method stub
+		if (stream.hasNext()) {
+			Token token;
+			token = stream.next();
+			if (token != null && !token.isDate() && !token.isTime()) {
+				String tkString = token.toString();
+				if (tkString != null && !matIsWord.reset(tkString).matches()) {
+					// Word Contractions
+					if (contractions.containsKey(tkString.toLowerCase())) {
+						boolean upper = false;
+						StringBuilder builder = new StringBuilder(contractions.get(tkString.toLowerCase()));
+						String tkStringUpper = tkString.toUpperCase();
+						if (tkString.equals(tkStringUpper)) {
+							upper = true;
+						}
+						else if (tkString.charAt(0) >= 'A' && tkString.charAt(0) <= 'Z'){
+							builder.setCharAt(0, (char) (builder.charAt(0) - 32));
+						}
+						tkString = builder.toString();
+						if (upper) tkString = tkStringUpper;
+					}
+
+					// Start or End with ' or " or -
+					// End with Punctuation
+					//				tkString = pattPunc.matcher(tkString).replaceAll(" ");
+					//				tkString = pattSingle.matcher(tkString).replaceAll("");
+					tkString = matPunc.reset(tkString).replaceAll(" ");
+					if (tkString.contains("'")) {
+						tkString = matSingle.reset(tkString).replaceAll("");
+					}
+					tkString = tkString.trim();
+
+					// Hyphens
+					String input = tkString;
+					int indexGrp2 = 0, indexGrp1 =0;
+					//				Matcher matcher = pattSym.matcher(tkString);
+					if (tkString.contains("-")){
+						Matcher matcher = matSym.reset(tkString);
+						while(matcher.find()) {
+							indexGrp1 = matcher.end(2);
+							indexGrp2 = matcher.end(3);
+							input= 	input.substring(0, indexGrp1) + " " + input.substring(indexGrp2);
+							matcher.reset(input);
+						}
+					}
+					tkString = input;
+					if ("".equals(tkString)) {
+						stream.remove();
+					} else {
+						token.setTermText(tkString);
+					}
+				}
+			}
+		}
+		return stream.hasNext();
+	}
+
 
 	private static final Map<String, String> contractions;
 	static {
@@ -122,60 +183,5 @@ public class TokenFilterSymbol extends TokenFilter {
 		tempMap.put("you've",	"you have");
 		tempMap.put("'em",	"them");
 		contractions = Collections.unmodifiableMap(tempMap);
-	}
-
-
-
-	@Override
-	public boolean increment() throws TokenizerException {
-		// TODO Auto-generated method stub
-		if (stream.hasNext()) {
-			Token token;
-			token = stream.next();
-			if (token != null && !token.isDate() && !token.isTime()) {
-				String tkString = token.toString();
-				// Word Contractions
-				if (contractions.containsKey(tkString.toLowerCase())) {
-					boolean upper = false;
-					StringBuilder builder = new StringBuilder(contractions.get(tkString.toLowerCase()));
-					String tkStringUpper = tkString.toUpperCase();
-					if (tkString.equals(tkStringUpper)) {
-						upper = true;
-					}
-					else if (tkString.charAt(0) >= 'A' && tkString.charAt(0) <= 'Z'){
-						builder.setCharAt(0, (char) (builder.charAt(0) - 32));
-					}
-					tkString = builder.toString();
-					if (upper) tkString = tkStringUpper;
-				}
-
-				// Start or End with ' or " or -
-				// End with Punctuation
-//				tkString = pattPunc.matcher(tkString).replaceAll(" ");
-//				tkString = pattSingle.matcher(tkString).replaceAll("");
-				tkString = matPunc.reset(tkString).replaceAll(" ");
-				tkString = matSingle.reset(tkString).replaceAll("");
-				tkString = tkString.trim();
-
-				// Hyphens
-				String input = tkString;
-				int indexGrp2 = 0, indexGrp1 =0;
-//				Matcher matcher = pattSym.matcher(tkString);
-				Matcher matcher = matSym.reset(tkString);
-				while(matcher.find()) {
-					indexGrp1 = matcher.end(2);
-					indexGrp2 = matcher.end(3);
-					input= 	input.substring(0, indexGrp1) + " " + input.substring(indexGrp2);
-					matcher.reset(input);
-				}
-				tkString = input;
-				if ("".equals(tkString)) {
-					stream.remove();
-				} else {
-					token.setTermText(tkString);
-				}
-			}
-		}
-		return stream.hasNext();
 	}
 }

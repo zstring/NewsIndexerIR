@@ -11,17 +11,9 @@ import java.util.regex.Pattern;
  *
  */
 public class TokenFilterNumber extends TokenFilter{
-//	private static Pattern pattIsNum, pattDate, pattMonth, pattNumRem;
-	private static Matcher matIsNum, matDate, matMonth, matNumRem;
+	private static Matcher matIsNum, matDate, matMonth, matNumRem, matIsDigit;
 	static {
-//		pattIsNum = Pattern.compile("[^a-zA-z]*[0-9][^a-zA-Z]*");
-//		pattDate = Pattern.compile("[0-9 ]?[AapP]\\.?[mM]\\.?(\\W|$)|"
-//				+ "[0-9 ]?[bB]\\.?[cC]\\.?(\\W|$)|[0-9 ]?[Aa]\\.?[dD]\\.?(\\W|$)");
-//		//		pattYear = Pattern.compile("\\W[12]\\d{3}\\W");
-//		pattNumRem = Pattern.compile("(,|\\.)?[0-9]");
-//		pattMonth = Pattern.compile("january|february|march|april|may|june|"
-//				+ "july|august|september|october|november|december|jan|feb|mar|apr"
-//				+ "|jun|jul|aug|sep|nov|dec");
+		matIsDigit = Pattern.compile("\\d*").matcher("");
 		matIsNum = Pattern.compile("[^a-zA-z]*[0-9][^a-zA-Z]*").matcher("");
 		matDate = Pattern.compile("[0-9 ]?[AapP]\\.?[mM]\\.?(\\W|$)|"
 				+ "[0-9 ]?[bB]\\.?[cC]\\.?(\\W|$)|[0-9 ]?[Aa]\\.?[dD]\\.?(\\W|$)").matcher("");
@@ -54,35 +46,37 @@ public class TokenFilterNumber extends TokenFilter{
 			if (token != null && !token.isDate() && !token.isTime()) {
 				boolean isDate = false;
 				String tkString = token.toString();
-				matIsNum.reset(tkString);
-				if (matIsNum.matches()) {
-//				if (pattIsNum.matcher(tkString).matches()) {
-					Token[] prevTokens = stream.getPrevTokens(2);
-					StringBuilder prevTokenString = new StringBuilder("");
-					for (int i = 0; i < prevTokens.length; i++) {
-						if (prevTokens[i] != null) {
-							prevTokenString.append(prevTokens[i].toString().toLowerCase()+" ");
+				if (tkString != null) {// && matIsDigit.reset(tkString).find()) {
+					matIsNum.reset(tkString);
+					if (matIsNum.matches()) {
+						//				if (pattIsNum.matcher(tkString).matches()) {
+						Token[] prevTokens = stream.getPrevTokens(2);
+						StringBuilder prevTokenString = new StringBuilder("");
+						for (int i = 0; i < prevTokens.length; i++) {
+							if (prevTokens[i] != null) {
+								prevTokenString.append(prevTokens[i].toString().toLowerCase()+" ");
+							}
+						}
+
+						if (matDate.reset(prevTokenString).find()) {
+							//					if (pattDate.matcher(prevTokenString).find()) {
+							isDate = true;
+						}
+						else if (matMonth.reset(prevTokenString).find()) {
+							//					else if (pattMonth.matcher(prevTokenString).find()) {
+							isDate = true;
+						}
+						else {
+							//						tkString = pattNumRem.matcher(tkString).replaceAll("");
+							tkString = matNumRem.reset(tkString).replaceAll("");
+						}
+						if ("".equals(tkString.trim())) {
+							stream.remove();
+						}
+						else {
+							token.setTermText(tkString);
 						}
 					}
-					
-					if (matDate.reset(prevTokenString).find()) {
-//					if (pattDate.matcher(prevTokenString).find()) {
-						isDate = true;
-					}
-					else if (matMonth.reset(prevTokenString).find()) {
-//					else if (pattMonth.matcher(prevTokenString).find()) {
-						isDate = true;
-					}
-					else {
-//						tkString = pattNumRem.matcher(tkString).replaceAll("");
-						tkString = matNumRem.reset(tkString).replaceAll("");
-					}
-				}
-				if ("".equals(tkString.trim())) {
-					stream.remove();
-				}
-				else {
-					token.setTermText(tkString);
 				}
 			}
 		}

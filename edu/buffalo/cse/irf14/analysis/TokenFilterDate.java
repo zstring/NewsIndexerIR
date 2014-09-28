@@ -16,43 +16,22 @@ public class TokenFilterDate extends TokenFilter {
 	 * call the super constructor to initialize tokenstream object
 	 * @param stream
 	 */
-//	private static Pattern pattMonth;
-//	private static Pattern pattTime;
-//	private static Pattern pattYear;
-//	private static Pattern pattAMPM;
-//	private static Pattern pattADBC;
-	private static Matcher matMonth;
-	private static Matcher matTime;
-	private static Matcher matYear;
-	private static Matcher matAMPM;
-	private static Matcher matADBC;
+	private static Matcher matMonth, matTime, matYear, 
+	matAMPM, matADBC, matIsWord;
 	static {
 		String monthRegex = "(january|jan)|(february|feb)|(march|mar)|"
 				+ "(april|apr)|(may)|(june|jun)|(july|jul)|(august|aug)|"
 				+ "(september|sep)|(october|oct)|(november|nov)|(december|dec)";
-//		pattMonth = Pattern.compile(monthRegex);
-//		//String timeRegex = "(\\d{1,2})(:(\\d{1,2}))(:(\\d{1,2}))?";
-//		String timeRegex = "(\\d{1,2})(:(\\d{1,2}))?(:(\\d{1,2}))?";
-//		pattTime = Pattern.compile(timeRegex);
-//		String digitRegex = "\\d+";
-//		pattYear = Pattern.compile(digitRegex);
-//		//String ampmRegex = "(am|pm)[^\\w^\\d]?";
-//		String ampmRegex = "((p)|(a))\\.?m(\\.)?(,)?";
-//		pattAMPM = Pattern.compile(ampmRegex);
-//		String adbcRegex = "((a)|(b))\\.?((d)|(c))(\\.)?(,)?";
-//		pattADBC = Pattern.compile(ampmRegex);
 		matMonth = Pattern.compile(monthRegex).matcher("");
-		//String timeRegex = "(\\d{1,2})(:(\\d{1,2}))(:(\\d{1,2}))?";
 		String timeRegex = "(\\d{1,2})(:(\\d{1,2}))?(:(\\d{1,2}))?";
 		matTime = Pattern.compile(timeRegex).matcher("");
 		String digitRegex = "\\d+";
 		matYear = Pattern.compile(digitRegex).matcher("");
-		//String ampmRegex = "(am|pm)[^\\w^\\d]?";
 		String ampmRegex = "((p)|(a))\\.?m(\\.)?(,)?";
 		matAMPM = Pattern.compile(ampmRegex).matcher("");
-		//String adbcRegex = "((a)|(b))\\.?((d)|(c))(\\.)?(,)?";
 		String adbcRegex = "((a\\.?d)|(b\\.?c))(,|\\.)?";
 		matADBC = Pattern.compile(adbcRegex).matcher("");
+		matIsWord = Pattern.compile("[^0-9]*").matcher("");
 
 	}
 	public TokenFilterDate(TokenStream stream) {
@@ -71,27 +50,30 @@ public class TokenFilterDate extends TokenFilter {
 			if (token != null) {
 				String tkString = token.toString();
 				if (tkString != null && !tkString.isEmpty()) {
-					String[] tTime = checkAndExtractTime(tkString);
-					String retVal = tTime[0];
-					String retTime = tTime[1];
-					if (!retVal.equals("0")) {
-						token.setTermText(retTime);
-						token.setTime(true);
-						if (retVal.equals("2")) {
-							stream.removeAt(stream.getCurrentIndex() + 1);
-						}
-						return stream.hasNext();
-					}
 					String[] retMonth = checkAndExtractMonth(tkString);
 					if (retMonth[0].equals("1")) {
 						token.setTermText(retMonth[1]);
 						token.setDate(true);
 						return stream.hasNext();
 					}
-					String[] retYear = checkAndExtractYear(tkString, "year");
-					if (retYear != null) {
-						token.setTermText(retYear[1] + retYear[0]);
-						token.setDate(true);
+					if (!matIsWord.reset(tkString).matches()) {
+						String[] tTime = checkAndExtractTime(tkString);
+						String retVal = tTime[0];
+						String retTime = tTime[1];
+						if (!retVal.equals("0")) {
+							token.setTermText(retTime);
+							token.setTime(true);
+							if (retVal.equals("2")) {
+								stream.removeAt(stream.getCurrentIndex() + 1);
+							}
+							return stream.hasNext();
+						}
+
+						String[] retYear = checkAndExtractYear(tkString, "year");
+						if (retYear != null) {
+							token.setTermText(retYear[1] + retYear[0]);
+							token.setDate(true);
+						}
 					}
 				}
 			}
@@ -110,7 +92,6 @@ public class TokenFilterDate extends TokenFilter {
 		//False identify that there is no AM/PM attached to time string
 		//and look for next tokens to identify AM/PM;
 		retTime[0] = "0";
-//		Matcher mat = pattTime.matcher(str);
 		Matcher mat = matTime.reset(str);
 		String finalTime = "";
 		if (mat.find()) {
@@ -127,7 +108,7 @@ public class TokenFilterDate extends TokenFilter {
 				timeZone = str.substring(lastIndex).trim().toLowerCase();
 			}
 			if (timeZone != null && !timeZone.isEmpty()) {
-//				Matcher matAMPM = pattAMPM.matcher(timeZone);
+				//				Matcher matAMPM = pattAMPM.matcher(timeZone);
 				matAMPM.reset(timeZone);
 				if (matAMPM.matches()) {
 					retTime[0] = "1";
@@ -164,7 +145,7 @@ public class TokenFilterDate extends TokenFilter {
 					nextStr = nextToken.getTermText();
 				}
 				nextStr = nextStr.toLowerCase();
-//				Matcher matAMPM = pattAMPM.matcher(nextStr);
+				//				Matcher matAMPM = pattAMPM.matcher(nextStr);
 				matAMPM.reset(nextStr);
 				if (matAMPM.matches()) {
 					retTime[0] = "2";
@@ -235,7 +216,7 @@ public class TokenFilterDate extends TokenFilter {
 		String monthIndex = "01";
 		String monthChar = "";
 		//		Matcher mat = Pattern.compile(monthRegex).matcher(m);
-//		Matcher mat = pattMonth.matcher(m);
+		//		Matcher mat = pattMonth.matcher(m);
 		Matcher mat = matMonth.reset(m);
 		if (mat.find()) {
 			retMonth[0] = "1";
@@ -278,7 +259,6 @@ public class TokenFilterDate extends TokenFilter {
 				else {
 					lastChar = monthChar;
 				}
-				
 				if (!"".equals(dateAndYear[3])) {
 					retMonth[1] = dateAndYear[3] + monthIndex + retMonth[1];
 				}
@@ -319,9 +299,9 @@ public class TokenFilterDate extends TokenFilter {
 		//		dateAndYear[0] = "01";
 		//		dateAndYear[1] = "1900";
 		int varDistancePrev = 0, varDistanceNext = 0;
-		boolean dateFlag = false, yearFlag = false, timeFlag = false;
+		boolean dateFlag = false, yearFlag = false;
 		boolean checkPrev = false;
-		String[] retDate = null, retYear = null, retTime = null;
+		String[] retDate = null, retYear = null;
 		for (int i = 0; i < 2 && (!dateFlag || !yearFlag); i++) {
 			Token tPrev = tokenList[1 - i];
 			Token tNext = tokenList[i + 2];
@@ -406,7 +386,7 @@ public class TokenFilterDate extends TokenFilter {
 		// TODO Auto-generated method stub
 		String[] retVal = null;
 		String lastChar = "";
-//		Matcher mat = pattYear.matcher(d);
+		//		Matcher mat = pattYear.matcher(d);
 		Matcher mat = matYear.reset(d);
 		if (mat.find()) {
 			int beginIndex = mat.start();
@@ -436,12 +416,12 @@ public class TokenFilterDate extends TokenFilter {
 				//checking the length of remaining string yearZone
 				//is less than three as it can have only have
 				//"ad." or "bc," something like that at MAX
-				
+
 				if (!yearZone.contains("-")) {
 					yearStr = String.format("%04d", yearVal);
 					//					yearStr = String.format("%0"+ (4 - yearStr.length())
 					//					+"d%s", 0, yearStr);
-					
+
 					//String adbcRegex = "((a\\.?d)|(b\\.?c))(,|.)?";
 					matADBC.reset(yearZone);
 					if (matADBC.matches()) {
@@ -479,8 +459,8 @@ public class TokenFilterDate extends TokenFilter {
 							}
 						}
 					}
-					
-					
+
+
 					/*if (!yearZone.contains("bc") && !yearZone.contains("ad")) {
 						//else we have to check the next or prev token
 						//get the respective "AD" "BC" if any.
@@ -505,10 +485,10 @@ public class TokenFilterDate extends TokenFilter {
 						}
 						flagYear = true;
 					}
-					*/
-					
-					
-					
+					 */
+
+
+
 					//flagYear true means current token contains
 					//the AD or BC with the year value combined
 					//e.g. 1999AD or 500BC.
@@ -547,7 +527,7 @@ public class TokenFilterDate extends TokenFilter {
 								Integer firstYear = Integer.parseInt(firYearStr);
 								String secYearStr = hypenYears[1];
 								String remainSecYearStr = "";
-//								Matcher mSec = pattYear.matcher(secYearStr);
+								//								Matcher mSec = pattYear.matcher(secYearStr);
 								Matcher mSec = matYear.reset(secYearStr);
 								if (mSec.find()) {
 									remainSecYearStr = secYearStr.substring(mSec.end());
@@ -597,7 +577,7 @@ public class TokenFilterDate extends TokenFilter {
 					}
 				}
 			}
-			
+
 		}
 		//this character contains the value for date such
 		//1999, or 2000. then output will be
@@ -611,7 +591,7 @@ public class TokenFilterDate extends TokenFilter {
 		String dateIndex = "01";
 		String lastChar = "";
 		//Matcher mat = Pattern.compile(digitRegex).matcher(d);
-//		Matcher mat = pattYear.matcher(d);
+		//		Matcher mat = pattYear.matcher(d);
 		Matcher mat = matYear.reset(d);
 		if (mat.find()) {
 			int beginIndex = mat.start();

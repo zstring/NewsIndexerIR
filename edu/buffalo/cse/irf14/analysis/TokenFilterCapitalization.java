@@ -53,7 +53,8 @@ public class TokenFilterCapitalization extends TokenFilter {
 			token = stream.next();
 			if (token != null) {
 				String tkString = token.toString();
-				if (tkString != null && !tkString.isEmpty()) {
+				if (tkString != null && !tkString.isEmpty()
+						&& !tkString.equals(tkString.toLowerCase())) {
 					char[] tkChar = token.getTermBuffer();
 					boolean isCamel = true, isCap = false, isSpecialCap = false;
 					if (!(tkChar[0] >= 'a' && tkChar[0] <= 'z')) {
