@@ -13,9 +13,11 @@ import java.util.regex.Pattern;
  *
  */
 public class TokenFilterCapitalization extends TokenFilter {
-	private static Pattern pattCap;
+//	private static Pattern pattCap;
+	private static Matcher matCap;
 	static {
-		pattCap = Pattern.compile(".*\\w*(\\.|\\?)$");
+//		pattCap = Pattern.compile(".*\\w*(\\.|\\?)$");
+		matCap = Pattern.compile(".*\\w*(\\.|\\?)$").matcher("");
 	}
 
 	public TokenFilterCapitalization(TokenStream stream) {
@@ -111,7 +113,8 @@ public class TokenFilterCapitalization extends TokenFilter {
 								}
 							}
 							//if (prev.matches(".*\\w*(\\.|\\?)$")) {
-							if (pattCap.matcher(prev).matches()) {
+//							if (pattCap.matcher(prev).matches()) {
+							if (matCap.reset(prev).matches()) {
 								tkString = tkString.toLowerCase();
 							}
 							//							 will not work if more than two words are merged.
@@ -153,7 +156,8 @@ public class TokenFilterCapitalization extends TokenFilter {
 					prev = tk.toString();
 				}
 				//if (prev.matches(".*\\w*(\\.|\\?)$")) {
-				if (pattCap.matcher(prev).matches()) {
+//				if (pattCap.matcher(prev).matches()) {
+				if (matCap.reset(prev).matches()) {
 					break;
 				}
 				else {
@@ -169,7 +173,8 @@ public class TokenFilterCapitalization extends TokenFilter {
 					next = tk.toString();
 				}
 				//if (next.matches(".*\\w*(\\.|\\?)$")) {
-				if (pattCap.matcher(next).matches()) {
+//				if (pattCap.matcher(next).matches()) {
+				if (matCap.reset(prev).matches()) {
 					tokenLine.add(tk);
 					break;
 				}
@@ -180,5 +185,4 @@ public class TokenFilterCapitalization extends TokenFilter {
 			}
 			return tokenLine;
 		}
-
 	}

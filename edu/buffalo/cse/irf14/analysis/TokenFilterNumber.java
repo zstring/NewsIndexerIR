@@ -27,9 +27,11 @@ public class TokenFilterNumber extends TokenFilter{
 				+ "[0-9 ]?[bB]\\.?[cC]\\.?(\\W|$)|[0-9 ]?[Aa]\\.?[dD]\\.?(\\W|$)").matcher("");
 		//		pattYear = Pattern.compile("\\W[12]\\d{3}\\W");
 		matNumRem = Pattern.compile("(,|\\.)?[0-9]").matcher("");
-		matMonth = Pattern.compile("january|february|march|april|may|june|"
-				+ "july|august|september|october|november|december|jan|feb|mar|apr"
-				+ "|jun|jul|aug|sep|nov|dec").matcher("");
+		matMonth = Pattern.compile("(?:jan|january)|(?:feb|february)|"
+				+ "(?:mar|march)|(?:apr|april)|(?:may)|(?:jun|june)|"
+				+ "(?:jul|july)|(?:aug|august)|(?:sep|september)|"
+				+ "(?:oct|october)|(?:nov|november)|(?:dec|december)")
+				.matcher("");
 
 	}
 	public TokenFilterNumber(TokenStream stream) {
@@ -52,7 +54,6 @@ public class TokenFilterNumber extends TokenFilter{
 			if (token != null && !token.isDate() && !token.isTime()) {
 				boolean isDate = false;
 				String tkString = token.toString();
-				int currIndex = stream.getCurrentIndex();
 				matIsNum.reset(tkString);
 				if (matIsNum.matches()) {
 //				if (pattIsNum.matcher(tkString).matches()) {

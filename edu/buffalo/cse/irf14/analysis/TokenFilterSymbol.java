@@ -14,11 +14,12 @@ import java.util.regex.Pattern;
  *
  */
 public class TokenFilterSymbol extends TokenFilter {
-	private static Pattern pattSym, pattPunc, pattSingle;
+//	private static Pattern pattSym, pattPunc, pattSingle;
+	private static Matcher matSym, matPunc, matSingle;
 	static {
-		pattSym = Pattern.compile("(-|^)([a-zA-Z])+(-)+([a-zA-Z])+(-|$)");
-		pattPunc = Pattern.compile("(^| )['\"-]*|([-'\"\\.!\\?]*|'s)($| )");
-		pattSingle = Pattern.compile("'");
+		matSym = Pattern.compile("(-|^)([a-zA-Z])+(-)+([a-zA-Z])+(-|$)").matcher("");
+		matPunc = Pattern.compile("(^| )['\"-]*|([-'\"\\.!\\?]*|'s)($| )").matcher("");
+		matSingle = Pattern.compile("'").matcher("");
 	}
 	public TokenFilterSymbol(TokenStream stream) {
 		super(stream);
@@ -150,14 +151,17 @@ public class TokenFilterSymbol extends TokenFilter {
 
 				// Start or End with ' or " or -
 				// End with Punctuation
-				tkString = pattPunc.matcher(tkString).replaceAll(" ");
-				tkString = pattSingle.matcher(tkString).replaceAll("");
+//				tkString = pattPunc.matcher(tkString).replaceAll(" ");
+//				tkString = pattSingle.matcher(tkString).replaceAll("");
+				tkString = matPunc.reset(tkString).replaceAll(" ");
+				tkString = matSingle.reset(tkString).replaceAll("");
 				tkString = tkString.trim();
 
 				// Hyphens
 				String input = tkString;
 				int indexGrp2 = 0, indexGrp1 =0;
-				Matcher matcher = pattSym.matcher(tkString);
+//				Matcher matcher = pattSym.matcher(tkString);
+				Matcher matcher = matSym.reset(tkString);
 				while(matcher.find()) {
 					indexGrp1 = matcher.end(2);
 					indexGrp2 = matcher.end(3);

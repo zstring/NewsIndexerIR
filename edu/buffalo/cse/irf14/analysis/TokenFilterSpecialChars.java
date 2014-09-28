@@ -4,13 +4,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TokenFilterSpecialChars extends TokenFilter {
-	private static Pattern pattSpChar, pattSpCharRem;
+//	private static Pattern pattSpChar, pattSpCharRem;
 	private static Matcher matSpChar, matSpCharRem;
 	static {
-		pattSpChar = Pattern.compile("(.*[a-zA-Z])(-)([a-zA-Z].*)");
-		pattSpCharRem = Pattern.compile("[^\\.\\sa-zA-Z0-9-]");
-		matSpChar = pattSpChar.matcher("");
-		matSpCharRem = pattSpCharRem.matcher("");
+		matSpChar = Pattern.compile("(.*[a-zA-Z])(-)([a-zA-Z].*)").matcher("");
+		matSpCharRem = Pattern.compile("[^\\.\\sa-zA-Z0-9-]").matcher("");
 	}
 
 	public TokenFilterSpecialChars(TokenStream stream) {

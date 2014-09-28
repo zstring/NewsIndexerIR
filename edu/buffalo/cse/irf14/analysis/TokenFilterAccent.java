@@ -2,9 +2,6 @@
  * 
  */
 package edu.buffalo.cse.irf14.analysis;
-
-import java.text.Normalizer;
-
 /**
  * @author avinav
  *
