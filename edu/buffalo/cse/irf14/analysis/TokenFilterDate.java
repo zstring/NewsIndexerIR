@@ -19,9 +19,9 @@ public class TokenFilterDate extends TokenFilter {
 	private static Matcher matMonth, matTime, matYear, 
 	matAMPM, matADBC, matIsWord;
 	static {
-		String monthRegex = "(?:(january|jan)|(february|feb)|(march|mar)|"
+		String monthRegex = "(january|jan)|(february|feb)|(march|mar)|"
 				+ "(april|apr)|(may)|(june|jun)|(july|jul)|(august|aug)|"
-				+ "(september|sep)|(october|oct)|(november|nov)|(december|dec))[\\., ]?$";
+				+ "(september|sep)|(october|oct)|(november|nov)|(december|dec)";
 		matMonth = Pattern.compile(monthRegex).matcher("");
 		String timeRegex = "(\\d{1,2})(:(\\d{1,2}))?(:(\\d{1,2}))?";
 		matTime = Pattern.compile(timeRegex).matcher("");
