@@ -5,6 +5,7 @@ package edu.buffalo.cse.irf14.document;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,25 +42,42 @@ public class Parser {
 			throw new ParserException();
 		}
 		Document d = new Document();
+		
+		FileReader reader;
+		BufferedReader buff;
+		try {
+			reader = new FileReader(filename);
+			buff = new BufferedReader(reader);
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+			throw new ParserException();
+		}
+		
 		try {
 			int lastIndex = filename.lastIndexOf(File.separator)
 					, flag = 0;
-			String categoryPath = filename.substring(0, lastIndex);
-			String fileIdWithExtn = filename.substring(lastIndex + 1);
-			String fileId = fileIdWithExtn.replaceFirst("[.][^.]+$", "");
-			String category = categoryPath.substring(categoryPath.lastIndexOf
-					(File.separator) + 1);
+			String categoryPath, fileIdWithExtn, fileId, category;
+			if (lastIndex == -1) {
+				categoryPath = "";
+				fileIdWithExtn = filename;
+				category = "";
+			} else {
+				categoryPath = filename.substring(0, lastIndex);
+				fileIdWithExtn = filename.substring(lastIndex + 1);
+				category = categoryPath.substring(categoryPath.lastIndexOf
+						(File.separator) + 1);
+			}
+			fileId = fileIdWithExtn.replaceFirst("[.][^.]+$", "");
 			d.setField(FieldNames.FILEID, fileId);
 			d.setField(FieldNames.CATEGORY, category);
 			String line;
 			StringBuilder content = new StringBuilder();
 			//Had to use it because Document.SetField() accepts a String[]
-			String[] strAuthors = null;				
+//			String[] strAuthors = null;
+			String strAuthors = "";
 			List<String> authors = new ArrayList<String>();
-			FileReader reader = new FileReader(filename);
-			BufferedReader buff = new BufferedReader(reader);
 			// Had to use it because lists were easily modified.
-
 			while ((line = buff.readLine()) != null) {
 				line = line.trim();
 				if (!line.isEmpty()) {
@@ -71,13 +89,18 @@ public class Parser {
 					//If the second line has <AUTHOR> tag, call extractAuthor function to parse auhtors and organization.
 					else if(flag == 1 && line.contains("<AUTHOR>")) {
 						authors = extractAuthor(line);
-						strAuthors = authors.subList(1, authors.size()).toArray(new String[authors.size() - 1]);
-						if(authors.get(0).equals("n")) {
-							d.setField(FieldNames.AUTHOR, strAuthors);
-						}
-						else {
-							d.setField(FieldNames.AUTHOR, Arrays.copyOfRange(strAuthors, 0, strAuthors.length - 1));
-							d.setField(FieldNames.AUTHORORG, strAuthors[strAuthors.length - 1]);
+						if (authors.size() > 1) {
+//							strAuthors = authors.subList(1, authors.size()).toArray(new String[authors.size() - 1]);
+							strAuthors = authors.get(1);
+							if(authors.get(0).equals("n")) {
+								d.setField(FieldNames.AUTHOR, strAuthors);
+							}
+							else {
+//								d.setField(FieldNames.AUTHOR, Arrays.copyOfRange(strAuthors, 0, strAuthors.length - 1));
+//								d.setField(FieldNames.AUTHORORG, strAuthors[strAuthors.length - 1]);
+								d.setField(FieldNames.AUTHOR, strAuthors);
+								d.setField(FieldNames.AUTHORORG, authors.get(2));
+							}
 						}
 						flag = 2;
 					}
@@ -98,7 +121,7 @@ public class Parser {
 			buff.close();
 		} catch (Exception e) {
 			System.out.println("Error Occurred in Parser" + e.getMessage());
-			throw new ParserException();
+
 		}
 		return d;
 	}
@@ -147,6 +170,7 @@ public class Parser {
 	 */
 	public static List<String> extractAuthor(final String line) {
 		List <String> authors = new ArrayList<String>();
+		String author = "", authorOrg = "";
 		try {
 			int authorStartIndex = 0, authorEndIndex = 0, orgStartIndex = 0;
 			String orgName = null;
@@ -159,12 +183,14 @@ public class Parser {
 					}
 				else if (mat.group().equalsIgnoreCase(" and ")) {
 					authorEndIndex = mat.start();
-					authors.add(line.substring(authorStartIndex, authorEndIndex).trim());
+//					authors.add(line.substring(authorStartIndex, authorEndIndex).trim());
+					author = author + line.substring(authorStartIndex, authorEndIndex).trim() + " ";
 					authorStartIndex = authorEndIndex + 4;
 				}
 				else if (mat.group().equals(",")) {
 					authorEndIndex = mat.start();
-					authors.add(line.substring(authorStartIndex, authorEndIndex).trim());
+//					authors.add(line.substring(authorStartIndex, authorEndIndex).trim());
+					author += line.substring(authorStartIndex, authorEndIndex).trim() + " ";
 					orgStartIndex = authorEndIndex + 1;
 				}
 				else if (mat.group().equalsIgnoreCase("</AUTHOR>")) {
@@ -172,10 +198,12 @@ public class Parser {
 						orgName = line.substring(orgStartIndex, mat.start()).trim();
 					}
 					else {
-						authors.add(line.substring(authorStartIndex,mat.start()).trim());
+//						authors.add(line.substring(authorStartIndex,mat.start()).trim());
+						author += line.substring(authorStartIndex,mat.start()).trim() + " ";
 					}
 				}
 			}
+			authors.add(author.trim());
 			if (orgName != null) {
 				//Setting it as y so that calling function know that the last
 				//element is organization name.
