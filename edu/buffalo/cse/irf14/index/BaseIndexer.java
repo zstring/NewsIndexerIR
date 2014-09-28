@@ -42,6 +42,7 @@ public class BaseIndexer implements Serializable {
 		fieldName = new ArrayList<FieldNames>();
 		if (IndexType.AUTHOR.equals(indexerType)) {
 			fieldName.add(FieldNames.AUTHOR);
+			fieldName.add(FieldNames.AUTHORORG);
 		}
 		else if (IndexType.CATEGORY.equals(indexerType)) {
 			fieldName.add(FieldNames.CATEGORY);

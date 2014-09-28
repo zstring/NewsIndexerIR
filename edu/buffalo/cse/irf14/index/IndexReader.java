@@ -37,7 +37,7 @@ public class IndexReader {
 		this.type = type;
 		indexReaderOpen();
 	}
-	
+
 	private void indexReaderOpen() {
 		// TODO Auto-generated method stub
 		FileInputStream fi;
@@ -59,8 +59,8 @@ public class IndexReader {
 			fi = new FileInputStream(indexDir + java.io.File.separator + fileName);
 			GZIPInputStream gzipIn = new GZIPInputStream(fi);
 			ObjectInputStream ois = new ObjectInputStream(gzipIn);
-//			fi = new FileInputStream(indexDir + java.io.File.separator + "File");
-//			ObjectInputStream ois = new ObjectInputStream(fi);
+			//			fi = new FileInputStream(indexDir + java.io.File.separator + "File");
+			//			ObjectInputStream ois = new ObjectInputStream(fi);
 			bi = (BaseIndexer) ois.readObject();
 			indexKeys = (Integer[]) ois.readObject();
 			ois.close();
@@ -89,10 +89,11 @@ public class IndexReader {
 	 */
 	public int getTotalKeyTerms() {
 		//TODO : YOU MUST IMPLEMENT THIS
-		return bi.termMap.keySet().size();
-		//return -1;
+		if (bi != null && bi.termMap != null)
+			return bi.termMap.keySet().size();
+		return -1;
 	}
-	
+
 	/**
 	 * Get total number of terms from the "value" dictionary associated with this 
 	 * index. A postings list is always created with the "value" dictionary
@@ -101,7 +102,9 @@ public class IndexReader {
 	public int getTotalValueTerms() {
 		//TODO: YOU MUST IMPLEMENT THIS
 		//return bi.t
-		return bi.getDocNum();
+		if (bi != null)
+			return bi.getDocNum();
+		return -1;
 	}
 
 	/**
@@ -114,25 +117,27 @@ public class IndexReader {
 	 */
 	public Map<String, Integer> getPostings(String term) {
 		//TODO:YOU MUST IMPLEMENT THIS
-		Integer termId = bi.termDict.get(term);
 		Map<String, Integer> map = null;
-		if (termId != null) {
-			map = new HashMap<String, Integer>(bi.termMap.get(termId).getPosting());
-//			map = new HashMap<String, Integer>();
-//			Map<Integer, Posting> m = bi.termIndex.get(termId);
-//			Map<Integer, String> doc = bi.docDict;
-//			if (m != null) {
-//				for (Iterator<Integer> i = m.keySet().iterator(); i.hasNext();) {
-//					Integer in = i.next();
-//					String docName = doc.get(in);
-//					int termFreq = m.get(in).getTermFreq();
-//					map.put(docName, termFreq);
-//				}
-//			}
+		if (bi != null && bi.termDict != null) {
+			Integer termId = bi.termDict.get(term);
+			if (termId != null) {
+				map = new HashMap<String, Integer>(bi.termMap.get(termId).getPosting());
+				//			map = new HashMap<String, Integer>();
+				//			Map<Integer, Posting> m = bi.termIndex.get(termId);
+				//			Map<Integer, String> doc = bi.docDict;
+				//			if (m != null) {
+				//				for (Iterator<Integer> i = m.keySet().iterator(); i.hasNext();) {
+				//					Integer in = i.next();
+				//					String docName = doc.get(in);
+				//					int termFreq = m.get(in).getTermFreq();
+				//					map.put(docName, termFreq);
+				//				}
+				//			}
+			}
 		}
 		return map;
 	}
-	
+
 	/**
 	 * Method to get the top k terms from the index in terms of the total number
 	 * of occurrences.
@@ -143,16 +148,18 @@ public class IndexReader {
 	public List<String> getTopK(int k) {
 		//TODO YOU MUST IMPLEMENT THIS
 		List<String> topKTerms = null;
-		int len = indexKeys.length - 1;
-		if (k > 0)
-			topKTerms = new ArrayList<String>();
-		for (int i = 0; i < k && i <= len; i++) {
-			String termText = bi.termMap.get(indexKeys[len - i]).getTermText();
-			topKTerms.add(termText);
+		if (bi != null && bi.termMap != null) {
+			int len = indexKeys.length - 1;
+			if (k > 0)
+				topKTerms = new ArrayList<String>();
+			for (int i = 0; i < k && i <= len; i++) {
+				String termText = bi.termMap.get(indexKeys[len - i]).getTermText();
+				topKTerms.add(termText);
+			}
 		}
 		return topKTerms;
 	}
-	
+
 	/**
 	 * Method to implement a simple boolean AND query on the given index
 	 * @param terms The ordered set of terms to AND, similar to getPostings()
@@ -165,20 +172,23 @@ public class IndexReader {
 	 */
 	public Map<String, Integer> query(String...terms) {
 		//TODO : BONUS ONLY
-		Map<String, Integer> output = getPostings(terms[0]);
-		for (int i = 1; i < terms.length; i++) {
-			Map<String, Integer> m = getPostings(terms[i]);
-			output.keySet().retainAll(m.keySet());
-			for (Iterator<String> it = output.keySet().iterator(); it.hasNext();) {
-				String in = it.next();
-				Integer freq = output.get(in) + m.get(in);
-				output.put(in, freq);
+		Map<String, Integer> output = null;
+		if (terms != null) {
+			output = getPostings(terms[0]);
+			for (int i = 1; i < terms.length; i++) {
+				Map<String, Integer> m = getPostings(terms[i]);
+				output.keySet().retainAll(m.keySet());
+				for (Iterator<String> it = output.keySet().iterator(); it.hasNext();) {
+					String in = it.next();
+					Integer freq = output.get(in) + m.get(in);
+					output.put(in, freq);
+				}
 			}
+			if (output.isEmpty()) return null;
 		}
-		if (output.isEmpty()) return null;
 		return output;
 	}
-	
+
 	public static void main(String[] args) {
 		String indexAddr = "/home/inspire/Dropbox/UB/JavaWorkspace/newsindexer/news_training";
 		IndexType type = IndexType.TERM;

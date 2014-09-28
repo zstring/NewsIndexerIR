@@ -183,7 +183,8 @@ public class Parser {
 				authors.add(orgName);
 			}
 		} catch (Exception e) {
-			System.out.println(" Error " + e.getMessage());
+			System.out.println(" Error while extracting author "
+					+ "during parser" + e.getMessage());
 		}
 		return authors;
 	}
