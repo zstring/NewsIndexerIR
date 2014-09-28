@@ -21,14 +21,14 @@ import edu.buffalo.cse.irf14.analysis.TokenStream;
  * Class that parses a given file into a Document
  */
 public class Parser {
-	private static Pattern pattMonth;
-	private static Pattern pattAuthor;
+	private static Matcher matMonth;
+	private static Matcher matAuthor;
 	static {
 		String months = "(jan)|(feb)|(mar)|(apr)|(may)|(jun)|"
 				+ "(jul)|(aug)|(sep)|(oct)|(nov)|(dec)";
-		pattMonth = Pattern.compile(months, Pattern.CASE_INSENSITIVE);
+		matMonth = Pattern.compile(months, Pattern.CASE_INSENSITIVE).matcher("");
 		String regex = " (by) | (and) |,|</author>";
-		pattAuthor = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+		matAuthor = Pattern.compile(regex, Pattern.CASE_INSENSITIVE).matcher("");
 	}
 	/** Static method to parse the given file into the Document object.
 	 * @param filename : The fully qualified filename to be parsed
@@ -116,7 +116,7 @@ public class Parser {
 			if (line.contains("-")) {
 				content = line.substring(line.indexOf("-")+1);
 				line = line.substring(0,line.indexOf("-"));
-				Matcher mat = pattMonth.matcher(line);
+				Matcher mat = matMonth.reset(line);
 				int monthIndex = -1;
 				if (mat.find()) {
 					monthIndex = mat.start();
@@ -152,7 +152,7 @@ public class Parser {
 			String orgName = null;
 			//if first element = n, there is no organization name in the list
 			authors.add("n");
-			Matcher mat = pattAuthor.matcher(line);
+			Matcher mat = matAuthor.reset(line);
 			while (mat.find()) {
 				if (mat.group().equalsIgnoreCase(" by ")) {
 					authorStartIndex = mat.end();
