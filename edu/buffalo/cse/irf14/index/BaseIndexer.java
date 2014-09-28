@@ -161,7 +161,7 @@ public class BaseIndexer implements Serializable {
 			if (diff < 0) return 1;
 			else if (diff > 0) return -1;
 			else 
-				return -1 * (term1.getTermText().compareTo(term2.getTermText()));
+				return (term1.getTermText().compareTo(term2.getTermText()));
 		}
 	}
 }
