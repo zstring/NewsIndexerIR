@@ -28,3 +28,4 @@ public interface Analyzer {
 	 */
 	public abstract TokenStream getStream();
 }
+ 

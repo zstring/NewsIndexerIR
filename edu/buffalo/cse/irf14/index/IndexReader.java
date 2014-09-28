@@ -149,11 +149,11 @@ public class IndexReader {
 		//TODO YOU MUST IMPLEMENT THIS
 		List<String> topKTerms = null;
 		if (bi != null && bi.termMap != null) {
-			int len = indexKeys.length - 1;
+			int len = indexKeys.length;
 			if (k > 0)
 				topKTerms = new ArrayList<String>();
-			for (int i = 0; i < k && i <= len; i++) {
-				String termText = bi.termMap.get(indexKeys[len - i]).getTermText();
+			for (int i = 0; i < k && i < len; i++) {
+				String termText = bi.termMap.get(indexKeys[i]).getTermText();
 				topKTerms.add(termText);
 			}
 		}
