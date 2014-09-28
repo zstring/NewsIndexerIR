@@ -3,8 +3,6 @@
  */
 package edu.buffalo.cse.irf14.analysis;
 
-import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -12,7 +10,7 @@ import java.util.regex.Pattern;
  *
  */
 public class TokenFilterNumber extends TokenFilter{
-	private static Pattern pattIsNum, pattDate, pattYear, pattMonth, pattNumRem,pattTimeYear;
+	private static Pattern pattIsNum, pattDate, pattMonth, pattNumRem;
 	static {
 		pattIsNum = Pattern.compile("[^a-zA-z]*[0-9][^a-zA-Z]*");
 		pattDate = Pattern.compile("[0-9 ]?[AapP]\\.?[mM]\\.?(\\W|$)|"
@@ -41,11 +39,11 @@ public class TokenFilterNumber extends TokenFilter{
 		if (stream.hasNext()) {
 			Token token;
 			token = stream.next();
-			if (token != null) {
+			if (!token.isDate() && !token.isTime() && token != null) {
 				boolean isDate = false;
 				String tkString = token.toString();
 				int currIndex = stream.getCurrentIndex();
-				if (!token.isDate() && pattIsNum.matcher(tkString).matches()) {
+				if (pattIsNum.matcher(tkString).matches()) {
 					Token[] prevTokens = stream.getPrevTokens(2);
 					StringBuilder prevTokenString = new StringBuilder("");
 					for (int i = 0; i < prevTokens.length; i++) {

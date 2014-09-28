@@ -131,7 +131,7 @@ public class TokenFilterSymbol extends TokenFilter {
 		if (stream.hasNext()) {
 			Token token;
 			token = stream.next();
-			if (token != null) {
+			if (token != null && !token.isDate() && !token.isTime()) {
 				String tkString = token.toString();
 				// Word Contractions
 				if (contractions.containsKey(tkString.toLowerCase())) {
