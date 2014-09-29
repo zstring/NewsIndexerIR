@@ -41,7 +41,6 @@ public class IndexReader {
 	private void indexReaderOpen() {
 		// TODO Auto-generated method stub
 		FileInputStream fi;
-		double start = System.currentTimeMillis();
 		String fileName = "";
 		try {
 			if (IndexType.AUTHOR.equals(type)) {
@@ -59,15 +58,10 @@ public class IndexReader {
 			fi = new FileInputStream(indexDir + java.io.File.separator + fileName);
 			GZIPInputStream gzipIn = new GZIPInputStream(fi);
 			ObjectInputStream ois = new ObjectInputStream(gzipIn);
-			//			fi = new FileInputStream(indexDir + java.io.File.separator + "File");
-			//			ObjectInputStream ois = new ObjectInputStream(fi);
 			bi = (BaseIndexer) ois.readObject();
 			indexKeys = (Integer[]) ois.readObject();
 			ois.close();
 			fi.close();
-			System.out.println("Reading Process Complete");
-			double timeSpent = System.currentTimeMillis() - start;
-			System.out.println("Time spent in Reading : " + timeSpent);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Exception in Writer File Not Found");
@@ -78,6 +72,8 @@ public class IndexReader {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -118,22 +114,16 @@ public class IndexReader {
 	public Map<String, Integer> getPostings(String term) {
 		//TODO:YOU MUST IMPLEMENT THIS
 		Map<String, Integer> map = null;
-		if (bi != null && bi.termDict != null) {
-			Integer termId = bi.termDict.get(term);
-			if (termId != null) {
-				map = new HashMap<String, Integer>(bi.termMap.get(termId).getPosting());
-				//			map = new HashMap<String, Integer>();
-				//			Map<Integer, Posting> m = bi.termIndex.get(termId);
-				//			Map<Integer, String> doc = bi.docDict;
-				//			if (m != null) {
-				//				for (Iterator<Integer> i = m.keySet().iterator(); i.hasNext();) {
-				//					Integer in = i.next();
-				//					String docName = doc.get(in);
-				//					int termFreq = m.get(in).getTermFreq();
-				//					map.put(docName, termFreq);
-				//				}
-				//			}
+		try {
+			if (bi != null && bi.termDict != null) {
+				Integer termId = bi.termDict.get(term);
+				if (termId != null) {
+					map = new HashMap<String, Integer>(bi.termMap.get(termId).getPosting());
+				}
 			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
 		}
 		return map;
 	}
