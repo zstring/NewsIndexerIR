@@ -35,7 +35,7 @@ public class TokenStream implements Iterator<Token>{
 	@Override
 	public boolean hasNext() {
 		// TODO YOU MUST IMPLEMENT THIS
-		if (idx < tokenList.size() - 1) {
+		if (idx >= -1 && idx < tokenList.size() - 1) {
 			return true;
 		}
 		return false;
@@ -61,7 +61,7 @@ public class TokenStream implements Iterator<Token>{
 	}
 	
 	public boolean hasPrevious() {
-		if (idx > 0) {
+		if (idx > 0 && idx <= tokenList.size()) {
 			return true;
 		}
 		return false;
@@ -194,6 +194,9 @@ public class TokenStream implements Iterator<Token>{
 		return tkPrevList;
 	}*/
 	public Token[] getPrevTokens(int n) {
+		if (n <= 0) {
+			return new Token[1];
+		}
 		Token[] tkPrevList = new Token[2*n + 1];
 		int sz = tokenList.size();
 		for (int i = n - 1; i >= 0 && idx + i - n >= 0; i--)
