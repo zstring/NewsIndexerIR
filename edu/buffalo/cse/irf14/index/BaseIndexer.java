@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.buffalo.cse.irf14.analysis.Analyzer;
-import edu.buffalo.cse.irf14.analysis.AnalyzerTerm;
 import edu.buffalo.cse.irf14.analysis.AnalyzerFactory;
 import edu.buffalo.cse.irf14.analysis.Token;
 import edu.buffalo.cse.irf14.analysis.TokenStream;
@@ -60,7 +59,10 @@ public class BaseIndexer implements Serializable {
 	}
 
 	public Set<Integer> getTermKeys() {
-		return termMap.keySet();
+		if (termMap != null) {
+			return termMap.keySet();
+		}
+		return null;
 	}
 	
 	public int getDocNum() {

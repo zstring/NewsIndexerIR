@@ -51,6 +51,9 @@ public class IndexWriter {
 	 */
 	public void addDocument(Document d) throws IndexerException {
 		//TODO : YOU MUST IMPLEMENT THIS
+		if (d == null) {
+			throw new IndexerException();
+		}
 		biAuthor.addDocument(d);
 		biCategory.addDocument(d);
 		biPlace.addDocument(d);
@@ -64,22 +67,22 @@ public class IndexWriter {
 	 */
 	public void close() throws IndexerException {
 		//TODO
-		String[] fileNames = {"AUTHOR", "CATEGORY", "PLACE", "TERM"};
-		Integer[][] termIndexKeys = new Integer[4][]; 
-		biAuthor.setDocNum();
-		biCategory.setDocNum();
-		biPlace.setDocNum();
-		biTerm.setDocNum();
-		termIndexKeys[0] = biAuthor.getTermKeys().toArray(new Integer[0]);
-		termIndexKeys[1] = biCategory.getTermKeys().toArray(new Integer[0]);
-		termIndexKeys[2] = biPlace.getTermKeys().toArray(new Integer[0]);
-		termIndexKeys[3] = biTerm.getTermKeys().toArray(new Integer[0]);
-		Arrays.sort(termIndexKeys[0], biAuthor.new SortByFreq());
-		Arrays.sort(termIndexKeys[1], biCategory.new SortByFreq());
-		Arrays.sort(termIndexKeys[2], biPlace.new SortByFreq());
-		Arrays.sort(termIndexKeys[3], biTerm.new SortByFreq());
-		FileOutputStream fo;
 		try {
+			String[] fileNames = {"AUTHOR", "CATEGORY", "PLACE", "TERM"};
+			Integer[][] termIndexKeys = new Integer[4][]; 
+			biAuthor.setDocNum();
+			biCategory.setDocNum();
+			biPlace.setDocNum();
+			biTerm.setDocNum();
+			termIndexKeys[0] = biAuthor.getTermKeys().toArray(new Integer[0]);
+			termIndexKeys[1] = biCategory.getTermKeys().toArray(new Integer[0]);
+			termIndexKeys[2] = biPlace.getTermKeys().toArray(new Integer[0]);
+			termIndexKeys[3] = biTerm.getTermKeys().toArray(new Integer[0]);
+			Arrays.sort(termIndexKeys[0], biAuthor.new SortByFreq());
+			Arrays.sort(termIndexKeys[1], biCategory.new SortByFreq());
+			Arrays.sort(termIndexKeys[2], biPlace.new SortByFreq());
+			Arrays.sort(termIndexKeys[3], biTerm.new SortByFreq());
+			FileOutputStream fo;
 			fo = new FileOutputStream(indexDir + java.io.File.separator + fileNames[0]);
 			GZIPOutputStream gzipOut = new GZIPOutputStream(fo);
 			ObjectOutputStream oos = new ObjectOutputStream(gzipOut);
@@ -115,14 +118,18 @@ public class IndexWriter {
 			oos.flush();
 			oos.close();
 			fo.close();
-			System.out.println("Writing Process Complete");
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Exception in Writer File Not Found");
 			e.printStackTrace();
+			throw new IndexerException();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Exception in Writer IO Exception");
+			e.printStackTrace();
+			throw new IndexerException();
+		} catch (Exception e) {
+			System.out.println("Error Occured");
 			e.printStackTrace();
 		}
 	}

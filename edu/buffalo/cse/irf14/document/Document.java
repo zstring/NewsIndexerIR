@@ -43,8 +43,8 @@ public class Document {
 		result.append("FILEID : " + this.getField(FieldNames.FILEID)[0] + "\n");
 		result.append("Title : " + this.getField(FieldNames.TITLE)[0] + "\n");
 		if (this.getField(FieldNames.AUTHOR) != null && this.getField(FieldNames.AUTHOR).length > 0) {
-			for (int i = 0; i<this.getField(FieldNames.AUTHOR).length; i++)
-				result.append("Author : " + this.getField(FieldNames.AUTHOR)[i] + "\n");
+//			for (int i = 0; i<this.getField(FieldNames.AUTHOR).length; i++)
+		result.append("Author : " + this.getField(FieldNames.AUTHOR)[0] + "\n");
 		}
 		if (this.getField(FieldNames.AUTHORORG) != null)
 			result.append("Author Org : " + this.getField(FieldNames.AUTHORORG)[0] + "\n");

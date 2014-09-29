@@ -68,7 +68,8 @@ public class Tokenizer {
 				tokenStream.setTokenList(tokenList);
 			}
 		} catch (Exception e) {
-			throw new TokenizerException();
+//			throw new TokenizerException();
+			e.printStackTrace();
 		}
 		return tokenStream;
 	}
