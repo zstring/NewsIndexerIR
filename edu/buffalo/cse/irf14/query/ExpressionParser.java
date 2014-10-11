@@ -47,7 +47,8 @@ public class ExpressionParser implements Expression {
 		
 		Stack<Expression> operator = new Stack<Expression>();
 		Stack<Expression> operand = new Stack<Expression>();
-		boolean dQuotesOn = false,dQuotesOff = false, defaultIndex = true, superDefaultIndex = false;
+		boolean dQuotesOn = false,dQuotesOff = false, defaultIndex = true, 
+				superDefaultIndex = false, isDefaultOperator = false;
 		String index = "";
 		StringBuilder quotedString = new StringBuilder("");
 		while (tokenStream.hasNext()) {
@@ -61,7 +62,12 @@ public class ExpressionParser implements Expression {
 					Expression term = new Term(quotedString.toString());
 					operand.push(term);
 					quotedString = new StringBuilder("");
-					defaultIndex = !defaultIndex;
+					if(!superDefaultIndex) {
+						defaultIndex = true;
+					}
+					if (isDefaultOperator) {
+						operator.push(new Term("OR"));
+					}
 				}
 				dQuotesOff = !dQuotesOff;
 			}
@@ -72,12 +78,15 @@ public class ExpressionParser implements Expression {
 					"CATEGORY".equalsIgnoreCase(token) || "PLACE".equalsIgnoreCase(token)) {
 				index = token;
 				defaultIndex = false;
+				isDefaultOperator = false;
 			}
 			else if(")".equals(token)) {
 				operator.push(new Term(token));
 				ObjectifyBracket(operand,operator);
 				superDefaultIndex = false;
 				defaultIndex = true;
+				
+				isDefaultOperator = false;
 			}
 			else if ("AND".equalsIgnoreCase(token)||"OR".equalsIgnoreCase(token)||
 					"NOT".equalsIgnoreCase(token)||"(".equals(token)) {
@@ -86,13 +95,24 @@ public class ExpressionParser implements Expression {
 				}
 				Expression term = new Term(token);
 				operator.push(term);
+				
+				isDefaultOperator = false;
 			}
 			else {
 				Expression qterm = new QTerm(token,index);
 				operand.push(qterm);
+				/* if defaultIndex is true, default index, "term" is used
+				 * superDefaultIndex is true when it sees and (
+				 * defaultIndex should not be made true
+				 */
 				if(!superDefaultIndex) {
 					defaultIndex = true;
 				}
+				// if two continuous terms occur isDefaultOperator index is true
+				if (isDefaultOperator) {
+					operator.push(new Term("OR"));
+				}
+				isDefaultOperator = true;
 			}
 		}
 		ObjectifyEnd(operator, operand);
