@@ -12,6 +12,5 @@ public interface Expression {
 	 *
 	 * @return
 	 */
-	@Override
-	public String toString();
+	public String toSudoString();
 }
