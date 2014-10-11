@@ -18,7 +18,7 @@ public class OrOperator implements Expression {
 	@Override
 	public String toSudoString() {
 		// TODO Auto-generated method stub
-		return null;
+		return leftOperand.toString() + " OR " + rightOperand.toString();
 	}
 
 	@Override

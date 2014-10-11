@@ -16,7 +16,7 @@ public class NotOperator implements Expression {
 	@Override
 	public String toSudoString() {
 		// TODO Auto-generated method stub
-		return null;
+		return "<" + operand.toString() + ">";
 	}
 
 	@Override

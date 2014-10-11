@@ -17,7 +17,7 @@ public class AndOperator implements Expression {
 	@Override
 	public String toSudoString() {
 		// TODO Auto-generated method stub
-		return null;
+		return leftOperand.toString() + " AND " + rightOperand.toString();
 	}
 
 	@Override

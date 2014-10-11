@@ -22,7 +22,7 @@ public class QBracket implements Expression {
 	@Override
 	public String toSudoString() {
 		// TODO Auto-generated method stub
-		return null;
+		return "[ " + encapsulate.toString() + " ]";
 	}
 
 	@Override
