@@ -11,10 +11,15 @@ public class Term implements Expression {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-	
+
 	@Override
-	public String toString() {
-		return this.name;
+	public String toSudoString() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
+	@Override
+	public String toString() {
+		return toSudoString();
+	}
 }
