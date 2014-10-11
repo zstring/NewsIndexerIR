@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 
 import edu.buffalo.cse.irf14.analysis.TokenStream;
 import edu.buffalo.cse.irf14.analysis.Tokenizer;
-import edu.buffalo.cse.irf14.analysis.TokenizerException;
 
 /**
  * @author avinav and himanshu
@@ -48,18 +47,21 @@ public class ExpressionParser implements Expression {
 		
 		Stack<Expression> operator = new Stack<Expression>();
 		Stack<Expression> operand = new Stack<Expression>();
-		boolean dQuotesOn = false,dQuotesOff = false;
+		boolean dQuotesOn = false,dQuotesOff = false, defaultIndex = true, superDefaultIndex = false;
+		String index = "";
 		StringBuilder quotedString = new StringBuilder("");
 		while (tokenStream.hasNext()) {
 			String token = tokenStream.next().toString();
-			String index = "TERM";
-			
+			if (defaultIndex) {
+			index = "TERM";
+			}
 			if ("\"".equals(token)) {
 				dQuotesOn = !dQuotesOn;
 				if (dQuotesOff) {
 					Expression term = new Term(quotedString.toString());
 					operand.push(term);
 					quotedString = new StringBuilder("");
+					defaultIndex = !defaultIndex;
 				}
 				dQuotesOff = !dQuotesOff;
 			}
@@ -69,32 +71,106 @@ public class ExpressionParser implements Expression {
 			else if ("AUTHOR".equalsIgnoreCase(token) || "TERM".equalsIgnoreCase(token) ||
 					"CATEGORY".equalsIgnoreCase(token) || "PLACE".equalsIgnoreCase(token)) {
 				index = token;
+				defaultIndex = false;
 			}
 			else if(")".equals(token)) {
-				Expression popped = operator.pop();
-				Objectify(operator,operand,popped);
+				operator.push(new Term(token));
+				ObjectifyBracket(operand,operator);
+				superDefaultIndex = false;
+				defaultIndex = true;
 			}
 			else if ("AND".equalsIgnoreCase(token)||"OR".equalsIgnoreCase(token)||
-					"NOT".equalsIgnoreCase(token)||"(".equalsIgnoreCase(token)) {
+					"NOT".equalsIgnoreCase(token)||"(".equals(token)) {
+				if ("(".equals(token)) {
+					superDefaultIndex = true;
+				}
 				Expression term = new Term(token);
 				operator.push(term);
 			}
 			else {
 				Expression qterm = new QTerm(token,index);
 				operand.push(qterm);
+				if(!superDefaultIndex) {
+					defaultIndex = true;
+				}
 			}
-			
 		}
-		
-		return null;
+		ObjectifyEnd(operator, operand);
+		return this.expression = operand.pop();
 	}
 	
-	public void Objectify(Stack<Expression> operator,Stack<Expression> operand, Expression popped) {
-		if ("AND".equalsIgnoreCase(popped.toString())) {
-			
+	public void ObjectifyBracket(Stack<Expression> operator,Stack<Expression> operand) throws Exception {
+		// Removing the ) that was pushed for calling this method
+		Expression popped = operator.pop();
+		/* It can only encounter AND,NOT,OR or ( 
+		 * It cannot encounter ) because it is the first ) itself.
+		 */
+		while (true) {
+			popped = operator.pop();
+			Objectify(operator, operand, popped);
+			if ("(".equals(popped.toString())) {
+				break;
+			}
 		}
-		Expression qterm = operator.pop();
-		
+	}
+	
+	public void ObjectifyEnd(Stack<Expression> operator,Stack<Expression> operand) throws Exception {
+		if (operator.isEmpty()) {
+			throw new Exception("Operator Stack underflow while ending");
+		}
+		Expression popped;
+		while (!operator.isEmpty()) {
+			popped = operator.pop();
+			Objectify(operator, operand, popped);
+		}
+	}
+	/* It can only encounter AND,NOT,OR or ( 
+	 * It cannot encounter ) because it is the first ) itself.
+	 */
+	public void Objectify(Stack<Expression> operator,Stack<Expression> operand, Expression popped) throws Exception {
+		String poppedText = popped.toString();
+		if ("AND".equalsIgnoreCase(poppedText)) {
+			if (operand.size() >= 2 ) {
+				Expression rightOperand = operand.pop();
+				Expression leftOperand = operand.pop();
+				Expression andOp = new AndOperator(leftOperand,rightOperand);
+				operand.push(andOp);
+			}
+			else {
+				throw new Exception("Operand Stack Underflow for AND operator");
+			}
+		}
+		else if ("OR".equalsIgnoreCase(poppedText)) {
+			if (operand.size() >=2) {
+				Expression rightOperand = operand.pop();
+				Expression leftOperand = operand.pop();
+				Expression orOp = new OrOperator(leftOperand,rightOperand);
+				operand.push(orOp);
+			}
+			else {
+				throw new Exception("Operand Stack Underflow for OR operator");
+			}
+		}
+		else if("NOT".equalsIgnoreCase(poppedText)) {
+			if (operand.size() >= 1) {
+				Expression op = operand.pop();
+				Expression notOp = new NotOperator(op);
+				operand.push(notOp);
+			}
+			else {
+				throw new Exception("Operand Stack Underflow for NOT operator");
+			}
+		}
+		else if("(".equals(poppedText)) {
+			if (operand.size() >= 1) {
+				Expression encaps = operand.pop();
+				Expression opBrack = new QBracket(encaps);
+				operand.push(opBrack);
+			}
+			else {
+				throw new Exception("Operand Stack Underflow for Brackets");
+			}
+		}
 	}
 
 	@Override
