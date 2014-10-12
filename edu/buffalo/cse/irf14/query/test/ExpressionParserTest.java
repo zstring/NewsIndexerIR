@@ -23,7 +23,7 @@ public class ExpressionParserTest {
 			"{ Author:rushdie AND <Term:jihad> }",
 			"{ Category:War AND Author:Dutt AND Place:Baghdad AND Term:prisoners OR Term:detainees OR Term:rebels }",
 			"{ [ Term:Love AND <Term:War> ] AND [ Category:movies AND <Category:crime> ] }",
-			"{ author:rushdie AND <Term:\"jihad hello\"> }"};
+			"{ Author:rushdie AND <Term:\"jihad hello\"> }"};
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		

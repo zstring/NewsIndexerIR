@@ -8,8 +8,8 @@ import edu.buffalo.cse.irf14.index.Posting;
 
 public class QTerm extends QIndexType implements Expression {
 	private String term;
-	private String index;
-	public QTerm(String term, String index) {
+	private IndexType index;
+	public QTerm(String term, IndexType index) {
 		this.term = term;
 		this.index = index;
 	}
@@ -24,7 +24,7 @@ public class QTerm extends QIndexType implements Expression {
 	@Override
 	public String toSudoString() {
 		// TODO Auto-generated method stub
-		return null;
+		return index.toString() + ":" + term;
 	}
 
 	@Override

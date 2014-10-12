@@ -65,12 +65,13 @@ public class ExpressionParser implements Expression {
 		Stack<Expression> operand = new Stack<Expression>();
 		boolean dQuotesOn = false,dQuotesOff = false, defaultIndex = true, 
 				superDefaultIndex = false, isDefaultOperator = false, notOperator = false;
-		String index = "";
+		//String index = "";
+		IndexType index = IndexType.TERM;
 		StringBuilder quotedString = new StringBuilder("\"");
 		while (tokenStream.hasNext()) {
 			String token = tokenStream.next().toString();
 			if (defaultIndex) {
-				index = "Term";
+				index = IndexType.TERM;
 			}
 			if ("\"".equals(token)) {
 				dQuotesOn = !dQuotesOn;
@@ -96,9 +97,23 @@ public class ExpressionParser implements Expression {
 			else if(dQuotesOn) {
 				quotedString.append(token+" ");
 			}
-			else if ("AUTHOR".equalsIgnoreCase(token) || "TERM".equalsIgnoreCase(token) ||
-					"CATEGORY".equalsIgnoreCase(token) || "PLACE".equalsIgnoreCase(token)) {
-				index = token;
+			else if ("AUTHOR".equalsIgnoreCase(token)){
+				index = IndexType.AUTHOR;
+				defaultIndex = false;
+				isDefaultOperator = false;
+			}
+			else if ("TERM".equalsIgnoreCase(token)) {
+				index = IndexType.TERM;
+				defaultIndex = false;
+				isDefaultOperator = false;
+			}
+			else if ("CATEGORY".equalsIgnoreCase(token)) {
+				index = IndexType.CATEGORY;
+				defaultIndex = false;
+				isDefaultOperator = false;
+			}
+			else if ("PLACE".equalsIgnoreCase(token)) {
+				index = IndexType.PLACE;
 				defaultIndex = false;
 				isDefaultOperator = false;
 			}
