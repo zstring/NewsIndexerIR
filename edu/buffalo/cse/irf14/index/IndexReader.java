@@ -127,7 +127,23 @@ public class IndexReader {
 		}
 		return map;
 	}
-
+	
+	/*
+	 * return the Map<String, Posting> for 
+	 * given term from baseIndexer Object
+	 */
+	public Map<String, Posting> getPostingList(String term) {
+		try {
+			if (bi != null && bi.termDict != null) {
+				Integer termId = bi.termDict.get(term);
+				return bi.termMap.get(termId).getPostingList();
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 	/**
 	 * Method to get the top k terms from the index in terms of the total number
 	 * of occurrences.

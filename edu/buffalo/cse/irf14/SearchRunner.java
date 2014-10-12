@@ -50,6 +50,7 @@ public class SearchRunner {
 
 	private void setUpIndexReader() {
 		// TODO Auto-generated method stub
+		reader = new HashMap<IndexType, IndexReader>();
 		reader.put(IndexType.AUTHOR, new IndexReader(indexDir, IndexType.AUTHOR));
 		reader.put(IndexType.CATEGORY, new IndexReader(indexDir, IndexType.CATEGORY));
 		reader.put(IndexType.PLACE, new IndexReader(indexDir, IndexType.PLACE));

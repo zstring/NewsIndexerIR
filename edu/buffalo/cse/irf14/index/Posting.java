@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Posting implements Serializable {
 
-	private static final long serialVersionUID = 23L;
+	private static final long serialVersionUID = 43L;
 	private int termFreq;
 	private List<Integer> posIndex;
 
