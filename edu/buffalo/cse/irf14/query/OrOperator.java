@@ -14,7 +14,10 @@ public class OrOperator implements Expression {
 	@Override
 	public Map<String, Posting> interpret() {
 		// TODO Auto-generated method stub
-		return null;
+		Map<String, Posting> leftMap = this.leftOperand.interpret();
+		Map<String, Posting> rightMap = this.rightOperand.interpret();
+		leftMap.putAll(rightMap);
+		return leftMap;
 	}
 
 	@Override
