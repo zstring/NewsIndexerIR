@@ -17,7 +17,7 @@ public class Token {
 	private String termText;
 	//The char array backing termText
 	private char[] termBuffer;
-	
+	private int posIndex;
 	private boolean isDate;
 	private boolean isTime;
 
@@ -26,6 +26,11 @@ public class Token {
 		this.isTime = false;
 	}
 
+	public Token (int posIndex) {
+		this.isDate = false;
+		this.isTime = false;
+		this.posIndex = posIndex;
+	}
 	/**
 	 * Method to set the termText to given text.
 	 * This is a sample implementation and you CAN change this
@@ -122,6 +127,10 @@ public class Token {
 
 	public void setTime(boolean isTime) {
 		this.isTime = isTime;
+	}
+	
+	public int getPosIndex() {
+		return this.posIndex;
 	}
 
 }

@@ -58,7 +58,9 @@ public class Tokenizer {
 			for (int i = 0; i < words.length; i++) {
 				String word = words[i].trim();
 				if (!word.isEmpty()) {
-					Token tk = new Token();
+					// passing the ith position to store the location 
+					// in a document Positional Index
+					Token tk = new Token(i); 
 					tk.setTermText(word);
 					tokenList.add(tk);
 				}

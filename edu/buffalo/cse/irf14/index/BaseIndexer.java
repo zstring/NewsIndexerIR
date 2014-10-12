@@ -134,14 +134,14 @@ public class BaseIndexer implements Serializable {
 							if (tkInt == null) {
 								//increment term id
 								termId += 1;
-								Term term = new Term(tkString, termId, docTerm);
+								Term term = new Term(tkString, termId, docTerm, tk.getPosIndex());
 								this.termDict.put(tkString, termId);
 								this.termMap.put(termId, term);
 							}
 							// If term already exist in index
 							else {
 								Term term = termMap.get(tkInt);
-								term.addOrUpdateDoc(docTerm);
+								term.addOrUpdateDoc(docTerm, tk.getPosIndex());
 							}
 						}
 					}

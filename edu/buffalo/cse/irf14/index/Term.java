@@ -11,13 +11,15 @@ import java.util.HashMap;
  *
  */
 public class Term implements Serializable {
-	
+
 	private static final long serialVersionUID = 41L;
 	private int colFreq;
 	private int docFreq;
 	private HashMap<String, Integer> postingMap;
+	private HashMap<String, Posting> postingList;
 	private String termText;
 	private int termId;
+	private double idf;
 
 	public int getColFreq() {
 		return colFreq;
@@ -25,6 +27,12 @@ public class Term implements Serializable {
 
 	public int getDocFreq() {
 		return docFreq;
+	}
+
+	public void setIdf(int totalDoc) {
+		double df = postingMap.keySet().size();
+		double val = (double)(totalDoc) / df;
+		idf =  Math.log10(val);
 	}
 
 	public HashMap<String, Integer> getPosting() {
@@ -37,15 +45,18 @@ public class Term implements Serializable {
 		this.termId = 0;
 		this.termText = "";
 		postingMap = new HashMap<String, Integer>();
+		postingList = new HashMap<String, Posting>();
 	}
 
-	public Term(String termText, int termId, String docTerm) {
+	public Term(String termText, int termId, String docTerm, int posIndex) {
 		this.termId = termId;
 		this.termText = termText;
 		this.colFreq = 1;
 		this.docFreq = 1;
 		this.postingMap = new HashMap<String, Integer>();
 		this.postingMap.put(docTerm, 1);
+		this.postingList = new HashMap<String, Posting>();
+		this.postingList.put(docTerm, new Posting(posIndex));
 	}
 
 	/**
@@ -91,14 +102,18 @@ public class Term implements Serializable {
 		docFreq += 1;
 	}
 
-	public void addOrUpdateDoc(String docTerm) {
+	public void addOrUpdateDoc(String docTerm, int index) {
 		if (this.postingMap.containsKey(docTerm)) {
 			int termFreq = this.postingMap.get(docTerm) + 1;
 			this.postingMap.put(docTerm, termFreq);
+			Posting val = this.postingList.get(docTerm);
+			val.addPosIndex(index);
+			val.incTermFreq();
 		}
 		else {
 			//Adding new document to the term posting
 			this.postingMap.put(docTerm, 1);
+			this.postingList.put(docTerm, new Posting(index));
 			this.incdocFreq();
 		}
 		this.incColFreq();
