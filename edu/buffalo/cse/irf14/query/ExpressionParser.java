@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 
 import edu.buffalo.cse.irf14.analysis.TokenStream;
 import edu.buffalo.cse.irf14.analysis.Tokenizer;
+import edu.buffalo.cse.irf14.analysis.TokenizerException;
 import edu.buffalo.cse.irf14.index.Posting;
 
 /**
@@ -19,9 +20,13 @@ import edu.buffalo.cse.irf14.index.Posting;
 public class ExpressionParser implements Expression {
 	private Expression expression;
 	
-	public void expressionParser(String userQuery, String defaultOperator) throws Exception {
+	public Expression getExpression() {
+		return expression;
+	}
+	
+	public void expressionParser(String userQuery, String defaultOperator) throws QueryParserException {
 		if (userQuery == null || userQuery.isEmpty()) {
-			throw new Exception("Query Null");
+			throw new QueryParserException("Query Null");
 		}
 		
 		Matcher matcher = Pattern.compile("(Author|Category|Term|Place)(:)",
@@ -42,9 +47,15 @@ public class ExpressionParser implements Expression {
 		userQuery = sb1.toString();
 		
 		Tokenizer tkr = new Tokenizer(" ");
-		TokenStream tokenStream = tkr.consume(userQuery);
+		TokenStream tokenStream = null;
+		try {
+			tokenStream = tkr.consume(userQuery);
+		} catch (TokenizerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		if (tokenStream == null) {
-			throw new Exception("Query Parser Exception: tokenStream empty");
+			throw new QueryParserException("Query Parser Exception: tokenStream empty");
 		}
 		
 		Stack<Expression> operator = new Stack<Expression>();
@@ -140,7 +151,7 @@ public class ExpressionParser implements Expression {
 		this.expression = operand.pop();
 	}
 	
-	public void ObjectifyBracket(Stack<Expression> operator,Stack<Expression> operand) throws Exception {
+	public void ObjectifyBracket(Stack<Expression> operator,Stack<Expression> operand) throws QueryParserException {
 		// Removing the ) that was pushed for calling this method
 		Expression popped = operator.pop();
 		/* It can only encounter AND,NOT,OR or ( 
@@ -155,7 +166,7 @@ public class ExpressionParser implements Expression {
 		}
 	}
 	
-	public void ObjectifyEnd(Stack<Expression> operator,Stack<Expression> operand) throws Exception {
+	public void ObjectifyEnd(Stack<Expression> operator,Stack<Expression> operand) throws QueryParserException {
 //		if (operator.isEmpty()) {
 //			throw new Exception("Operator Stack underflow while ending");
 //		}
@@ -168,7 +179,7 @@ public class ExpressionParser implements Expression {
 	/* It can only encounter AND,NOT,OR or ( 
 	 * It cannot encounter ) because it is the first ) itself.
 	 */
-	public void Objectify(Stack<Expression> operator,Stack<Expression> operand, Expression popped) throws Exception {
+	public void Objectify(Stack<Expression> operator,Stack<Expression> operand, Expression popped) throws QueryParserException {
 		String poppedText = popped.toString();
 		if ("AND".equalsIgnoreCase(poppedText)) {
 			if (operand.size() >= 2) {
@@ -178,7 +189,7 @@ public class ExpressionParser implements Expression {
 				operand.push(andOp);
 			}
 			else {
-				throw new Exception("Operand Stack Underflow for AND operator");
+				throw new QueryParserException("Operand Stack Underflow for AND operator");
 			}
 		}
 		else if ("OR".equalsIgnoreCase(poppedText)) {
@@ -189,7 +200,7 @@ public class ExpressionParser implements Expression {
 				operand.push(orOp);
 			}
 			else {
-				throw new Exception("Operand Stack Underflow for OR operator");
+				throw new QueryParserException("Operand Stack Underflow for OR operator");
 			}
 		}
 		else if("NOT".equalsIgnoreCase(poppedText)) {
@@ -199,7 +210,7 @@ public class ExpressionParser implements Expression {
 				operand.push(notOp);
 			}
 			else {
-				throw new Exception("Operand Stack Underflow for NOT operator");
+				throw new QueryParserException("Operand Stack Underflow for NOT operator");
 			}
 		}
 		else if("(".equals(poppedText)) {
@@ -209,7 +220,7 @@ public class ExpressionParser implements Expression {
 				operand.push(opBrack);
 			}
 			else {
-				throw new Exception("Operand Stack Underflow for Brackets");
+				throw new QueryParserException("Operand Stack Underflow for Brackets");
 			}
 		}
 	}

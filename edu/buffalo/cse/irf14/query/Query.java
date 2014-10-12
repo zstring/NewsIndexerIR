@@ -9,8 +9,13 @@ public class Query {
 	/**
 	 * Method to convert given parsed query into string
 	 */
+	Expression queryTerm;
+	public Query(Expression term) {
+		this.queryTerm = term;
+	}
 	public String toString() {
 		//TODO: YOU MUST IMPLEMENT THIS
-		return null;
+		return queryTerm.toString();
 	}
+	
 }

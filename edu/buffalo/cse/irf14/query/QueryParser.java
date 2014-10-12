@@ -14,8 +14,11 @@ public class QueryParser {
 	 * @param defaultOperator : The default operator to use, one amongst (AND|OR)
 	 * @return Query object if successfully parsed, null otherwise
 	 */
-	public static Query parse(String userQuery, String defaultOperator) {
+	public static Query parse(String userQuery, String defaultOperator) throws QueryParserException{
 		//TODO: YOU MUST IMPLEMENT THIS METHOD
-		return null;
+		ExpressionParser expressionParser = new ExpressionParser();
+		expressionParser.expressionParser(userQuery, defaultOperator);
+		Query query = new Query(expressionParser.getExpression());
+		return query;
 	}
 }
