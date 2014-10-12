@@ -48,19 +48,25 @@ public class ExpressionParser implements Expression {
 		Stack<Expression> operator = new Stack<Expression>();
 		Stack<Expression> operand = new Stack<Expression>();
 		boolean dQuotesOn = false,dQuotesOff = false, defaultIndex = true, 
-				superDefaultIndex = false, isDefaultOperator = false;
+				superDefaultIndex = false, isDefaultOperator = false, notOperator = false;
 		String index = "";
 		StringBuilder quotedString = new StringBuilder("\"");
 		while (tokenStream.hasNext()) {
 			String token = tokenStream.next().toString();
 			if (defaultIndex) {
-				index = "TERM";
+				index = "term";
 			}
 			if ("\"".equals(token)) {
 				dQuotesOn = !dQuotesOn;
 				if (dQuotesOff) {
-					Expression term = new QTerm(quotedString.toString().trim()+"\"", index);
-					operand.push(term);
+					Expression qTerm = new QTerm(quotedString.toString().trim()+"\"", index);
+					if(notOperator) {
+						operand.push(new NotOperator(new Term(token)));
+						notOperator = false;
+					}
+					else {
+						operand.push(qTerm);
+					}
 					quotedString = new StringBuilder("\"");
 					if(!superDefaultIndex) {
 						defaultIndex = true;
@@ -93,17 +99,26 @@ public class ExpressionParser implements Expression {
 				if ("(".equals(token)) {
 					superDefaultIndex = true;
 				}
-				if("NOT".equals(token)) {
+				if("NOT".equalsIgnoreCase(token)) {
 					operator.push(new Term("AND"));
+					notOperator = true;
 				}
-				Expression term = new Term(token);
-				operator.push(term);
-				
+				else {
+					Expression term = new Term(token);
+					operator.push(term);
+				}
 				isDefaultOperator = false;
 			}
 			else {
 				Expression qterm = new QTerm(token,index);
-				operand.push(qterm);
+				
+				if(notOperator) {
+					operand.push(new NotOperator(qterm));
+					notOperator = false;
+				}
+				else {
+					operand.push(qterm);
+				}
 				/* if defaultIndex is true, default index, "term" is used
 				 * superDefaultIndex is true when it sees and (
 				 * defaultIndex should not be made true
@@ -112,6 +127,7 @@ public class ExpressionParser implements Expression {
 					defaultIndex = true;
 				}
 				// if two continuous terms occur isDefaultOperator index is true
+				
 				if (isDefaultOperator) {
 					operator.push(new Term("OR"));
 				}
