@@ -5,8 +5,8 @@ public class TestExpressionParser {
 		ExpressionParser expParser = new ExpressionParser();
 		
 		try {
-			Expression expression = expParser.expressionParser("Category:war and author:dutt not place:baghdad and prisoners detainees rebels", "OR");
-			System.out.println(expression.toString());
+			expParser.expressionParser("author: rushdie not \"jihad hello\"", "OR");
+			System.out.println(expParser.toString());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

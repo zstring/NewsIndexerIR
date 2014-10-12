@@ -17,9 +17,9 @@ import edu.buffalo.cse.irf14.analysis.Tokenizer;
 public class ExpressionParser implements Expression {
 	private Expression expression;
 	
-	public Expression expressionParser(String userQuery, String defaultOperator) throws Exception {
+	public void expressionParser(String userQuery, String defaultOperator) throws Exception {
 		if (userQuery == null || userQuery.isEmpty()) {
-			return null;
+			throw new Exception("Query Null");
 		}
 		
 		Matcher matcher = Pattern.compile("(Author|Category|Term|Place)(:)",
@@ -54,14 +54,14 @@ public class ExpressionParser implements Expression {
 		while (tokenStream.hasNext()) {
 			String token = tokenStream.next().toString();
 			if (defaultIndex) {
-				index = "term";
+				index = "Term";
 			}
 			if ("\"".equals(token)) {
 				dQuotesOn = !dQuotesOn;
 				if (dQuotesOff) {
 					Expression qTerm = new QTerm(quotedString.toString().trim()+"\"", index);
 					if(notOperator) {
-						operand.push(new NotOperator(new Term(token)));
+						operand.push(new NotOperator(qTerm));
 						notOperator = false;
 					}
 					else {
@@ -135,7 +135,7 @@ public class ExpressionParser implements Expression {
 			}
 		}
 		ObjectifyEnd(operator, operand);
-		return this.expression = operand.pop();
+		this.expression = operand.pop();
 	}
 	
 	public void ObjectifyBracket(Stack<Expression> operator,Stack<Expression> operand) throws Exception {
@@ -221,7 +221,12 @@ public class ExpressionParser implements Expression {
 	@Override
 	public String toSudoString() {
 		// TODO Auto-generated method stub
-		return null;
+		return "{ " + expression.toString() + " }";
+	}
+	
+	@Override
+	public String toString() {
+		return toSudoString();
 	}
 
 }
