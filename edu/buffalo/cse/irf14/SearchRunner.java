@@ -2,8 +2,12 @@ package edu.buffalo.cse.irf14;
 
 import java.io.File;
 import java.io.PrintStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import edu.buffalo.cse.irf14.index.IndexReader;
+import edu.buffalo.cse.irf14.index.IndexType;
 
 /**
  * Main class to run the searcher.
@@ -13,7 +17,11 @@ import java.util.Map;
  */
 public class SearchRunner {
 	public enum ScoringModel {TFIDF, OKAPI};
-	
+	private HashMap<IndexType, IndexReader> reader;
+	private String indexDir;
+	private String corpusDir;
+	private char mode;
+	private PrintStream stream;
 	/**
 	 * Default (and only public) constuctor
 	 * @param indexDir : The directory where the index resides
@@ -23,9 +31,29 @@ public class SearchRunner {
 	 */
 	public SearchRunner(String indexDir, String corpusDir, 
 			char mode, PrintStream stream) {
+		this.indexDir = indexDir;
+		this.corpusDir = corpusDir;
+		this.mode = mode;
+		this.stream = stream;
+		setUpIndexWriter();
+		setUpIndexReader();
 		//TODO: IMPLEMENT THIS METHOD
 	}
 	
+	private void setUpIndexWriter() {
+		// TODO Auto-generated method stub
+		
+		
+	}
+
+	private void setUpIndexReader() {
+		// TODO Auto-generated method stub
+		reader.put(IndexType.AUTHOR, new IndexReader(indexDir, IndexType.AUTHOR));
+		reader.put(IndexType.CATEGORY, new IndexReader(indexDir, IndexType.CATEGORY));
+		reader.put(IndexType.PLACE, new IndexReader(indexDir, IndexType.PLACE));
+		reader.put(IndexType.TERM, new IndexReader(indexDir, IndexType.TERM));
+	}
+
 	/**
 	 * Method to execute given query in the Q mode
 	 * @param userQuery : Query to be parsed and executed
