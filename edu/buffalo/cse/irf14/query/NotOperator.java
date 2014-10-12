@@ -1,5 +1,8 @@
 package edu.buffalo.cse.irf14.query;
 
+import java.util.Map;
+import edu.buffalo.cse.irf14.index.Posting;
+
 public class NotOperator implements Expression {
 	private Expression operand;
 	
@@ -8,9 +11,9 @@ public class NotOperator implements Expression {
 	}
 
 	@Override
-	public int interpret(String s) {
+	public Map<String, Posting> interpret(String s) {
 		// TODO Auto-generated method stub
-		return 0;
+		return null;
 	}
 
 	@Override

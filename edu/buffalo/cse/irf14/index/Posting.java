@@ -1,9 +1,11 @@
 package edu.buffalo.cse.irf14.index;
 import java.util.ArrayList;
+import java.io.Serializable;
 import java.util.List;
 
-public class Posting {
+public class Posting implements Serializable {
 
+	private static final long serialVersionUID = 23L;
 	private int termFreq;
 	private List<Integer> posIndex;
 

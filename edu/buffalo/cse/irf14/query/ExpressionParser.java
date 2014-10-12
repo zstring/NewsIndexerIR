@@ -3,12 +3,14 @@
  */
 package edu.buffalo.cse.irf14.query;
 
+import java.util.Map;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import edu.buffalo.cse.irf14.analysis.TokenStream;
 import edu.buffalo.cse.irf14.analysis.Tokenizer;
+import edu.buffalo.cse.irf14.index.Posting;
 
 /**
  * @author avinav and himanshu
@@ -213,9 +215,9 @@ public class ExpressionParser implements Expression {
 	}
 
 	@Override
-	public int interpret(String s) {
+	public Map<String, Posting> interpret(String s) {
 		// TODO Auto-generated method stub
-		return 0;
+		return null;
 	}
 
 	@Override

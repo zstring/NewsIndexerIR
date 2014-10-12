@@ -1,5 +1,8 @@
 package edu.buffalo.cse.irf14.query;
 
+import java.util.Map;
+import edu.buffalo.cse.irf14.index.Posting;
+
 public interface Expression {
 
 	/**
@@ -7,7 +10,7 @@ public interface Expression {
 	 * @param s
 	 * @return
 	 */
-	public int interpret(String s);
+	public Map<String, Posting> interpret(String s);
 	/**
 	 *
 	 * @return
