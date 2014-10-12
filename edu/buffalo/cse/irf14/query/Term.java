@@ -1,5 +1,9 @@
 package edu.buffalo.cse.irf14.query;
 
+import java.util.Map;
+
+import edu.buffalo.cse.irf14.index.Posting;
+
 public class Term implements Expression {
 	private String name;
 	public Term(String name) {
@@ -7,15 +11,15 @@ public class Term implements Expression {
 	}
 
 	@Override
-	public int interpret(String s) {
+	public Map<String, Posting> interpret() {
 		// TODO Auto-generated method stub
-		return 0;
+		return null;
 	}
 
 	@Override
 	public String toSudoString() {
 		// TODO Auto-generated method stub
-		return null;
+		return this.name;
 	}
 
 	@Override

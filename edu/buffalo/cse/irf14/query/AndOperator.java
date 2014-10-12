@@ -1,5 +1,9 @@
 package edu.buffalo.cse.irf14.query;
 
+import java.util.Map;
+
+import edu.buffalo.cse.irf14.index.Posting;
+
 public class AndOperator implements Expression {
 	private Expression leftOperand;
 	private Expression rightOperand;
@@ -9,9 +13,13 @@ public class AndOperator implements Expression {
 	}
 
 	@Override
-	public int interpret(String s) {
+	public Map<String, Posting> interpret()  {
 		// TODO Auto-generated method stub
-		return 0;
+		Map<String, Posting> leftMap = leftOperand.interpret();
+		Map<String, Posting> rightMap = rightOperand.interpret();
+		leftMap.re
+		
+		return null;
 	}
 
 	@Override

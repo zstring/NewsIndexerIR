@@ -12,7 +12,7 @@ public class OrOperator implements Expression {
 	}
 
 	@Override
-	public Map<String, Posting> interpret(String s) {
+	public Map<String, Posting> interpret() {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -10,7 +10,7 @@ public interface Expression {
 	 * @param s
 	 * @return
 	 */
-	public Map<String, Posting> interpret(String s);
+	public Map<String, Posting> interpret();
 	/**
 	 *
 	 * @return
