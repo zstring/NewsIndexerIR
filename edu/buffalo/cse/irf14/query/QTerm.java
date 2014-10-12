@@ -17,8 +17,9 @@ public class QTerm extends QIndexType implements Expression {
 	@Override
 	public Map<String, Posting> interpret(HashMap<IndexType, IndexReader> reader) {
 		// TODO Auto-generated method stub
+		IndexReader ir = reader.get(index);
+		return ir.getPostingList(term);
 		
-		return null;
 	}
 
 	@Override
