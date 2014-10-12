@@ -18,7 +18,7 @@ public class ExpressionParser implements Expression {
 	private Expression expression;
 	
 	public Expression expressionParser(String userQuery, String defaultOperator) throws Exception {
-		if (userQuery == null || !userQuery.isEmpty()) {
+		if (userQuery == null || userQuery.isEmpty()) {
 			return null;
 		}
 		
@@ -50,7 +50,7 @@ public class ExpressionParser implements Expression {
 		boolean dQuotesOn = false,dQuotesOff = false, defaultIndex = true, 
 				superDefaultIndex = false, isDefaultOperator = false;
 		String index = "";
-		StringBuilder quotedString = new StringBuilder("");
+		StringBuilder quotedString = new StringBuilder("\"");
 		while (tokenStream.hasNext()) {
 			String token = tokenStream.next().toString();
 			if (defaultIndex) {
@@ -59,9 +59,9 @@ public class ExpressionParser implements Expression {
 			if ("\"".equals(token)) {
 				dQuotesOn = !dQuotesOn;
 				if (dQuotesOff) {
-					Expression term = new Term(quotedString.toString());
+					Expression term = new QTerm(quotedString.toString().trim()+"\"", index);
 					operand.push(term);
-					quotedString = new StringBuilder("");
+					quotedString = new StringBuilder("\"");
 					if(!superDefaultIndex) {
 						defaultIndex = true;
 					}
@@ -82,7 +82,7 @@ public class ExpressionParser implements Expression {
 			}
 			else if(")".equals(token)) {
 				operator.push(new Term(token));
-				ObjectifyBracket(operand,operator);
+				ObjectifyBracket(operator, operand);
 				superDefaultIndex = false;
 				defaultIndex = true;
 				
@@ -92,6 +92,9 @@ public class ExpressionParser implements Expression {
 					"NOT".equalsIgnoreCase(token)||"(".equals(token)) {
 				if ("(".equals(token)) {
 					superDefaultIndex = true;
+				}
+				if("NOT".equals(token)) {
+					operator.push(new Term("AND"));
 				}
 				Expression term = new Term(token);
 				operator.push(term);
@@ -135,9 +138,9 @@ public class ExpressionParser implements Expression {
 	}
 	
 	public void ObjectifyEnd(Stack<Expression> operator,Stack<Expression> operand) throws Exception {
-		if (operator.isEmpty()) {
-			throw new Exception("Operator Stack underflow while ending");
-		}
+//		if (operator.isEmpty()) {
+//			throw new Exception("Operator Stack underflow while ending");
+//		}
 		Expression popped;
 		while (!operator.isEmpty()) {
 			popped = operator.pop();
@@ -150,7 +153,7 @@ public class ExpressionParser implements Expression {
 	public void Objectify(Stack<Expression> operator,Stack<Expression> operand, Expression popped) throws Exception {
 		String poppedText = popped.toString();
 		if ("AND".equalsIgnoreCase(poppedText)) {
-			if (operand.size() >= 2 ) {
+			if (operand.size() >= 2) {
 				Expression rightOperand = operand.pop();
 				Expression leftOperand = operand.pop();
 				Expression andOp = new AndOperator(leftOperand,rightOperand);
@@ -197,6 +200,12 @@ public class ExpressionParser implements Expression {
 	public int interpret(String s) {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@Override
+	public String toSudoString() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
