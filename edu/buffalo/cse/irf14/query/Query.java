@@ -1,5 +1,10 @@
 package edu.buffalo.cse.irf14.query;
 
+import java.util.HashMap;
+
+import edu.buffalo.cse.irf14.index.IndexReader;
+import edu.buffalo.cse.irf14.index.IndexType;
+
 /**
  * Class that represents a parsed query
  * @author nikhillo
@@ -18,4 +23,8 @@ public class Query {
 		return queryTerm.toString();
 	}
 	
+	public void execute(HashMap<IndexType, IndexReader> reader) {
+		// TODO Auto-generated method stub
+		queryTerm.interpret(reader);
+	}
 }

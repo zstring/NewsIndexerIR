@@ -8,6 +8,8 @@ import java.util.Map;
 
 import edu.buffalo.cse.irf14.index.IndexReader;
 import edu.buffalo.cse.irf14.index.IndexType;
+import edu.buffalo.cse.irf14.query.Query;
+import edu.buffalo.cse.irf14.query.QueryParser;
 
 /**
  * Main class to run the searcher.
@@ -60,6 +62,14 @@ public class SearchRunner {
 	 * @param model : Scoring Model to use for ranking results
 	 */
 	public void query(String userQuery, ScoringModel model) {
+		String defaultOperator = "OR";
+		try {
+			Query query = QueryParser.parse(userQuery, defaultOperator);
+			query.execute(reader);
+		} 
+		catch (Exception ex){
+
+		}
 		//TODO: IMPLEMENT THIS METHOD
 	}
 	
