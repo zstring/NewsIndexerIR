@@ -39,6 +39,16 @@ public class Term implements Serializable {
 		return postingMap;
 	}
 
+	/**
+	 * returns the PostingList with <String, Posting>
+	 * same functionality as getPosting() but returing 
+	 * the other object
+	 * @return
+	 */
+	public HashMap<String, Posting> getPostingList() {
+		return postingList;
+	}
+
 	public Term() {
 		this.colFreq = 0;
 		this.docFreq = 0;
