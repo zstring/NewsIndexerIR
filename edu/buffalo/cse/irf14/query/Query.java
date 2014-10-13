@@ -1,9 +1,11 @@
 package edu.buffalo.cse.irf14.query;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import edu.buffalo.cse.irf14.index.IndexReader;
 import edu.buffalo.cse.irf14.index.IndexType;
+import edu.buffalo.cse.irf14.index.Posting;
 
 /**
  * Class that represents a parsed query
@@ -25,6 +27,10 @@ public class Query {
 	
 	public void execute(HashMap<IndexType, IndexReader> reader) {
 		// TODO Auto-generated method stub
-		queryTerm.interpret(reader);
+		Map<String, Posting> ret = queryTerm.interpret(reader);
+		for (String doc : ret.keySet()){
+			System.out.println(" DocName : " + doc + " " + ret.get(doc).toString());
+		}
+		System.out.println("TOTAL COUNT " + ret.keySet().size());
 	}
 }

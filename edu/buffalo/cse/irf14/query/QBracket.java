@@ -22,7 +22,7 @@ public class QBracket implements Expression {
 	@Override
 	public Map<String, Posting> interpret(HashMap<IndexType, IndexReader> reader) {
 		// TODO Auto-generated method stub
-		return null;
+		return encapsulate.interpret(reader);
 	}
 
 	@Override

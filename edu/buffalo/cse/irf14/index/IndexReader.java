@@ -136,7 +136,9 @@ public class IndexReader {
 		try {
 			if (bi != null && bi.termDict != null) {
 				Integer termId = bi.termDict.get(term);
-				return bi.termMap.get(termId).getPostingList();
+				if (termId != null)
+					return bi.termMap.get(termId).getPostingList();
+				return null;
 			}
 		}
 		catch (Exception e) {

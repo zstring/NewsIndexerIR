@@ -36,4 +36,9 @@ public class Posting implements Serializable {
 		// TODO Auto-generated method stub
 		this.posIndex.add(index);
 	}
+	
+	@Override
+	public String toString() {
+		return "Term Freq " + termFreq;
+	}
 }
