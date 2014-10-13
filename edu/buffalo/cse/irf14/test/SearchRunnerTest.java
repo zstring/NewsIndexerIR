@@ -20,6 +20,9 @@ public class SearchRunnerTest {
 	@Test
 	public void test() {
 		String[] query = {"Author:(Peter Not (Bale or Cooney or Torday) )"};
+		query[0] = "(A OR B OR C OR D) AND ((E AND F) OR (G AND H)) "
+				+ "AND ((I OR J OR K) AND (L OR M OR N OR O)) AND "
+				+ "(P OR (Q OR (R OR (S AND T))))";
 		try {
 		String indexDir = "/home/inspire/Dropbox/UB/JavaWorkspace/newsindexer/news_training";
 		String corpusDir = "";

@@ -8,6 +8,7 @@ import java.util.Map;
 
 import edu.buffalo.cse.irf14.index.IndexReader;
 import edu.buffalo.cse.irf14.index.IndexType;
+import edu.buffalo.cse.irf14.index.Posting;
 import edu.buffalo.cse.irf14.query.Query;
 import edu.buffalo.cse.irf14.query.QueryParser;
 
@@ -66,14 +67,28 @@ public class SearchRunner {
 		String defaultOperator = "OR";
 		try {
 			Query query = QueryParser.parse(userQuery, defaultOperator);
-			query.execute(reader);
-		} 
+			Map<String, Posting> unRankedResult = query.execute(reader);
+			RankedResultWithModel(unRankedResult, model);
+		}
 		catch (Exception ex){
 
 		}
 		//TODO: IMPLEMENT THIS METHOD
 	}
-	
+
+	/**
+	 * 
+	 * @param unRankedResult
+	 * @param model
+	 */
+	private void RankedResultWithModel(Map<String, Posting> unRankedResult,
+			ScoringModel model) {
+		// TODO Auto-generated method stub
+		if (unRankedResult != null && unRankedResult.keySet().size() > 1) {
+			
+		}
+	}
+
 	/**
 	 * Method to execute queries in E mode
 	 * @param queryFile : The file from which queries are to be read and executed

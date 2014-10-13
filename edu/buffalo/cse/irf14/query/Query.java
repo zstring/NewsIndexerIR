@@ -25,12 +25,13 @@ public class Query {
 		return queryTerm.toString();
 	}
 	
-	public void execute(HashMap<IndexType, IndexReader> reader) {
+	public Map<String, Posting> execute(HashMap<IndexType, IndexReader> reader) {
 		// TODO Auto-generated method stub
 		Map<String, Posting> ret = queryTerm.interpret(reader);
 		for (String doc : ret.keySet()){
 			System.out.println(" DocName : " + doc + " " + ret.get(doc).toString());
 		}
 		System.out.println("TOTAL COUNT " + ret.keySet().size());
+		return ret;
 	}
 }

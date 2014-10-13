@@ -30,6 +30,7 @@ public class BaseIndexer implements Serializable {
 	private transient AnalyzerFactory aFactory;
 	public Map<String, Integer> termDict;
 	public Map<Integer, Term> termMap;
+	public Map<String, HashMap<Integer, Double>> docVector;
 	public transient Set<String> documentSet;
 
 
@@ -56,6 +57,7 @@ public class BaseIndexer implements Serializable {
 		termDict = new HashMap<String, Integer>();
 		termMap = new HashMap<Integer, Term>();
 		documentSet = new HashSet<String>();
+		docVector = new HashMap<String, HashMap<Integer,Double>>();
 	}
 
 	public Set<Integer> getTermKeys() {
@@ -122,8 +124,10 @@ public class BaseIndexer implements Serializable {
 				if(tStream.hasNext() && !isDocCounted) {
 					this.documentSet.add(docTerm);
 					isDocCounted = true;
+					docVector.put(docTerm, new HashMap<Integer, Double>());
 				}
 
+				HashMap<Integer, Double> termSpace = docVector.get(docTerm);
 				while (tStream.hasNext()) {
 					Token tk = tStream.next();
 					if (tk != null) {
@@ -137,14 +141,33 @@ public class BaseIndexer implements Serializable {
 								Term term = new Term(tkString, termId, docTerm, tk.getPosIndex());
 								this.termDict.put(tkString, termId);
 								this.termMap.put(termId, term);
+								termSpace.put(termId, 1.0);
 							}
 							// If term already exist in index
 							else {
 								Term term = termMap.get(tkInt);
 								term.addOrUpdateDoc(docTerm, tk.getPosIndex());
+								
+								Double tFreq = termSpace.get(tkInt);
+								if (tFreq != null) {
+									termSpace.put(tkInt, tFreq + 1.0);
+								}
+								else {
+									termSpace.put(tkInt, 1.0);
+								}
 							}
 						}
 					}
+				}
+				double ssd = 0.0;
+				for (Integer id : termSpace.keySet()) {
+					ssd += Math.pow(termSpace.get(id), 2);
+				}
+				ssd = Math.sqrt(ssd);
+				for (Integer id : termSpace.keySet()) {
+					double normlizedVal = termSpace.get(id);
+					normlizedVal /= ssd;
+					termSpace.put(termId, normlizedVal);
 				}
 			} catch (TokenizerException e) {
 				// TODO Auto-generated catch block
