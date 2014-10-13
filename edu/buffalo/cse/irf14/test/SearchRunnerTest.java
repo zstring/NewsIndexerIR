@@ -19,7 +19,7 @@ public class SearchRunnerTest {
 
 	@Test
 	public void test() {
-		String[] query = {"Author:(Peter AND Bale )"};
+		String[] query = {"Author:(Peter Not (Bale or Cooney or Torday) )"};
 		try {
 		String indexDir = "/home/inspire/Dropbox/UB/JavaWorkspace/newsindexer/news_training";
 		String corpusDir = "";

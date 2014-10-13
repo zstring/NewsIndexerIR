@@ -17,7 +17,7 @@ public class NotOperator implements Expression {
 	@Override
 	public Map<String, Posting> interpret(HashMap<IndexType, IndexReader> reader) {
 		// TODO Auto-generated method stub
-		return null;
+		return operand.interpret(reader);
 	}
 
 	@Override

@@ -20,7 +20,12 @@ public class AndOperator implements Expression {
 		// TODO Auto-generated method stub
 		Map<String, Posting> leftMap = leftOperand.interpret(reader);
 		Map<String, Posting> rightMap = rightOperand.interpret(reader);
-		leftMap.keySet().retainAll(rightMap.keySet());
+		if (rightOperand instanceof NotOperator) {
+			leftMap.keySet().removeAll(rightMap.keySet());
+		}
+		else {
+			leftMap.keySet().retainAll(rightMap.keySet());	
+		}
 		return leftMap;
 	}
 
