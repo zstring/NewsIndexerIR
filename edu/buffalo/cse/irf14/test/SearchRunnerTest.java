@@ -19,20 +19,21 @@ public class SearchRunnerTest {
 
 	@Test
 	public void test() {
-		String[] query = {"Author:(Peter Not (Bale or Cooney or Torday) )"};
-		query[0] = "(A OR B OR C OR D) AND ((E AND F) OR (G AND H)) "
-				+ "AND ((I OR J OR K) AND (L OR M OR N OR O)) AND "
-				+ "(P OR (Q OR (R OR (S AND T))))";
+		String[] query = {"(black OR blue) OR bruises"};
+//		query[0] = "(A OR B OR C OR D) AND ((E AND F) OR (G AND H)) "
+//				+ "AND ((I OR J OR K) AND (L OR M OR N OR O)) AND "
+//				+ "(P OR (Q OR (R OR (S AND T))))";
 		try {
-		String indexDir = "/home/inspire/Dropbox/UB/JavaWorkspace/newsindexer/news_training";
+		String indexDir = "/home/avinav/Dropbox/workspace/avinav_newsindexer/data";
 		String corpusDir = "";
 		char mode = 'E';
-		FileOutputStream file = new FileOutputStream("/home/inspire/Dropbox/UB/JavaWorkspace/newsindexer/output.txt");
+		FileOutputStream file = new FileOutputStream("/home/avinav/Dropbox/workspace/avinav_newsindexer/data/output.txt");
 		PrintStream stream = new PrintStream(file);
 		sr = new SearchRunner(indexDir, corpusDir, mode, stream);
 		for (int i = 0; i < query.length; i++) {
 			sr.query(query[i], ScoringModel.OKAPI);
 		}
+		stream.close();
 		} catch (Exception ex) {
 			fail("Error no file found");
 		}

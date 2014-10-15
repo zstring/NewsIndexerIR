@@ -20,6 +20,12 @@ public class OrOperator implements Expression {
 		// TODO Auto-generated method stub
 		Map<String, Posting> leftMap = this.leftOperand.interpret(reader);
 		Map<String, Posting> rightMap = this.rightOperand.interpret(reader);
+		if (rightMap == null) {
+			return leftMap;
+		}
+		if (leftMap == null) {
+			return rightMap;
+		}
 		leftMap.putAll(rightMap);
 		return leftMap;
 	}
@@ -41,10 +47,10 @@ public class OrOperator implements Expression {
 		// TODO Auto-generated method stub
 		Map<Integer, Double> leftMap = leftOperand.getQVector(reader);
 		Map<Integer, Double> rightMap = rightOperand.getQVector(reader);
-		if (leftMap.isEmpty() || leftMap == null) {
+		if (leftMap == null) {
 			return rightMap;
 		}
-		if (rightMap.isEmpty() || rightMap == null) {
+		if (rightMap == null) {
 			return leftMap;
 		}
 		for (Integer termId : leftMap.keySet() ) {

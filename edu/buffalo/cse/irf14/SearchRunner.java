@@ -75,10 +75,15 @@ public class SearchRunner {
 			Query query = QueryParser.parse(userQuery, defaultOperator);
 			Map<String, Posting> unRankedResult = query.execute(reader);
 			Map<Integer, Double> queryVector = query.getVector(reader);
-			RankedResultWithModel(unRankedResult, queryVector, model);
+			Map<String, Double> rankedResult = RankedResultWithModel(unRankedResult, queryVector, model);
+			
+			for (String docId : rankedResult.keySet()) {
+				stream.print("Doc: " + docId + " Score: " + rankedResult.get(docId));
+				stream.println();
+			}
 		}
 		catch (Exception ex){
-
+			ex.printStackTrace();
 		}
 		//TODO: IMPLEMENT THIS METHOD
 	}
@@ -88,21 +93,28 @@ public class SearchRunner {
 	 * @param unRankedResult
 	 * @param model
 	 */
-	private void RankedResultWithModel(Map<String, Posting> unRankedResult,
+	private Map<String, Double> RankedResultWithModel(Map<String, Posting> unRankedResult,
 			Map<Integer, Double> queryVector, ScoringModel model) {
 		// TODO Auto-generated method stub
+		int a = 1;
 		HashMap<String, HashMap<Integer, Double>> docVector = readDocVector();
 		ScorerClass sc = new ScorerClass();
+		Map<String, Double> rankedResult = null;
 		if (unRankedResult != null && unRankedResult.keySet().size() > 1) {
-			sc.rankResult(unRankedResult, docVector, queryVector, model);
+			rankedResult = sc.rankResult(unRankedResult, docVector, queryVector, model);
 		}
+		for (String docId : rankedResult.keySet()) {
+			System.out.println("Doc: " + docId + " Score: " + rankedResult.get(docId));
+		}
+		return rankedResult;
+		
 	}
 	@SuppressWarnings("unchecked")
 	private HashMap<String, HashMap<Integer, Double>> readDocVector() {
 		// TODO Auto-generated method stub
 		HashMap<String, HashMap<Integer, Double>> docVector = null;
 		try {
-			FileInputStream fo = new FileInputStream(indexDir + File.pathSeparator + "VECTOR");
+			FileInputStream fo = new FileInputStream(indexDir + java.io.File.separator  + "VECTOR");
 			GZIPInputStream gzip = new GZIPInputStream(fo);
 			ObjectInputStream ois = new ObjectInputStream(gzip);
 			docVector = (HashMap<String, HashMap<Integer, Double>>)ois.readObject();

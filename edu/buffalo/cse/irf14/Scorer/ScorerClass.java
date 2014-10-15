@@ -19,7 +19,7 @@ public class ScorerClass {
 			Double sum = 0.0;
 			Map<Integer, Double> docV = docVector.get(docId);
 			for (Integer termId : termKeys) {
-				sum += docV.get(termId) * queryVector.get(termId);
+				sum += docV.get(termId) == null ? 0 : docV.get(termId) * queryVector.get(termId);
 			}
 			rankedResult.put(docId, sum);
 		}
