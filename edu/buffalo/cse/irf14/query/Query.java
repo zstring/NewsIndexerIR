@@ -35,8 +35,8 @@ public class Query {
 		return ret;
 	}
 
-	public Map<Integer, Double> getVector() {
+	public Map<Integer, Double> getVector(HashMap<IndexType, IndexReader> reader) {
 		// TODO Auto-generated method stub
-		return null;
+		return queryTerm.getQVector(reader);
 	}
 }

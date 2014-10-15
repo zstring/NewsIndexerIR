@@ -24,4 +24,11 @@ public class QPlace extends QIndexType implements Expression {
 	public String toString() {
 		return toSudoString();
 	}
+
+	@Override
+	public Map<Integer, Double> getQVector(
+			HashMap<IndexType, IndexReader> reader) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

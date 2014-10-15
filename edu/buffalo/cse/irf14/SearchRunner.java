@@ -74,7 +74,7 @@ public class SearchRunner {
 		try {
 			Query query = QueryParser.parse(userQuery, defaultOperator);
 			Map<String, Posting> unRankedResult = query.execute(reader);
-			Map<Integer, Double> queryVector = query.getVector();
+			Map<Integer, Double> queryVector = query.getVector(reader);
 			RankedResultWithModel(unRankedResult, queryVector, model);
 		}
 		catch (Exception ex){

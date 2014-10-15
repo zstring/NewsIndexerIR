@@ -34,4 +34,28 @@ public class OrOperator implements Expression {
 	public String toString() {
 		return toSudoString();
 	}
+
+	@Override
+	public Map<Integer, Double> getQVector(
+			HashMap<IndexType, IndexReader> reader) {
+		// TODO Auto-generated method stub
+		Map<Integer, Double> leftMap = leftOperand.getQVector(reader);
+		Map<Integer, Double> rightMap = rightOperand.getQVector(reader);
+		if (leftMap.isEmpty() || leftMap == null) {
+			return rightMap;
+		}
+		if (rightMap.isEmpty() || rightMap == null) {
+			return leftMap;
+		}
+		for (Integer termId : leftMap.keySet() ) {
+			Double oldIdf = rightMap.get(termId);
+			if ( oldIdf != null) {
+				rightMap.put(termId,oldIdf + leftMap.get(termId));
+			}
+			else {
+				rightMap.put(termId, leftMap.get(termId));
+			}
+		}
+		return rightMap;
+	}
 }

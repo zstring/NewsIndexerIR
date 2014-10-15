@@ -21,4 +21,6 @@ public interface Expression {
 	 * @return
 	 */
 	public String toSudoString();
+	
+	public Map<Integer, Double> getQVector(HashMap<IndexType, IndexReader> reader);
 }

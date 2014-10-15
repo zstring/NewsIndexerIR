@@ -35,4 +35,11 @@ public class QBracket implements Expression {
 	public String toString() {
 		return toSudoString();
 	}
+
+	@Override
+	public Map<Integer, Double> getQVector(
+			HashMap<IndexType, IndexReader> reader) {
+		// TODO Auto-generated method stub
+		return encapsulate.getQVector(reader);
+	}
 }

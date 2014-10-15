@@ -9,7 +9,6 @@ import edu.buffalo.cse.irf14.index.Posting;
 public class QTerm extends QIndexType implements Expression {
 	private String term;
 	private IndexType index;
-	private HashMap<Integer, Double> qVector;
 
 	public QTerm(String term, IndexType index) {
 		this.term = term;
@@ -20,18 +19,9 @@ public class QTerm extends QIndexType implements Expression {
 	public Map<String, Posting> interpret(HashMap<IndexType, IndexReader> reader) {
 		// TODO Auto-generated method stub
 		IndexReader ir = reader.get(index);
-		edu.buffalo.cse.irf14.index.Term termOb = ir.getTerm(this.term);
-		double termIdf = termOb.getIdf();
-		int termId = termOb.getTermId();
-		if (qVector.get(termId) != null) {
-			qVector.put(termId,termIdf);
-		}
-		else {
-			double oldIdf = qVector.get(termId);
-			qVector.put(termId, termIdf + oldIdf);
-		}
 		return ir.getPostingList(this.term);
 	}
+	
 
 	@Override
 	public String toSudoString() {
@@ -44,8 +34,21 @@ public class QTerm extends QIndexType implements Expression {
 		return toSudoString();
 	}
 	
-	public HashMap<Integer, Double> getQueryVector() {
-		return qVector;
+
+	@Override
+	public Map<Integer, Double> getQVector(
+			HashMap<IndexType, IndexReader> reader) {
+		// TODO Auto-generated method stub
+		IndexReader ir = reader.get(index);
+		HashMap<Integer, Double> qVector = new HashMap<Integer, Double>();
+		edu.buffalo.cse.irf14.index.Term termOb = ir.getTerm(this.term);
+		if (termOb != null) {
+			double termIdf = termOb.getIdf();
+			int termId = termOb.getTermId();
+			qVector.put(termId,termIdf);
+			return qVector;
+		}
+		return null;
 	}
 	
 }

@@ -260,4 +260,11 @@ public class ExpressionParser implements Expression {
 		return toSudoString();
 	}
 
+	@Override
+	public Map<Integer, Double> getQVector(
+			HashMap<IndexType, IndexReader> reader) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
