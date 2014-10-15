@@ -30,6 +30,10 @@ public class BaseIndexer implements Serializable {
 	private transient AnalyzerFactory aFactory;
 	public Map<String, Integer> termDict;
 	public Map<Integer, Term> termMap;
+	public Map<Integer, Term> getTermMap() {
+		return termMap;
+	}
+
 	public transient Set<String> documentSet;
 
 

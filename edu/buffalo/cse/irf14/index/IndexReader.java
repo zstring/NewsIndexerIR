@@ -77,6 +77,15 @@ public class IndexReader {
 			e.printStackTrace();
 		}
 	}
+	
+	public Term getTerm(String term) {
+		Integer termId = bi.termDict.get(term);
+		if (termId != null) {
+			return bi.termMap.get(termId);
+		}
+		return null;
+	
+	}
 
 	/**
 	 * Get total number of terms from the "key" dictionary associated with this 

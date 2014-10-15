@@ -77,6 +77,15 @@ public class IndexWriter {
 			termSpace.put(id, normlizedVal);
 		}
 	}
+	
+	public void setIdfAllTerms(BaseIndexer bi) {
+		Map<Integer, Term> termMap = bi.getTermMap();
+		int totalDoc = bi.getDocNum();
+		for (int termId : bi.getTermKeys()) {
+			Term term = termMap.get(termId);
+			term.setIdf(totalDoc);
+		}
+	}
 
 	/**
 	 * Method that indicates that all open resources must be closed
@@ -92,6 +101,10 @@ public class IndexWriter {
 			biCategory.setDocNum();
 			biPlace.setDocNum();
 			biTerm.setDocNum();
+			setIdfAllTerms(biAuthor);
+			setIdfAllTerms(biCategory);
+			setIdfAllTerms(biPlace);
+			setIdfAllTerms(biTerm);
 			termIndexKeys[0] = biAuthor.getTermKeys().toArray(new Integer[0]);
 			termIndexKeys[1] = biCategory.getTermKeys().toArray(new Integer[0]);
 			termIndexKeys[2] = biPlace.getTermKeys().toArray(new Integer[0]);

@@ -19,6 +19,10 @@ public class Term implements Serializable {
 	private HashMap<String, Posting> postingList;
 	private String termText;
 	private int termId;
+	public int getTermId() {
+		return termId;
+	}
+
 	private double idf;
 
 	public int getColFreq() {
@@ -47,6 +51,10 @@ public class Term implements Serializable {
 	 */
 	public HashMap<String, Posting> getPostingList() {
 		return postingList;
+	}
+
+	public double getIdf() {
+		return idf;
 	}
 
 	public Term() {
