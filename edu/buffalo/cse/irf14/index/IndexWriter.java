@@ -8,6 +8,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
 import edu.buffalo.cse.irf14.analysis.Token;
@@ -31,7 +33,7 @@ public class IndexWriter {
 	private BaseIndexer biCategory;
 	private BaseIndexer biPlace;
 	private BaseIndexer biTerm;
-
+	public HashMap<String, HashMap<Integer, Double>> docVector;
 	public IndexWriter(String indexDir) {
 		//TODO : YOU MUST IMPLEMENT THIS
 		this.indexDir = indexDir;
@@ -39,6 +41,7 @@ public class IndexWriter {
 		this.biCategory = new BaseIndexer(IndexType.CATEGORY);
 		this.biPlace = new BaseIndexer(IndexType.PLACE);
 		this.biTerm = new BaseIndexer(IndexType.TERM);
+		this.docVector = new HashMap<String, HashMap<Integer, Double>>();
 	}
 
 	/**
@@ -54,10 +57,25 @@ public class IndexWriter {
 		if (d == null) {
 			throw new IndexerException();
 		}
-		biAuthor.addDocument(d);
-		biCategory.addDocument(d);
-		biPlace.addDocument(d);
-		biTerm.addDocument(d);
+		biAuthor.addDocument(d, docVector);
+		biCategory.addDocument(d, docVector);
+		biPlace.addDocument(d, docVector);
+		biTerm.addDocument(d, docVector);
+		String docTerm = "";
+		if (d.getField(FieldNames.FILEID).length > 0) {
+			docTerm = d.getField(FieldNames.FILEID)[0];
+		}
+		HashMap<Integer, Double> termSpace = docVector.get(docTerm);
+		double ssd = 0.0;
+		for (Integer id : termSpace.keySet()) {
+			ssd += Math.pow(termSpace.get(id), 2);
+		}
+		ssd = Math.sqrt(ssd);
+		for (Integer id : termSpace.keySet()) {
+			double normlizedVal = termSpace.get(id);
+			normlizedVal /= ssd;
+			termSpace.put(id, normlizedVal);
+		}
 	}
 
 	/**
@@ -68,7 +86,7 @@ public class IndexWriter {
 	public void close() throws IndexerException {
 		//TODO
 		try {
-			String[] fileNames = {"AUTHOR", "CATEGORY", "PLACE", "TERM"};
+			String[] fileNames = {"AUTHOR", "CATEGORY", "PLACE", "TERM", "VECTOR"};
 			Integer[][] termIndexKeys = new Integer[4][]; 
 			biAuthor.setDocNum();
 			biCategory.setDocNum();
@@ -115,6 +133,14 @@ public class IndexWriter {
 			oos = new ObjectOutputStream(gzipOut);
 			oos.writeObject(biTerm);
 			oos.writeObject(termIndexKeys[3]);
+			oos.flush();
+			oos.close();
+			fo.close();
+
+			fo = new FileOutputStream(indexDir + java.io.File.separator + fileNames[4]);
+			gzipOut = new GZIPOutputStream(fo);
+			oos = new ObjectOutputStream(gzipOut);
+			oos.writeObject(docVector);
 			oos.flush();
 			oos.close();
 			fo.close();

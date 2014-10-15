@@ -30,7 +30,6 @@ public class BaseIndexer implements Serializable {
 	private transient AnalyzerFactory aFactory;
 	public Map<String, Integer> termDict;
 	public Map<Integer, Term> termMap;
-	public Map<String, HashMap<Integer, Double>> docVector;
 	public transient Set<String> documentSet;
 
 
@@ -57,7 +56,6 @@ public class BaseIndexer implements Serializable {
 		termDict = new HashMap<String, Integer>();
 		termMap = new HashMap<Integer, Term>();
 		documentSet = new HashSet<String>();
-		docVector = new HashMap<String, HashMap<Integer,Double>>();
 	}
 
 	public Set<Integer> getTermKeys() {
@@ -87,7 +85,9 @@ public class BaseIndexer implements Serializable {
 	 * @param d : The Document to be added
 	 * @throws IndexerException : In case any error occurs
 	 */
-	public void addDocument(Document d) throws IndexerException {
+	public void addDocument(Document d, 
+			HashMap<String, HashMap<Integer, Double>> docVector)
+					throws IndexerException {
 		//TODO : YOU MUST IMPLEMENT THIS
 		try {
 			if (d != null) {
@@ -101,7 +101,7 @@ public class BaseIndexer implements Serializable {
 					FieldNames fn = fieldName.get(i);
 					if (d.getField(fn) != null && d.getField(fn).length > 0) {
 						strContent = d.getField(fn)[0].trim();
-						createIndex(strContent, fn, docTerm);
+						createIndex(strContent, fn, docTerm, docVector);
 					}
 				}
 			}
@@ -111,7 +111,8 @@ public class BaseIndexer implements Serializable {
 		}
 	}
 
-	public void createIndex (String strContent, FieldNames fn, String docTerm) {
+	public void createIndex (String strContent, FieldNames fn, String docTerm,
+			HashMap<String, HashMap<Integer, Double>> docVector) {
 		if (!strContent.isEmpty()) {
 			TokenStream tStream;
 			try {
@@ -124,7 +125,9 @@ public class BaseIndexer implements Serializable {
 				if(tStream.hasNext() && !isDocCounted) {
 					this.documentSet.add(docTerm);
 					isDocCounted = true;
-					docVector.put(docTerm, new HashMap<Integer, Double>());
+					if (!docVector.containsKey(docTerm)) {
+						docVector.put(docTerm, new HashMap<Integer, Double>());	
+					}
 				}
 
 				HashMap<Integer, Double> termSpace = docVector.get(docTerm);
@@ -158,16 +161,6 @@ public class BaseIndexer implements Serializable {
 							}
 						}
 					}
-				}
-				double ssd = 0.0;
-				for (Integer id : termSpace.keySet()) {
-					ssd += Math.pow(termSpace.get(id), 2);
-				}
-				ssd = Math.sqrt(ssd);
-				for (Integer id : termSpace.keySet()) {
-					double normlizedVal = termSpace.get(id);
-					normlizedVal /= ssd;
-					termSpace.put(termId, normlizedVal);
 				}
 			} catch (TokenizerException e) {
 				// TODO Auto-generated catch block

@@ -34,4 +34,9 @@ public class Query {
 		System.out.println("TOTAL COUNT " + ret.keySet().size());
 		return ret;
 	}
+
+	public Map<Integer, Double> getVector() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

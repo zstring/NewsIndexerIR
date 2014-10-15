@@ -1,11 +1,17 @@
 package edu.buffalo.cse.irf14;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.zip.GZIPInputStream;
 
+import edu.buffalo.cse.irf14.Scorer.ScorerClass;
 import edu.buffalo.cse.irf14.index.IndexReader;
 import edu.buffalo.cse.irf14.index.IndexType;
 import edu.buffalo.cse.irf14.index.Posting;
@@ -42,11 +48,11 @@ public class SearchRunner {
 		setUpIndexReader();
 		//TODO: IMPLEMENT THIS METHOD
 	}
-	
+
 	private void setUpIndexWriter() {
 		// TODO Auto-generated method stub
-		
-		
+
+
 	}
 
 	private void setUpIndexReader() {
@@ -68,7 +74,8 @@ public class SearchRunner {
 		try {
 			Query query = QueryParser.parse(userQuery, defaultOperator);
 			Map<String, Posting> unRankedResult = query.execute(reader);
-			RankedResultWithModel(unRankedResult, model);
+			Map<Integer, Double> queryVector = query.getVector();
+			RankedResultWithModel(unRankedResult, queryVector, model);
 		}
 		catch (Exception ex){
 
@@ -82,11 +89,31 @@ public class SearchRunner {
 	 * @param model
 	 */
 	private void RankedResultWithModel(Map<String, Posting> unRankedResult,
-			ScoringModel model) {
+			Map<Integer, Double> queryVector, ScoringModel model) {
 		// TODO Auto-generated method stub
+		HashMap<String, HashMap<Integer, Double>> docVector = readDocVector();
+		ScorerClass sc = new ScorerClass();
 		if (unRankedResult != null && unRankedResult.keySet().size() > 1) {
-			
+			sc.rankResult(unRankedResult, docVector, queryVector, model);
 		}
+	}
+	@SuppressWarnings("unchecked")
+	private HashMap<String, HashMap<Integer, Double>> readDocVector() {
+		// TODO Auto-generated method stub
+		HashMap<String, HashMap<Integer, Double>> docVector = null;
+		try {
+			FileInputStream fo = new FileInputStream(indexDir + File.pathSeparator + "VECTOR");
+			GZIPInputStream gzip = new GZIPInputStream(fo);
+			ObjectInputStream ois = new ObjectInputStream(gzip);
+			docVector = (HashMap<String, HashMap<Integer, Double>>)ois.readObject();
+			ois.close();
+			gzip.close();
+			fo.close();
+		} catch (FileNotFoundException ex) {
+		} catch (IOException ex) {
+		} catch (ClassNotFoundException ex) {
+		}
+		return docVector;
 	}
 
 	/**
@@ -96,14 +123,14 @@ public class SearchRunner {
 	public void query(File queryFile) {
 		//TODO: IMPLEMENT THIS METHOD
 	}
-	
+
 	/**
 	 * General cleanup method
 	 */
 	public void close() {
 		//TODO : IMPLEMENT THIS METHOD
 	}
-	
+
 	/**
 	 * Method to indicate if wildcard queries are supported
 	 * @return true if supported, false otherwise
@@ -112,7 +139,7 @@ public class SearchRunner {
 		//TODO: CHANGE THIS TO TRUE ONLY IF WILDCARD BONUS ATTEMPTED
 		return false;
 	}
-	
+
 	/**
 	 * Method to get substituted query terms for a given term with wildcards
 	 * @return A Map containing the original query term as key and list of
@@ -121,9 +148,9 @@ public class SearchRunner {
 	public Map<String, List<String>> getQueryTerms() {
 		//TODO:IMPLEMENT THIS METHOD IFF WILDCARD BONUS ATTEMPTED
 		return null;
-		
+
 	}
-	
+
 	/**
 	 * Method to indicate if speel correct queries are supported
 	 * @return true if supported, false otherwise
@@ -132,7 +159,7 @@ public class SearchRunner {
 		//TODO: CHANGE THIS TO TRUE ONLY IF SPELLCHECK BONUS ATTEMPTED
 		return false;
 	}
-	
+
 	/**
 	 * Method to get ordered "full query" substitutions for a given misspelt query
 	 * @return : Ordered list of full corrections (null if none present) for the given query
