@@ -125,12 +125,12 @@ public class ExpressionParser implements Expression {
 				
 				isDefaultOperator = false;
 			}
-			else if ("AND".equalsIgnoreCase(token)||"OR".equalsIgnoreCase(token)||
-					"NOT".equalsIgnoreCase(token)||"(".equals(token)) {
+			else if ("AND".equals(token) || "OR".equals(token)||
+					"NOT".equals(token) || "(".equals(token)) {
 				if ("(".equals(token)) {
 					superDefaultIndex = true;
 				}
-				if("NOT".equalsIgnoreCase(token)) {
+				if("NOT".equals(token)) {
 					operator.push(new Term("AND"));
 					notOperator = true;
 				}
@@ -199,7 +199,7 @@ public class ExpressionParser implements Expression {
 	 */
 	public void Objectify(Stack<Expression> operator,Stack<Expression> operand, Expression popped) throws QueryParserException {
 		String poppedText = popped.toString();
-		if ("AND".equalsIgnoreCase(poppedText)) {
+		if ("AND".equals(poppedText)) {
 			if (operand.size() >= 2) {
 				Expression rightOperand = operand.pop();
 				Expression leftOperand = operand.pop();
@@ -210,7 +210,7 @@ public class ExpressionParser implements Expression {
 				throw new QueryParserException("Operand Stack Underflow for AND operator");
 			}
 		}
-		else if ("OR".equalsIgnoreCase(poppedText)) {
+		else if ("OR".equals(poppedText)) {
 			if (operand.size() >=2) {
 				Expression rightOperand = operand.pop();
 				Expression leftOperand = operand.pop();
@@ -221,7 +221,7 @@ public class ExpressionParser implements Expression {
 				throw new QueryParserException("Operand Stack Underflow for OR operator");
 			}
 		}
-		else if("NOT".equalsIgnoreCase(poppedText)) {
+		else if("NOT".equals(poppedText)) {
 			if (operand.size() >= 1) {
 				Expression op = operand.pop();
 				Expression notOp = new NotOperator(op);
