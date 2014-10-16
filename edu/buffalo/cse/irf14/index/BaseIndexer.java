@@ -117,6 +117,9 @@ public class BaseIndexer implements Serializable {
 
 	public void createIndex (String strContent, FieldNames fn, String docTerm,
 			HashMap<String, HashMap<Integer, Double>> docVector) {
+		if (docTerm.equals("0004824")) {
+			System.out.print("C2r");
+		}
 		if (!strContent.isEmpty()) {
 			double termWeight = 1.0;
 			if (fn.equals(FieldNames.TITLE)) {
@@ -131,8 +134,6 @@ public class BaseIndexer implements Serializable {
 			else if (fn.equals(FieldNames.PLACE)) {
 				termWeight = 2.0;
 			}
-			
-			
 			TokenStream tStream;
 			try {
 				tStream = tkr.consume(strContent);
