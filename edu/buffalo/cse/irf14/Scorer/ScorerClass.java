@@ -19,10 +19,18 @@ public class ScorerClass {
 			Double sum = 0.0;
 			Map<Integer, Double> docV = docVector.get(docId);
 			for (Integer termId : termKeys) {
-				sum += docV.get(termId) == null ? 0 : docV.get(termId) * queryVector.get(termId);
+					sum += docV.get(termId) == null ? 0 : docV.get(termId) * queryVector.get(termId);
+					if(docId.equals("0003361") || docId.equals("0000218")) {
+						System.out.println(docId + " " + termId + " " + docVector.get(docId).get(termId));
+					}
+					
 			}
 			rankedResult.put(docId, sum);
 		}
+		for (Integer termId : termKeys) {
+			System.out.println("TermID: " + termId + " Weight: " + queryVector.get(termId));
+		}
+		
 		return rankedResult;
 	}
 

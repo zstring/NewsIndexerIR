@@ -118,6 +118,21 @@ public class BaseIndexer implements Serializable {
 	public void createIndex (String strContent, FieldNames fn, String docTerm,
 			HashMap<String, HashMap<Integer, Double>> docVector) {
 		if (!strContent.isEmpty()) {
+			double termWeight = 1.0;
+			if (fn.equals(FieldNames.TITLE)) {
+				termWeight = 4.0;
+			}
+			else if (fn.equals(FieldNames.AUTHOR)) {
+				termWeight = 5.0;
+			}
+			else if (fn.equals(FieldNames.CATEGORY)) {
+				termWeight = 5.0;
+			}
+			else if (fn.equals(FieldNames.PLACE)) {
+				termWeight = 2.0;
+			}
+			
+			
 			TokenStream tStream;
 			try {
 				tStream = tkr.consume(strContent);
@@ -148,7 +163,7 @@ public class BaseIndexer implements Serializable {
 								Term term = new Term(tkString, termId, docTerm, tk.getPosIndex());
 								this.termDict.put(tkString, termId);
 								this.termMap.put(termId, term);
-								termSpace.put(termId, 1.0);
+								termSpace.put(termId, termWeight);
 							}
 							// If term already exist in index
 							else {
@@ -157,10 +172,10 @@ public class BaseIndexer implements Serializable {
 								
 								Double tFreq = termSpace.get(tkInt);
 								if (tFreq != null) {
-									termSpace.put(tkInt, tFreq + 1.0);
+									termSpace.put(tkInt, tFreq + termWeight);
 								}
 								else {
-									termSpace.put(tkInt, 1.0);
+									termSpace.put(tkInt, termWeight);
 								}
 							}
 						}
