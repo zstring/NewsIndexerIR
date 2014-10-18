@@ -9,6 +9,7 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import edu.buffalo.cse.irf14.analysis.Token;
 import edu.buffalo.cse.irf14.analysis.TokenStream;
 import edu.buffalo.cse.irf14.analysis.Tokenizer;
 import edu.buffalo.cse.irf14.analysis.TokenizerException;
@@ -22,6 +23,10 @@ import edu.buffalo.cse.irf14.index.Posting;
  */
 public class ExpressionParser implements Expression {
 	private Expression expression;
+	Matcher matcherIndex = Pattern.compile("(Author|Category|Term|Place)(:)",
+			Pattern.CASE_INSENSITIVE).matcher("");
+	Matcher matcherSpChar = Pattern.compile("(\\()|(\\))|(\")").matcher("");
+	Matcher matcherOp = Pattern.compile("AND|OR|NOT").matcher("");
 	
 	public Expression getExpression() {
 		return expression;
@@ -32,21 +37,25 @@ public class ExpressionParser implements Expression {
 			throw new QueryParserException("Query Null");
 		}
 		
-		Matcher matcher = Pattern.compile("(Author|Category|Term|Place)(:)",
-				Pattern.CASE_INSENSITIVE).matcher(userQuery);
+		/* Preprocessing: 1. Replacing ":" from "Index:" to " "
+		 * 2. Adding white space between "\"", "(" and ")"  
+		 * 3. Add brackets in case of two or more repetitive terms
+		 * 
+		 */
+		matcherIndex.reset(userQuery);
 		StringBuffer sb = new StringBuffer();
-		while(matcher.find()) {
-			matcher.appendReplacement(sb, matcher.group(1)+" ");
+		while(matcherIndex.find()) {
+			matcherIndex.appendReplacement(sb, matcherIndex.group(1) + " ");
 		}
-		matcher.appendTail(sb);
+		matcherIndex.appendTail(sb);
 		userQuery = sb.toString();
 
-		Matcher matcher1 = Pattern.compile("(\\()|(\\))|(\")").matcher(userQuery);
+		matcherSpChar.reset(userQuery);
 		StringBuffer sb1 = new StringBuffer();
-		while(matcher1.find()) {
-			matcher1.appendReplacement(sb1, " "+matcher1.group(0)+" ");
+		while(matcherSpChar.find()) {
+			matcherSpChar.appendReplacement(sb1, " " + matcherSpChar.group(0) + " ");
 		}
-		matcher1.appendTail(sb1);
+		matcherSpChar.appendTail(sb1);
 		userQuery = sb1.toString();
 		
 		Tokenizer tkr = new Tokenizer(" ");
@@ -60,12 +69,95 @@ public class ExpressionParser implements Expression {
 		if (tokenStream == null) {
 			throw new QueryParserException("Query Parser Exception: tokenStream empty");
 		}
+	
+		int in = 0;
+		//{notTerm, Term, Term}
+		boolean[] openBrackPatt = {true, false, false};
+		boolean isTerm = false;
+		int[] openBrackPos = {0, 0, 0};
+		while (tokenStream.hasNext()) {
+			String tokenString = tokenStream.next().toString();
+			in = tokenStream.getCurrentIndex();
+			isTerm = isTerm(tokenString, tokenStream, true);
+			if (openBrackPatt[0]) {
+				if (openBrackPatt[1]) {
+					if(openBrackPatt[2] = isTerm) {
+						openBrackPos[2] = in;
+						Token tk = new Token();
+						tk.setTermText("(");
+						tokenStream.insertAt(openBrackPos[1], tk);
+						tokenStream.next();
+						openBrackPatt[0] = false; openBrackPatt[1] = false;
+						openBrackPatt[2] = false;
+					}
+					else {
+						openBrackPatt[0] = true; openBrackPatt[1] = false;
+					}
+				}
+				else {
+					if (openBrackPatt[1] = isTerm) {
+						openBrackPos[1] = in;
+					}
+					else { 
+						openBrackPatt[0] = true; 
+					}
+				}
+			}
+			else {
+				openBrackPatt[0] = !isTerm;
+				openBrackPos[0] = in;
+			}
+		}
+		
+		tokenStream.next();
+		// Term,Term,NonTerm
+		openBrackPatt[0] = true;openBrackPatt[1] = false; openBrackPatt[2] = false;
+		isTerm = false;
+		openBrackPos[0] = tokenStream.getCurrentIndex(); openBrackPos[1] = 0; openBrackPos[2] = 0;
+		while (tokenStream.hasPrevious()) {
+			String tokenString = tokenStream.previous().toString();
+			in = tokenStream.getCurrentIndex();
+			isTerm = isTerm(tokenString, tokenStream ,false);
+			if (openBrackPatt[0]) {
+				if (openBrackPatt[1]) {
+					if(openBrackPatt[2] = isTerm) {
+						openBrackPos[2] = in;
+						Token tk = new Token();
+						tk.setTermText(")");
+						tokenStream.insertAt(openBrackPos[0], tk);
+						openBrackPatt[0] = false; openBrackPatt[1] = false;
+						openBrackPatt[2] = false;
+					}
+					else {
+						openBrackPatt[0] = true; openBrackPatt[1] = false;
+					}
+				}
+				else {
+					if (openBrackPatt[1] = isTerm) {
+						openBrackPos[1] = in;
+					}
+					else { 
+						openBrackPatt[0] = true; 
+					}
+				}
+			}
+			else {
+				openBrackPatt[0] = !isTerm;
+				openBrackPos[0] = in;
+			}
+		}
+		tokenStream.reset();
+		
+		// Preprocessing End
+		 
 		
 		Stack<Expression> operator = new Stack<Expression>();
 		Stack<Expression> operand = new Stack<Expression>();
 		boolean dQuotesOn = false,dQuotesOff = false, defaultIndex = true, 
 				superDefaultIndex = false, isDefaultOperator = false, notOperator = false;
 		//String index = "";
+		
+		
 		IndexType index = IndexType.TERM;
 		StringBuilder quotedString = new StringBuilder("\"");
 		while (tokenStream.hasNext()) {
@@ -91,6 +183,7 @@ public class ExpressionParser implements Expression {
 					if (isDefaultOperator) {
 						operator.push(new Term("OR"));
 					}
+					isDefaultOperator = true;
 				}
 				dQuotesOff = !dQuotesOff;
 			}
@@ -241,6 +334,37 @@ public class ExpressionParser implements Expression {
 				throw new QueryParserException("Operand Stack Underflow for Brackets");
 			}
 		}
+	}
+	
+	public boolean isTerm(String term, TokenStream tokenStream, boolean next) {
+		if (term == null) {
+			return false;
+		}
+		Matcher mat = Pattern.compile("author|category|place|term",Pattern.CASE_INSENSITIVE).matcher(term);
+		matcherOp.reset(term);
+		if (matcherOp.matches() || mat.matches() 
+				|| "(".equals(term) || ")".equals(term)) {
+			return false;
+		}
+		if("\"".equals(term)) {
+			if (next) {
+				while (tokenStream.hasNext()) {
+					term = tokenStream.next().toString();
+					if ("\"".equals(term)) {
+						return true;
+					}
+				}
+			}
+			else {
+				while (tokenStream.hasPrevious()) {
+					term = tokenStream.previous().toString();
+					if ("\"".equals(term)) {
+						return true;
+					}
+				}
+			}
+		}
+		return true;
 	}
 
 	@Override
