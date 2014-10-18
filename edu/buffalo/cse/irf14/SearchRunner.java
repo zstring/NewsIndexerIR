@@ -7,6 +7,7 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.zip.GZIPInputStream;
@@ -27,6 +28,7 @@ import edu.buffalo.cse.irf14.query.QueryParser;
 public class SearchRunner {
 	public enum ScoringModel {TFIDF, OKAPI};
 	private HashMap<IndexType, IndexReader> reader;
+	HashMap<String, HashMap<Integer, Double>> docVector;
 	private String indexDir;
 	private String corpusDir;
 	private char mode;
@@ -62,6 +64,7 @@ public class SearchRunner {
 		reader.put(IndexType.CATEGORY, new IndexReader(indexDir, IndexType.CATEGORY));
 		reader.put(IndexType.PLACE, new IndexReader(indexDir, IndexType.PLACE));
 		reader.put(IndexType.TERM, new IndexReader(indexDir, IndexType.TERM));
+		docVector = readDocVector();
 	}
 
 	/**
@@ -97,9 +100,8 @@ public class SearchRunner {
 			Map<Integer, Double> queryVector, ScoringModel model) {
 		// TODO Auto-generated method stub
 		int a = 1;
-		HashMap<String, HashMap<Integer, Double>> docVector = readDocVector();
 		ScorerClass sc = new ScorerClass();
-		Map<String, Double> rankedResult = null;
+		TreeMap<String, Double> rankedResult = null;
 		if (unRankedResult != null && unRankedResult.keySet().size() > 1) {
 			rankedResult = sc.rankResult(unRankedResult, docVector, queryVector, model);
 		}

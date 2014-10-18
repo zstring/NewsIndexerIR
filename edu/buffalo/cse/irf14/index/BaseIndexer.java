@@ -117,6 +117,9 @@ public class BaseIndexer implements Serializable {
 
 	public void createIndex (String strContent, FieldNames fn, String docTerm,
 			HashMap<String, HashMap<Integer, Double>> docVector) {
+		if (docTerm.equals("0004824")) {
+			System.out.print("C2r");
+		}
 		if (!strContent.isEmpty()) {
 			double termWeight = 1.0;
 			if (fn.equals(FieldNames.TITLE)) {
@@ -131,8 +134,6 @@ public class BaseIndexer implements Serializable {
 			else if (fn.equals(FieldNames.PLACE)) {
 				termWeight = 2.0;
 			}
-			
-			
 			TokenStream tStream;
 			try {
 				tStream = tkr.consume(strContent);
@@ -169,7 +170,6 @@ public class BaseIndexer implements Serializable {
 							else {
 								Term term = termMap.get(tkInt);
 								term.addOrUpdateDoc(docTerm, tk.getPosIndex());
-								
 								Double tFreq = termSpace.get(tkInt);
 								if (tFreq != null) {
 									termSpace.put(tkInt, tFreq + termWeight);
@@ -178,12 +178,59 @@ public class BaseIndexer implements Serializable {
 									termSpace.put(tkInt, termWeight);
 								}
 							}
+							addOrUpdateSplitTermsInDict(tk, docTerm, termSpace, termWeight);
 						}
 					}
 				}
 			} catch (TokenizerException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * Method for adding or Updating tokens having multiple 
+	 * strings with whitespace delimited, Add them seperately 
+	 * into dictionary with less weight
+	 * @param tk
+	 * @param docTerm
+	 * @param termSpace
+	 * @param termWeight
+	 */
+	private void addOrUpdateSplitTermsInDict(Token tk,
+			String docTerm, HashMap<Integer, Double> termSpace, double termWeight) {
+		String tkString = tk.toString();
+		if (!tkString.isEmpty()) {
+			String[] splitTk = tkString.split(" ");
+			int len = splitTk.length;
+			if (len > 1) {
+				//Reducing the termWeight as it is sub String
+				// of the actual token
+				termWeight = termWeight * 0.3;
+				for (int i = 0; i < len; i++) {
+					Integer tkInt = termDict.get(splitTk[i]);
+					if (tkInt == null) {
+						//increment term id
+						termId += 1;
+						Term term = new Term(tkString, termId,
+								docTerm, tk.getPosIndex());
+						this.termDict.put(tkString, termId);
+						this.termMap.put(termId, term);
+						termSpace.put(termId, termWeight);
+					}
+					else {
+						Term term = termMap.get(tkInt);
+						term.addOrUpdateDoc(docTerm, tk.getPosIndex());
+						Double tFreq = termSpace.get(tkInt);
+						if (tFreq != null) {
+							termSpace.put(tkInt, tFreq + termWeight);
+						}
+						else {
+							termSpace.put(tkInt, termWeight);
+						}
+					}
+				}
 			}
 		}
 	}

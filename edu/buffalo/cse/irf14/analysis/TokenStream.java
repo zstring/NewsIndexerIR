@@ -23,8 +23,14 @@ public class TokenStream implements Iterator<Token>{
 		idx = -1;
 		isRemoved = false;
 	}
-	
-	
+	public TokenStream(String tokenString) {
+		tokenList = new ArrayList<Token>();
+		idx = -1;
+		isRemoved = false;
+		Token tk = new Token();
+		tk.setTermText(tokenString);
+		tokenList.add(tk);
+	}
 	/**
 	 * Method that checks if there is any Token left in the stream
 	 * with regards to the current pointer.
