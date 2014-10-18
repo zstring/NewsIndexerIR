@@ -117,7 +117,7 @@ public class BaseIndexer implements Serializable {
 
 	public void createIndex (String strContent, FieldNames fn, String docTerm,
 			HashMap<String, HashMap<Integer, Double>> docVector) {
-		if (docTerm.equals("0004824")) {
+		if (docTerm.equals("0005645") || docTerm.equals("0005646")) {
 			System.out.print("C2r");
 		}
 		if (!strContent.isEmpty()) {
@@ -178,7 +178,7 @@ public class BaseIndexer implements Serializable {
 									termSpace.put(tkInt, termWeight);
 								}
 							}
-							addOrUpdateSplitTermsInDict(tk, docTerm, termSpace, termWeight);
+							addOrUpdateSplitTermsInDict(tk, docTerm, termSpace, termWeight, fn);
 						}
 					}
 				}
@@ -197,9 +197,10 @@ public class BaseIndexer implements Serializable {
 	 * @param docTerm
 	 * @param termSpace
 	 * @param termWeight
+	 * @param fn 
 	 */
 	private void addOrUpdateSplitTermsInDict(Token tk,
-			String docTerm, HashMap<Integer, Double> termSpace, double termWeight) {
+			String docTerm, HashMap<Integer, Double> termSpace, double termWeight, FieldNames fn) {
 		String tkString = tk.toString();
 		if (!tkString.isEmpty()) {
 			String[] splitTk = tkString.split(" ");
@@ -213,9 +214,9 @@ public class BaseIndexer implements Serializable {
 					if (tkInt == null) {
 						//increment term id
 						termId += 1;
-						Term term = new Term(tkString, termId,
+						Term term = new Term(splitTk[i], termId,
 								docTerm, tk.getPosIndex());
-						this.termDict.put(tkString, termId);
+						this.termDict.put(splitTk[i], termId);
 						this.termMap.put(termId, term);
 						termSpace.put(termId, termWeight);
 					}

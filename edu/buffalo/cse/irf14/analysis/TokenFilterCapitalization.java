@@ -48,6 +48,10 @@ public class TokenFilterCapitalization extends TokenFilter {
 	@Override
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stub
+		//Added condition for single token stream to handle
+		//Query term value to handle camel case structure
+		if (stream.getTokenList().size() == 1)
+			return false;
 		if (stream.hasNext()) {
 			Token token;
 			token = stream.next();

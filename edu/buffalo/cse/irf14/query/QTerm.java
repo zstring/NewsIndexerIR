@@ -1,5 +1,7 @@
 package edu.buffalo.cse.irf14.query;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import edu.buffalo.cse.irf14.analysis.Analyzer;
@@ -25,10 +27,14 @@ public class QTerm extends QIndexType implements Expression {
 	public Map<String, Posting> interpret(HashMap<IndexType, IndexReader> reader) {
 		// TODO Auto-generated method stub
 		IndexReader ir = reader.get(index);
-		String aTerm = getAnalyzedTerm(this.term);
-		return ir.getPostingList(aTerm);
+		System.out.println("a");
+		List<String> aTerms = getAnalyzedTerm(this.term);
+		Map<String, Posting> posting = new HashMap<String, Posting>();
+		for (int i = 0; i < aTerms.size(); i++) {
+			posting.putAll(ir.getPostingList(aTerms.get(i)));
+		}
+		return posting;
 	}
-	
 
 	@Override
 	public String toSudoString() {
@@ -40,7 +46,7 @@ public class QTerm extends QIndexType implements Expression {
 	public String toString() {
 		return toSudoString();
 	}
-	
+
 
 	@Override
 	public Map<Integer, Double> getQVector(
@@ -48,28 +54,55 @@ public class QTerm extends QIndexType implements Expression {
 		// TODO Auto-generated method stub
 		IndexReader ir = reader.get(index);
 		HashMap<Integer, Double> qVector = new HashMap<Integer, Double>();
-		String aTerm = getAnalyzedTerm(this.term);
-		edu.buffalo.cse.irf14.index.Term termOb = ir.getTerm(aTerm);
-		if (termOb != null) {
-			double termIdf = termOb.getIdf();
-			int termId = termOb.getTermId();
-			qVector.put(termId,termIdf);
-			System.out.println(termId + " " + this.term);
-			return qVector;
+		List<String> aTerms = getAnalyzedTerm(this.term);
+		for (int i = 0; i < aTerms.size(); i++) {
+			edu.buffalo.cse.irf14.index.Term termOb = ir.getTerm(aTerms.get(i));
+			//this weight represent the weight for the given term
+			// if its in another format than make it less e.g. 0.3
+			double wt = 1;
+			if (i != 0) {
+				wt = 0.3;
+			}
+			if (termOb != null) {
+				double termIdf = termOb.getIdf();
+				int termId = termOb.getTermId();
+				qVector.put(termId, termIdf * wt);
+				System.out.println(termId + " " + this.term);
+			}
 		}
-		return null;
+		return qVector;
 	}
 
-	private String getAnalyzedTerm(String string) {
+	private List<String> getAnalyzedTerm(String string) {
 		AnalyzerFactory fact = AnalyzerFactory.getInstance();
+		// Number of Permuation of a given String
+		// 1. Camel Case, 2. all lower, 3. given format
+		// 1. Ios 2. ios 3. iOS
+		String lowerCase = string.toLowerCase();
+		String camelCase = string.toUpperCase();
+		if (string.length() > 1) {
+			camelCase = string.substring(0, 1).toUpperCase() 
+					+ string.substring(1).toLowerCase();
+		}
+		List<String> terms = new ArrayList<String>();
+		terms.add(string);
+		if (!string.equals(lowerCase)) {
+			terms.add(lowerCase);
+		}
+		if (!string.equals(camelCase)) {
+			terms.add(camelCase);
+		}
 		try {
-			TokenStream stream = new TokenStream(string);
-			Analyzer analyzer = fact.getAnalyzerForField(index.toFieldNames(), stream);
-			while (analyzer.increment()) {
+			for (int i = 0; i < terms.size(); i++) {
+				TokenStream stream = new TokenStream(terms.get(i));
+				Analyzer analyzer = fact.getAnalyzerForField(index.toFieldNames(), stream);
+				while (analyzer.increment()) {
+				}
+				stream = analyzer.getStream();
+				stream.reset();
+				terms.set(i, stream.next().toString());
 			}
-			stream = analyzer.getStream();
-			stream.reset();
-			return stream.next().toString();
+			return terms;
 		} catch (TokenizerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

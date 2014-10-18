@@ -5,15 +5,15 @@ import java.util.regex.Pattern;
 
 public class TokenFilterStemmer extends TokenFilter {
 
-	private Matcher matAlpha;
+	//	private Matcher matAlpha;
 	/**
 	 * parameterized constructor calling super constructor
 	 * @param stream
 	 */
 	public TokenFilterStemmer(TokenStream stream) {
 		super(stream);
-		String alphaRegex = "[a-zA-Z]+";
-		matAlpha = Pattern.compile(alphaRegex).matcher("");
+		//		String alphaRegex = "[a-zA-Z]+";
+		//		matAlpha = Pattern.compile(alphaRegex).matcher("");
 	}
 
 	@Override
@@ -25,20 +25,30 @@ public class TokenFilterStemmer extends TokenFilter {
 			if (token != null) {
 				String tkText = token.getTermText();
 				if (tkText != null && tkText.length() > 1) {
-					matAlpha.reset(tkText);
-					if (matAlpha.matches()) {
+					String[] splitText = tkText.split(" ");
+					StringBuilder sb = new StringBuilder();
+					for (int i = 0; i < splitText.length; i++) {
+						//					matAlpha.reset(tkText);
+						//					if (matAlpha.matches()) {
 						Stemmer stemmer = new Stemmer();
-						char[] tkTextChar = tkText.toCharArray();
+//						char[] tkTextChar = tkText.toCharArray();
+						char[] tkTextChar = splitText[i].toCharArray();
 						stemmer.add(tkTextChar, tkTextChar.length);
+						if (tkText.equals("Adobe Resources Corp")) {
+							System.out.println("STOP");
+						}
 						stemmer.stem();
 						String stemString = stemmer.toString();
-						if (!tkText.equals(stemString)) {
-							token.setTermText(stemString);
-						}
+						sb.append(stemString + " ");
+					}
+					String tkStem = sb.toString().trim();
+					if (!tkText.equals(tkStem)) {
+						token.setTermText(tkStem);
 					}
 				}
 			}
 		}
+		//		}
 		return stream.hasNext();
 	}
 

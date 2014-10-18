@@ -20,25 +20,22 @@ public class SearchRunnerTest {
 	@Test
 	public void test() {
 		String[] query = {"(black OR blue) OR bruises"};
-		query[0] = "\"Adobe Resources Corp\"";
-		query[0] = "tapioca";
-//		query[0] = "(A OR B OR C OR D) AND ((E AND F) OR (G AND H)) "
-//				+ "AND ((I OR J OR K) AND (L OR M OR N OR O)) AND "
-//				+ "(P OR (Q OR (R OR (S AND T))))";
+		query[0] = "Adobe";
+//		query[0] = "tapioca";
 		try {
-		String indexDir = "/home/avinav/Dropbox/workspace/avinav_newsindexer/data";
-		indexDir = "/home/inspire/Dropbox/UB/JavaWorkspace/newsindexer/news_training";
-		String fileOutput = "/home/avinav/Dropbox/workspace/avinav_newsindexer/data/output.txt";
-		fileOutput = "/home/inspire/Dropbox/UB/JavaWorkspace/newsindexer/news_training/output.txt";
-		String corpusDir = "";
-		char mode = 'E';
-		FileOutputStream file = new FileOutputStream(fileOutput);
-		PrintStream stream = new PrintStream(file);
-		sr = new SearchRunner(indexDir, corpusDir, mode, stream);
-		for (int i = 0; i < query.length; i++) {
-			sr.query(query[i], ScoringModel.OKAPI);
-		}
-		stream.close();
+			String indexDir = "/home/avinav/Dropbox/workspace/avinav_newsindexer/data";
+			indexDir = "/home/inspire/Dropbox/UB/JavaWorkspace/newsindexer/news_training";
+			String fileOutput = "/home/avinav/Dropbox/workspace/avinav_newsindexer/data/output.txt";
+			fileOutput = "/home/inspire/Dropbox/UB/JavaWorkspace/newsindexer/news_training/output.txt";
+			String corpusDir = "";
+			char mode = 'E';
+			FileOutputStream file = new FileOutputStream(fileOutput);
+			PrintStream stream = new PrintStream(file);
+			sr = new SearchRunner(indexDir, corpusDir, mode, stream);
+			for (int i = 0; i < query.length; i++) {
+				sr.query(query[i], ScoringModel.OKAPI);
+			}
+			stream.close();
 		} catch (Exception ex) {
 			fail("Error no file found");
 		}
