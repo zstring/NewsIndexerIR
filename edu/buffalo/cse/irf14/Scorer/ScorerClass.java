@@ -36,6 +36,10 @@ public class ScorerClass {
 		sortedRankedRes.putAll(rankedResult);
 		return sortedRankedRes;
 	}
+	/*
+	 * Comaparator for TreeMap
+	 * Sorting the keys based on values
+	 */
 	public class SortByValueComp implements Comparator<String> {
 		Map<String, Double> map;
 		public SortByValueComp(Map<String, Double> map) {
@@ -43,6 +47,10 @@ public class ScorerClass {
 		}
 		@Override
 		public int compare(String a, String b) {
+			//Intentionally comparaing two String objects
+			//to check weather they are same object or 
+			//not if same then return 0 else compare the value 
+			//of another string to first one
 			if (a == b) 
 				return 0;
 			Double aValue = map.get(a);
