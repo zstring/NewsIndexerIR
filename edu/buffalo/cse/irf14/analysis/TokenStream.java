@@ -175,7 +175,7 @@ public class TokenStream implements Iterator<Token>{
 	}
 	
 	public void insertAt(int index,Token token) {
-		if (index >= 0 && index < tokenList.size()) {
+		if (index >= 0 && index <= tokenList.size()) {
 			tokenList.add(index, token);			
 		}
 	}
