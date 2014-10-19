@@ -73,22 +73,25 @@ public class ExpressionParser implements Expression {
 		int in = 0;
 		//{notTerm, Term, Term}
 		boolean[] openBrackPatt = {true, false, false};
-		boolean isTerm = false;
+		boolean isTerm = false, nonTermExist = false;
 		int[] openBrackPos = {0, 0, 0};
 		while (tokenStream.hasNext()) {
 			String tokenString = tokenStream.next().toString();
 			in = tokenStream.getCurrentIndex();
 			isTerm = isTerm(tokenString, tokenStream, true);
+			if(!isTerm) nonTermExist = true;
 			if (openBrackPatt[0]) {
 				if (openBrackPatt[1]) {
 					if(openBrackPatt[2] = isTerm) {
 						openBrackPos[2] = in;
-						Token tk = new Token();
-						tk.setTermText("(");
-						tokenStream.insertAt(openBrackPos[1], tk);
-						tokenStream.next();
-						openBrackPatt[0] = false; openBrackPatt[1] = false;
-						openBrackPatt[2] = false;
+						if (!isTerm || nonTermExist) {
+							Token tk = new Token();
+							tk.setTermText("(");
+							tokenStream.insertAt(openBrackPos[1], tk);
+							tokenStream.next();
+							openBrackPatt[0] = false; openBrackPatt[1] = false;
+							openBrackPatt[2] = false;
+						}
 					}
 					else {
 						openBrackPatt[0] = true; openBrackPatt[1] = false;
@@ -108,25 +111,28 @@ public class ExpressionParser implements Expression {
 				openBrackPos[0] = in;
 			}
 		}
-		
 		tokenStream.next();
 		// Term,Term,NonTerm
 		openBrackPatt[0] = true;openBrackPatt[1] = false; openBrackPatt[2] = false;
-		isTerm = false;
+		isTerm = false; nonTermExist = false;
 		openBrackPos[0] = tokenStream.getCurrentIndex(); openBrackPos[1] = 0; openBrackPos[2] = 0;
 		while (tokenStream.hasPrevious()) {
 			String tokenString = tokenStream.previous().toString();
 			in = tokenStream.getCurrentIndex();
 			isTerm = isTerm(tokenString, tokenStream ,false);
+			if(!isTerm) nonTermExist = true;
 			if (openBrackPatt[0]) {
 				if (openBrackPatt[1]) {
 					if(openBrackPatt[2] = isTerm) {
 						openBrackPos[2] = in;
-						Token tk = new Token();
-						tk.setTermText(")");
-						tokenStream.insertAt(openBrackPos[0], tk);
-						openBrackPatt[0] = false; openBrackPatt[1] = false;
-						openBrackPatt[2] = false;
+						if (!isTerm || nonTermExist) {
+							Token tk = new Token();
+							tk.setTermText(")");
+							tokenStream.insertAt(openBrackPos[1], tk);
+							tokenStream.next();
+							openBrackPatt[0] = false; openBrackPatt[1] = false;
+							openBrackPatt[2] = false;
+						}
 					}
 					else {
 						openBrackPatt[0] = true; openBrackPatt[1] = false;

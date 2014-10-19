@@ -14,14 +14,14 @@ public class ExpressionParserTest {
 	private String[] input = {"hello", "hello world", "\"hello world\"", "orange AND yellow",
 			"(black OR blue) AND bruises", "Author:rushdie NOT jihad", 
 			"Category:War AND Author:Dutt AND Place:Baghdad AND prisoners detainees rebels",
-			"(Love NOT War) AND Category:(movies NOT crime)" ,"author: rushdie not \"jihad hello\""};
+			"(Love NOT War) AND Category:(movies NOT crime)" ,"author: rushdie NOT \"jihad hello\""};
 	private String[] output = {"{ Term:hello }",
 			"{ Term:hello OR Term:world }",
 			"{ Term:\"hello world\" }",
 			"{ Term:orange AND Term:yellow }",
 			"{ [ Term:black OR Term:blue ] AND Term:bruises }",
 			"{ Author:rushdie AND <Term:jihad> }",
-			"{ Category:War AND Author:Dutt AND Place:Baghdad AND Term:prisoners OR Term:detainees OR Term:rebels }",
+			"{ Category:War AND Author:Dutt AND Place:Baghdad AND [ Term:prisoners OR Term:detainees OR Term:rebels ] }",
 			"{ [ Term:Love AND <Term:War> ] AND [ Category:movies AND <Category:crime> ] }",
 			"{ Author:rushdie AND <Term:\"jihad hello\"> }"};
 	@BeforeClass
@@ -39,7 +39,7 @@ public class ExpressionParserTest {
 		try {
 			for (int i = 0; i < input.length; i++) {
 				expParser.expressionParser(input[i], "OR");
-				assertEquals(expParser.toString(), output[i]);
+				assertEquals( output[i],expParser.toString());
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
