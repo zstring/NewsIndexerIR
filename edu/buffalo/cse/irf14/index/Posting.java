@@ -8,6 +8,8 @@ public class Posting implements Serializable {
 	private static final long serialVersionUID = 43L;
 	private int termFreq;
 	private List<Integer> posIndex;
+	private boolean type;
+	private int termId;
 
 	public Posting() {
 		posIndex = new ArrayList<Integer>();
@@ -36,9 +38,24 @@ public class Posting implements Serializable {
 		// TODO Auto-generated method stub
 		this.posIndex.add(index);
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Term Freq " + termFreq;
+	}
+
+	public void setType(boolean type, int termId) {
+		if (type) {
+			this.type = type;
+			this.termId = termId;
+		}
+	}
+
+	public boolean getType() {
+		return this.type;
+	}
+
+	public int getTermId() {
+		return this.termId;
 	}
 }
