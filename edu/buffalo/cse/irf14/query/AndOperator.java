@@ -1,7 +1,9 @@
 package edu.buffalo.cse.irf14.query;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import edu.buffalo.cse.irf14.index.IndexReader;
 import edu.buffalo.cse.irf14.index.IndexType;
@@ -34,7 +36,21 @@ public class AndOperator implements Expression {
 			if (leftMap == null) {
 				return rightMap;
 			}
-			leftMap.keySet().retainAll(rightMap.keySet());	
+			//Updating the Title Term Type for 
+			// Query Weight
+			Set<String> keys = new HashSet<String>(rightMap.keySet());
+			keys.addAll(new HashSet<String>(leftMap.keySet()));
+			for (String docId : keys) {
+				Posting postRight = rightMap.get(docId);
+				Posting postLeft = leftMap.get(docId);
+				if (postRight == null || postLeft == null) {
+					leftMap.remove(docId);
+				}
+				else if (postRight.getType()) {
+						leftMap.put(docId, postRight);
+				}
+			}
+//			leftMap.keySet().retainAll(rightMap.keySet());	
 		}
 		return leftMap;
 	}

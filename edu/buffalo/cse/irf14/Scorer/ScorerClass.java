@@ -41,15 +41,18 @@ public class ScorerClass {
 				Double sum = 0.0;
 				Posting post = unRankedResult.get(docId);
 				//Extra weight for having title term document
-				double titleWeight = 1.0;
+				int termTitleId = 1;
 				if (post.getType()) {
-					titleWeight = 1.6;
+					termTitleId = post.getTermId(); 
 				}
 				Map<Integer, Double> docV = docVector.get(docId);
 				for (Integer termId : termKeys) {
-					sum += docV.get(termId) == null ? 0 : docV.get(termId) * queryVector.get(termId);
+					double titleWt = 1;
+					if (termId == termTitleId) {
+						titleWt = 4;
+					}
+					sum += docV.get(termId) == null ? 0 : docV.get(termId) * queryVector.get(termId) * titleWt;
 				}
-				sum *= titleWeight;
 				rankedResult.put(docId, sum);
 			}
 		}

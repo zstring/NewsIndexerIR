@@ -9,7 +9,7 @@ import edu.buffalo.cse.irf14.index.Posting;
 public class OrOperator implements Expression {
 	private Expression leftOperand;
 	private Expression rightOperand;
-	
+
 	public OrOperator(Expression left, Expression right) {
 		this.leftOperand = left;
 		this.rightOperand = right;
@@ -26,7 +26,19 @@ public class OrOperator implements Expression {
 		if (leftMap == null) {
 			return rightMap;
 		}
-		leftMap.putAll(rightMap);
+		//Updating the Title Term Type for 
+		// Query Weight
+		for (String docId : rightMap.keySet() ) {
+			Posting postRight = rightMap.get(docId);
+			Posting postLeft = leftMap.get(docId);
+			if (postLeft == null) {
+				leftMap.put(docId, postRight);
+			}
+			else if (postRight != null && postRight.getType()) {
+				leftMap.put(docId, postRight);
+			}
+		}
+		//		leftMap.putAll(rightMap);
 		return leftMap;
 	}
 
