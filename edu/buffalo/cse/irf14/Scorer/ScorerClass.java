@@ -33,8 +33,6 @@ public class ScorerClass {
 					if (termKeys.size() >= 5) val *= ((k3 + 1) * termFreq) / k3 + termFreq;
 					score += val;
 				}
-				if (score > 1.0)
-					score = 1.0;
 				rankedResult.put(docId, score);
 			}
 		}
@@ -45,8 +43,6 @@ public class ScorerClass {
 				for (Integer termId : termKeys) {
 					sum += docV.get(termId) == null ? 0 : docV.get(termId) * queryVector.get(termId);
 				}
-				if (sum > 1.0)
-					sum = 1.0;
 				rankedResult.put(docId, sum);
 			}
 		}
@@ -56,6 +52,12 @@ public class ScorerClass {
 			System.out.println("TermID: " + termId + " Weight: " + queryVector.get(termId));
 		}
 		sortedRankedRes.putAll(rankedResult);
+		for (String doc : sortedRankedRes.keySet()) {
+			double val = sortedRankedRes.get(doc);
+			if (val > 1) {
+				sortedRankedRes.put(doc, 1.0);
+			}
+		}
 		return sortedRankedRes;
 	}
 	/*
