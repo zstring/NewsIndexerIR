@@ -79,7 +79,8 @@ public class SearchRunner {
 			Query query = QueryParser.parse(userQuery, defaultOperator);
 			Map<String, Posting> unRankedResult = query.execute(reader);
 			Map<Integer, Double> queryVector = query.getVector(reader);
-			Map<String, Double> rankedResult =  RankedResultWithModel(unRankedResult, queryVector, this.avgLen, model);
+			Map<Integer, Double> queryTermFreq = query.getQueryTermFreq(reader);
+			Map<String, Double> rankedResult =  RankedResultWithModel(unRankedResult, queryVector, queryTermFreq, this.avgLen, model);
 			
 			for (String docId : rankedResult.keySet()) {
 				stream.print("Doc: " + docId + " Score: " + rankedResult.get(docId));
@@ -98,12 +99,12 @@ public class SearchRunner {
 	 * @param model
 	 */
 	private Map<String, Double> RankedResultWithModel(Map<String, Posting> unRankedResult,
-			Map<Integer, Double> queryVector, double avgLen, ScoringModel model) {
+			Map<Integer, Double> queryVector, Map<Integer, Double> queryTermFreq, double avgLen, ScoringModel model) {
 		// TODO Auto-generated method stub
 		ScorerClass sc = new ScorerClass();
 		TreeMap<String, Double> rankedResult = null;
 		if (unRankedResult != null && unRankedResult.keySet().size() > 1) {
-			rankedResult = sc.rankResult(unRankedResult, docVector, queryVector, avgLen, model);
+			rankedResult = sc.rankResult(unRankedResult, docVector, queryVector, queryTermFreq, avgLen, model);
 		}
 		for (String docId : rankedResult.keySet()) {
 			System.out.println("Doc: " + docId + " Score: " + rankedResult.get(docId));
