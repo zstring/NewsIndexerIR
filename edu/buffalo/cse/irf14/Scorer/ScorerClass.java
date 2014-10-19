@@ -12,14 +12,14 @@ import edu.buffalo.cse.irf14.index.Posting;
 public class ScorerClass {
 
 	public TreeMap<String, Double> rankResult (Map<String, Posting> unRankedResult,
-			HashMap<String, HashMap<Integer, Double>> docVector,
+			HashMap<String, HashMap<Integer, Double>> docVector, Map<Integer, Double> queryTermFreq,
 			Map<Integer, Double> queryVector, double avgLen, ScoringModel model) {
 		
 		HashMap<String, Double> rankedResult = new HashMap<String, Double>();
 		Set<Integer> termKeys = queryVector.keySet();
 		
 		if(ScoringModel.OKAPI.equals(model)) {
-			double k1 = 0.5, k3 = 0.5, b = 0.5;
+			double k1 = 1.2, k3 = 2, b = 0.75;
 			Double termFreq = 0.0, idf = 0.0;
 			double val = 0.0, score = 0.0;
 			for (String docId : unRankedResult.keySet()) {
@@ -30,7 +30,7 @@ public class ScorerClass {
 					idf = queryVector.get(termId) == null ? 0 : queryVector.get(termId);
 					termFreq = docV.get(termId) == null ? 0 : docV.get(termId);
 					val = idf * ((k1 + 1) * termFreq) / (k1 * ((1 - b) + b * (docV.size() / avgLen)) + termFreq);
-					if (termKeys.size() >= 5) val *= ((k3 + 1) * termFreq) / k3 + termFreq;
+					if (termKeys.size() >= 10) val *= ((k3 + 1) * queryTermFreq.get(termId)) / (k3 + queryTermFreq.get(termId));
 					score += val;
 				}
 				rankedResult.put(docId, score);
