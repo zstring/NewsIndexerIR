@@ -56,13 +56,13 @@ public class QTerm extends QIndexType implements Expression {
 		IndexReader ir = reader.get(index);
 		Double weight = 1.0;
 		if (index.equals(IndexType.AUTHOR)) {
-			weight = 10.0;
+			weight = 5.0;
 		}
 		else if (index.equals(IndexType.CATEGORY)) {
-			weight = 10.0;
+			weight = 5.0;
 		}
 		else if (index.equals(IndexType.PLACE)) {
-			weight = 10.0;
+			weight = 5.0;
 		}
 		HashMap<Integer, Double> qVector = new HashMap<Integer, Double>();
 		List<String> aTerms = getAnalyzedTerm(this.term);
@@ -82,6 +82,20 @@ public class QTerm extends QIndexType implements Expression {
 			}
 		}
 		return qVector;
+	}
+	
+	public Map<Integer, Double> getQueryTermFreq(HashMap<IndexType, IndexReader> reader) {
+		HashMap<Integer, Double> queryFreq = new HashMap<Integer, Double>();
+		IndexReader ir = reader.get(index);
+		List<String> aTerms = getAnalyzedTerm(this.term);
+		for (int i = 0; i < aTerms.size(); i++) {
+			edu.buffalo.cse.irf14.index.Term termOb = ir.getTerm(aTerms.get(i));
+			if (termOb != null) {
+				int termId = termOb.getTermId();
+				queryFreq.put(termId, 1.0);
+			}
+		}
+		return queryFreq;
 	}
 
 	private List<String> getAnalyzedTerm(String string) {

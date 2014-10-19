@@ -23,4 +23,5 @@ public interface Expression {
 	public String toSudoString();
 	
 	public Map<Integer, Double> getQVector(HashMap<IndexType, IndexReader> reader);
+	public Map<Integer, Double> getQueryTermFreq(HashMap<IndexType, IndexReader> reader);
 }

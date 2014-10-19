@@ -64,4 +64,28 @@ public class OrOperator implements Expression {
 		}
 		return rightMap;
 	}
+
+	@Override
+	public Map<Integer, Double> getQueryTermFreq(
+			HashMap<IndexType, IndexReader> reader) {
+		// TODO Auto-generated method stub
+		Map<Integer, Double> leftMap = leftOperand.getQueryTermFreq(reader);
+		Map<Integer, Double> rightMap = rightOperand.getQueryTermFreq(reader);
+		if (leftMap == null) {
+			return rightMap;
+		}
+		if (rightMap == null) {
+			return leftMap;
+		}
+		for (Integer termId : leftMap.keySet() ) {
+			Double oldtermFreq = rightMap.get(termId);
+			if ( oldtermFreq != null ) {
+				rightMap.put(termId, oldtermFreq + leftMap.get(termId));
+			}
+			else {
+				rightMap.put(termId, leftMap.get(termId));
+			}
+		}
+		return rightMap;
+	}
 }
