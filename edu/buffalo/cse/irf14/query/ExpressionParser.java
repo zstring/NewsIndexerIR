@@ -27,6 +27,7 @@ public class ExpressionParser implements Expression {
 			Pattern.CASE_INSENSITIVE).matcher("");
 	Matcher matcherSpChar = Pattern.compile("(\\()|(\\))|(\")").matcher("");
 	Matcher matcherOp = Pattern.compile("AND|OR|NOT").matcher("");
+	Matcher mat = Pattern.compile("author|category|place|term",Pattern.CASE_INSENSITIVE).matcher("");
 	
 	public Expression getExpression() {
 		return expression;
@@ -77,6 +78,10 @@ public class ExpressionParser implements Expression {
 		int[] openBrackPos = {0, 0, 0};
 		while (tokenStream.hasNext()) {
 			String tokenString = tokenStream.next().toString();
+			if (mat.reset(tokenString).matches()) {
+				if (tokenStream.hasNext()) tokenString = tokenStream.next().toString();
+				else break;
+			}
 			in = tokenStream.getCurrentIndex();
 			isTerm = isTerm(tokenString, tokenStream, true);
 			if(!isTerm) nonTermExist = true;
@@ -118,6 +123,10 @@ public class ExpressionParser implements Expression {
 		openBrackPos[0] = tokenStream.getCurrentIndex(); openBrackPos[1] = 0; openBrackPos[2] = 0;
 		while (tokenStream.hasPrevious()) {
 			String tokenString = tokenStream.previous().toString();
+			if (mat.reset(tokenString).matches()) {
+				if (tokenStream.hasPrevious()) tokenString = tokenStream.previous().toString();
+				else break;
+			}
 			in = tokenStream.getCurrentIndex();
 			isTerm = isTerm(tokenString, tokenStream ,false);
 			if(!isTerm) nonTermExist = true;
@@ -270,11 +279,15 @@ public class ExpressionParser implements Expression {
 	
 	public void ObjectifyBracket(Stack<Expression> operator,Stack<Expression> operand) throws QueryParserException {
 		// Removing the ) that was pushed for calling this method
+		if (operator.isEmpty()){
+			throw new QueryParserException("Operator stack underflow!");
+		}
 		Expression popped = operator.pop();
 		/* It can only encounter AND,NOT,OR or ( 
 		 * It cannot encounter ) because it is the first ) itself.
 		 */
 		while (true) {
+			if (operator.isEmpty()) throw new QueryParserException("Operator stack underflow!");  
 			popped = operator.pop();
 			Objectify(operator, operand, popped);
 			if ("(".equals(popped.toString())) {
@@ -346,10 +359,8 @@ public class ExpressionParser implements Expression {
 		if (term == null) {
 			return false;
 		}
-		Matcher mat = Pattern.compile("author|category|place|term",Pattern.CASE_INSENSITIVE).matcher(term);
 		matcherOp.reset(term);
-		if (matcherOp.matches() || mat.matches() 
-				|| "(".equals(term) || ")".equals(term)) {
+		if (matcherOp.matches() || "(".equals(term) || ")".equals(term)) {
 			return false;
 		}
 		if("\"".equals(term)) {
