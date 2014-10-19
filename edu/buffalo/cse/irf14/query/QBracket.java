@@ -42,4 +42,11 @@ public class QBracket implements Expression {
 		// TODO Auto-generated method stub
 		return encapsulate.getQVector(reader);
 	}
+
+	@Override
+	public Map<Integer, Double> getQueryTermFreq(
+			HashMap<IndexType, IndexReader> reader) {
+		// TODO Auto-generated method stub
+		return encapsulate.getQueryTermFreq(reader);
+	}
 }

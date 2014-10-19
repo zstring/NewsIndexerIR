@@ -36,5 +36,12 @@ public class Term implements Expression {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public Map<Integer, Double> getQueryTermFreq(
+			HashMap<IndexType, IndexReader> reader) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 }

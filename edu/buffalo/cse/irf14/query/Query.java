@@ -39,6 +39,12 @@ public class Query {
 		Map<Integer, Double> map = queryTerm.getQVector(reader);
 		return map;
 	}
+	
+	public Map<Integer, Double> getQueryTermFreq(HashMap<IndexType, IndexReader> reader) {
+		// TODO Auto-generated method stub
+		Map<Integer, Double> map = queryTerm.getQueryTermFreq(reader);
+		return map;
+	}
 
 	private Map<Integer, Double> getUnitVector (Map<Integer, Double> map) {
 		Double sum = 0.0;

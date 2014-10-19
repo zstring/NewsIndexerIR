@@ -38,4 +38,11 @@ public class NotOperator implements Expression {
 		return null;
 	}
 
+	@Override
+	public Map<Integer, Double> getQueryTermFreq(
+			HashMap<IndexType, IndexReader> reader) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
