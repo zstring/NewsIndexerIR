@@ -122,8 +122,10 @@ public class BaseIndexer implements Serializable {
 			HashMap<String, HashMap<Integer, Double>> docVector) {
 		if (!strContent.isEmpty()) {
 			double termWeight = 1.0;
+			boolean fieldType = false;
 			if (fn.equals(FieldNames.TITLE)) {
 				termWeight = 3.0;
+				fieldType = true;
 			}
 			else if (fn.equals(FieldNames.AUTHOR)) {
 				termWeight = 10.0;
@@ -161,7 +163,8 @@ public class BaseIndexer implements Serializable {
 							if (tkInt == null) {
 								//increment term id
 								termId += 1;
-								Term term = new Term(tkString, termId, docTerm, tk.getPosIndex());
+								Term term = new Term(tkString, termId, docTerm,
+										tk.getPosIndex(), fieldType);
 								this.termDict.put(tkString, termId);
 								this.termMap.put(termId, term);
 								termSpace.put(termId, termWeight);
@@ -169,7 +172,7 @@ public class BaseIndexer implements Serializable {
 							// If term already exist in index
 							else {
 								Term term = termMap.get(tkInt);
-								term.addOrUpdateDoc(docTerm, tk.getPosIndex());
+								term.addOrUpdateDoc(docTerm, tk.getPosIndex(), fieldType);
 								Double tFreq = termSpace.get(tkInt);
 								if (tFreq != null) {
 									termSpace.put(tkInt, tFreq + termWeight);
@@ -204,6 +207,10 @@ public class BaseIndexer implements Serializable {
 		String tkString = tk.toString();
 		if (!tkString.isEmpty()) {
 			String[] splitTk = tkString.split(" ");
+			boolean fieldType = false;
+			if (fn.equals(FieldNames.TITLE)) {
+				fieldType = true;
+			}
 			int len = splitTk.length;
 			if (len > 1) {
 				//Reducing the termWeight as it is sub String
@@ -215,14 +222,14 @@ public class BaseIndexer implements Serializable {
 						//increment term id
 						termId += 1;
 						Term term = new Term(splitTk[i], termId,
-								docTerm, tk.getPosIndex());
+								docTerm, tk.getPosIndex(), fieldType);
 						this.termDict.put(splitTk[i], termId);
 						this.termMap.put(termId, term);
 						termSpace.put(termId, termWeight);
 					}
 					else {
 						Term term = termMap.get(tkInt);
-						term.addOrUpdateDoc(docTerm, tk.getPosIndex());
+						term.addOrUpdateDoc(docTerm, tk.getPosIndex(), fieldType);
 						Double tFreq = termSpace.get(tkInt);
 						if (tFreq != null) {
 							termSpace.put(tkInt, tFreq + termWeight);
