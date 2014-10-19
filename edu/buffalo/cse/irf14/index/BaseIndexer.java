@@ -117,22 +117,19 @@ public class BaseIndexer implements Serializable {
 
 	public void createIndex (String strContent, FieldNames fn, String docTerm,
 			HashMap<String, HashMap<Integer, Double>> docVector) {
-		if (docTerm.equals(".0007405") || docTerm.equals("0007405")) {
-			System.out.print("C2r");
-		}
 		if (!strContent.isEmpty()) {
 			double termWeight = 1.0;
 			if (fn.equals(FieldNames.TITLE)) {
 				termWeight = 3.0;
 			}
 			else if (fn.equals(FieldNames.AUTHOR)) {
-				termWeight = 5.0;
+				termWeight = 100.0;
 			}
 			else if (fn.equals(FieldNames.CATEGORY)) {
-				termWeight = 5.0;
+				termWeight = 100.0;
 			}
 			else if (fn.equals(FieldNames.PLACE)) {
-				termWeight = 5.0;
+				termWeight = 100.0;
 			}
 			TokenStream tStream;
 			try {
