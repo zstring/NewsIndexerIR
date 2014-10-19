@@ -184,13 +184,13 @@ public class Parser {
 				else if (mat.group().equalsIgnoreCase(" and ")) {
 					authorEndIndex = mat.start();
 //					authors.add(line.substring(authorStartIndex, authorEndIndex).trim());
-					author = author + line.substring(authorStartIndex, authorEndIndex).trim() + " ";
+					author = author + line.substring(authorStartIndex, authorEndIndex).trim() + ", ";
 					authorStartIndex = authorEndIndex + 4;
 				}
 				else if (mat.group().equals(",")) {
 					authorEndIndex = mat.start();
 //					authors.add(line.substring(authorStartIndex, authorEndIndex).trim());
-					author += line.substring(authorStartIndex, authorEndIndex).trim() + " ";
+					author += line.substring(authorStartIndex, authorEndIndex).trim() + ", ";
 					orgStartIndex = authorEndIndex + 1;
 				}
 				else if (mat.group().equalsIgnoreCase("</AUTHOR>")) {
