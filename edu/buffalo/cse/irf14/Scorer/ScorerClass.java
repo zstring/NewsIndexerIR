@@ -72,12 +72,10 @@ public class ScorerClass {
 			//to check weather they are same object or 
 			//not if same then return 0 else compare the value 
 			//of another string to first one
-			if (a.equals(b))
-				return 0;
 			Double aValue = map.get(a);
 			Double bValue = map.get(b);
 			int res = aValue.compareTo(bValue);
-			return res != 0 ? -res : 1;
+			return res != 0 ? -res : a.compareTo(b);
 		}
 	}
 }
