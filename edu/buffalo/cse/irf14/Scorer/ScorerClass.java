@@ -26,9 +26,19 @@ public class ScorerClass {
 				val = 0.0;
 				score = 0.0;
 				Map<Integer, Double> docV = docVector.get(docId);
+				Posting post = unRankedResult.get(docId);
+				//Extra weight for having title term document
+				int termTitleId = 1;
+				if (post.getType()) {
+					termTitleId = post.getTermId(); 
+				}
 				for (Integer termId : termKeys) {
+					double titleWt = 1;
+					if (termId == termTitleId) {
+						titleWt = 4;
+					}
 					idf = queryVector.get(termId) == null ? 0 : queryVector.get(termId);
-					termFreq = docV.get(termId) == null ? 0 : docV.get(termId);
+					termFreq = docV.get(termId) == null ? 0 : docV.get(termId) * titleWt;
 					val = idf * ((k1 + 1) * termFreq) / (k1 * ((1 - b) + b * (docV.size() / avgLen)) + termFreq);
 					if (termKeys.size() >= 10) val *= ((k3 + 1) * queryTermFreq.get(termId)) / (k3 + queryTermFreq.get(termId));
 					score += val;
