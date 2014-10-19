@@ -33,7 +33,9 @@ public class IndexWriter {
 	private BaseIndexer biCategory;
 	private BaseIndexer biPlace;
 	private BaseIndexer biTerm;
+	
 	public HashMap<String, HashMap<Integer, Double>> docVector;
+	public HashMap<String, Double> docLength;
 	public IndexWriter(String indexDir) {
 		//TODO : YOU MUST IMPLEMENT THIS
 		this.indexDir = indexDir;
@@ -42,6 +44,7 @@ public class IndexWriter {
 		this.biPlace = new BaseIndexer(IndexType.PLACE);
 		this.biTerm = new BaseIndexer(IndexType.TERM);
 		this.docVector = new HashMap<String, HashMap<Integer, Double>>();
+		this.docLength = new HashMap<String, Double>();
 	}
 
 	/**
@@ -65,17 +68,21 @@ public class IndexWriter {
 		if (d.getField(FieldNames.FILEID).length > 0) {
 			docTerm = d.getField(FieldNames.FILEID)[0];
 		}
+		
 		HashMap<Integer, Double> termSpace = docVector.get(docTerm);
 		double ssd = 0.0;
 		for (Integer id : termSpace.keySet()) {
 			ssd += Math.pow(termSpace.get(id), 2);
 		}
 		ssd = Math.sqrt(ssd);
+		double normLen = 0.0;
 		for (Integer id : termSpace.keySet()) {
 			double normlizedVal = termSpace.get(id);
 			normlizedVal /= ssd;
 			termSpace.put(id, normlizedVal);
+			normLen += normlizedVal;
 		}
+		this.docLength.put(docTerm, normLen);
 	}
 	
 	public void setIdfAllTerms(BaseIndexer bi) {
@@ -105,6 +112,12 @@ public class IndexWriter {
 			setIdfAllTerms(biCategory);
 			setIdfAllTerms(biPlace);
 			setIdfAllTerms(biTerm);
+			double avgLen = 0.0;
+			for (String docId : docLength.keySet()) {
+				avgLen += docLength.get(docId);
+			}
+			if(docLength.size() != 0) avgLen /= docLength.size();
+			
 			termIndexKeys[0] = biAuthor.getTermKeys().toArray(new Integer[0]);
 			termIndexKeys[1] = biCategory.getTermKeys().toArray(new Integer[0]);
 			termIndexKeys[2] = biPlace.getTermKeys().toArray(new Integer[0]);
@@ -154,6 +167,7 @@ public class IndexWriter {
 			gzipOut = new GZIPOutputStream(fo);
 			oos = new ObjectOutputStream(gzipOut);
 			oos.writeObject(docVector);
+			oos.writeObject(avgLen);
 			oos.flush();
 			oos.close();
 			fo.close();

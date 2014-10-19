@@ -33,6 +33,7 @@ public class SearchRunner {
 	private String corpusDir;
 	private char mode;
 	private PrintStream stream;
+	private double avgLen;
 	/**
 	 * Default (and only public) constuctor
 	 * @param indexDir : The directory where the index resides
@@ -78,7 +79,7 @@ public class SearchRunner {
 			Query query = QueryParser.parse(userQuery, defaultOperator);
 			Map<String, Posting> unRankedResult = query.execute(reader);
 			Map<Integer, Double> queryVector = query.getVector(reader);
-			Map<String, Double> rankedResult = RankedResultWithModel(unRankedResult, queryVector, model);
+			Map<String, Double> rankedResult =  RankedResultWithModel(unRankedResult, queryVector, this.avgLen, model);
 			
 			for (String docId : rankedResult.keySet()) {
 				stream.print("Doc: " + docId + " Score: " + rankedResult.get(docId));
@@ -97,20 +98,19 @@ public class SearchRunner {
 	 * @param model
 	 */
 	private Map<String, Double> RankedResultWithModel(Map<String, Posting> unRankedResult,
-			Map<Integer, Double> queryVector, ScoringModel model) {
+			Map<Integer, Double> queryVector, double avgLen, ScoringModel model) {
 		// TODO Auto-generated method stub
-		int a = 1;
 		ScorerClass sc = new ScorerClass();
 		TreeMap<String, Double> rankedResult = null;
 		if (unRankedResult != null && unRankedResult.keySet().size() > 1) {
-			rankedResult = sc.rankResult(unRankedResult, docVector, queryVector, model);
+			rankedResult = sc.rankResult(unRankedResult, docVector, queryVector, avgLen, model);
 		}
 		for (String docId : rankedResult.keySet()) {
 			System.out.println("Doc: " + docId + " Score: " + rankedResult.get(docId));
 		}
-		return rankedResult;
-		
+		return rankedResult;	
 	}
+	
 	@SuppressWarnings("unchecked")
 	private HashMap<String, HashMap<Integer, Double>> readDocVector() {
 		// TODO Auto-generated method stub
@@ -120,6 +120,7 @@ public class SearchRunner {
 			GZIPInputStream gzip = new GZIPInputStream(fo);
 			ObjectInputStream ois = new ObjectInputStream(gzip);
 			docVector = (HashMap<String, HashMap<Integer, Double>>)ois.readObject();
+			this.avgLen = (Double) ois.readObject();
 			ois.close();
 			gzip.close();
 			fo.close();

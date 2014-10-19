@@ -13,20 +13,41 @@ public class ScorerClass {
 
 	public TreeMap<String, Double> rankResult (Map<String, Posting> unRankedResult,
 			HashMap<String, HashMap<Integer, Double>> docVector,
-			Map<Integer, Double> queryVector, ScoringModel model) {
+			Map<Integer, Double> queryVector, double avgLen, ScoringModel model) {
+		
 		HashMap<String, Double> rankedResult = new HashMap<String, Double>();
 		Set<Integer> termKeys = queryVector.keySet();
-		for (String docId : unRankedResult.keySet()) {
-			Double sum = 0.0;
-			Map<Integer, Double> docV = docVector.get(docId);
-			for (Integer termId : termKeys) {
-					sum += docV.get(termId) == null ? 0 : docV.get(termId) * queryVector.get(termId);
-//					if(docId.equals("0003361") || docId.equals("0000218") 
-//							|| docId.equals("0004824")) {
-//						System.out.println(docId + " " + termId + " " + docVector.get(docId).get(termId));
-//					}
+		
+		if(ScoringModel.OKAPI.equals(model)) {
+			double k1 = 0.5, k3 = 0.5, b = 0.5, termFreq = 0.0, idf = 0.0;
+			double val = 0.0, score = 0.0;
+			for (String docId : unRankedResult.keySet()) {
+				val = 0.0;
+				score = 0.0;
+				Map<Integer, Double> docV = docVector.get(docId);
+				for (Integer termId : termKeys) {
+					idf = queryVector.get(termId);
+					termFreq = docV.get(termId);
+					val = idf * ((k1 + 1) * termFreq) / (k1 * ((1 - b) + b * (docV.size() / avgLen)) + termFreq);
+					if (termKeys.size() >= 5) val *= ((k3 + 1) * termFreq) / k3 + termFreq;
+					score += val;
+				}
+				rankedResult.put(docId, score);
 			}
-			rankedResult.put(docId, sum);
+		}
+		else {			
+			for (String docId : unRankedResult.keySet()) {
+				Double sum = 0.0;
+				Map<Integer, Double> docV = docVector.get(docId);
+				for (Integer termId : termKeys) {
+					sum += docV.get(termId) == null ? 0 : docV.get(termId) * queryVector.get(termId);
+					//					if(docId.equals("0003361") || docId.equals("0000218") 
+					//							|| docId.equals("0004824")) {
+					//						System.out.println(docId + " " + termId + " " + docVector.get(docId).get(termId));
+					//					}
+				}
+				rankedResult.put(docId, sum);
+			}
 		}
 		TreeMap<String, Double> sortedRankedRes = 
 				new TreeMap<String, Double>(new SortByValueComp(rankedResult));
