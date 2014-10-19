@@ -12,8 +12,9 @@ import edu.buffalo.cse.irf14.index.Posting;
 public class ScorerClass {
 
 	public TreeMap<String, Double> rankResult (Map<String, Posting> unRankedResult,
-			HashMap<String, HashMap<Integer, Double>> docVector, Map<Integer, Double> queryTermFreq,
-			Map<Integer, Double> queryVector, double avgLen, ScoringModel model) {
+			HashMap<String, HashMap<Integer, Double>> docVector,
+			Map<Integer, Double> queryVector, Map<Integer, Double> queryTermFreq,
+			double avgLen, ScoringModel model) {
 		
 		HashMap<String, Double> rankedResult = new HashMap<String, Double>();
 		Set<Integer> termKeys = queryVector.keySet();
@@ -58,7 +59,7 @@ public class ScorerClass {
 				Map<Integer, Double> docV = docVector.get(docId);
 				for (Integer termId : termKeys) {
 					double titleWt = 1;
-					if (termId == termTitleId) {
+					if (termId == termTitleId && post.getType()) {
 						titleWt = 4;
 					}
 					sum += docV.get(termId) == null ? 0 : docV.get(termId) * queryVector.get(termId) * titleWt;
@@ -72,10 +73,33 @@ public class ScorerClass {
 			System.out.println("TermID: " + termId + " Weight: " + queryVector.get(termId));
 		}
 		sortedRankedRes.putAll(rankedResult);
+		boolean flagGreater = false;
 		for (String doc : sortedRankedRes.keySet()) {
 			double val = sortedRankedRes.get(doc);
 			if (val > 1) {
-				sortedRankedRes.put(doc, 1.0);
+				flagGreater = true;
+				break;
+			}
+		}
+
+		//Normalizing Score only if it is greater than one
+		//Updating with avg of top 5 values if greater than 
+		//one
+		if (flagGreater) {
+			double maxVal = 0.0;
+			int iter = 0;
+			for (String doc : sortedRankedRes.keySet()) {
+				double val = sortedRankedRes.get(doc);
+				if (iter == 5 || val < 1.0)
+					break;
+					maxVal += val;
+					iter++;
+			}
+			maxVal = maxVal / iter;
+			for (String doc : sortedRankedRes.descendingKeySet()) {
+				double val = sortedRankedRes.get(doc) / maxVal;
+				if (val > 1.0) val = 1.0;
+				sortedRankedRes.put(doc, val / maxVal);
 			}
 		}
 		return sortedRankedRes;

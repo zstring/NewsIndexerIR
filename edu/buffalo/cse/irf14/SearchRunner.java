@@ -106,8 +106,13 @@ public class SearchRunner {
 		if (unRankedResult != null && unRankedResult.keySet().size() > 1) {
 			rankedResult = sc.rankResult(unRankedResult, docVector, queryVector, queryTermFreq, avgLen, model);
 		}
+		if (rankedResult != null) {
+		int i = 0; 
 		for (String docId : rankedResult.keySet()) {
+			i++;
+			if (i > 25) break;
 			System.out.println("Doc: " + docId + " Score: " + rankedResult.get(docId));
+		}
 		}
 		return rankedResult;	
 	}
