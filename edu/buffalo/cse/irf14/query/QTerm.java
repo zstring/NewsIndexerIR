@@ -27,7 +27,6 @@ public class QTerm extends QIndexType implements Expression {
 	public Map<String, Posting> interpret(HashMap<IndexType, IndexReader> reader) {
 		// TODO Auto-generated method stub
 		IndexReader ir = reader.get(index);
-		System.out.println("a");
 		List<String> aTerms = getAnalyzedTerm(this.term);
 		Map<String, Posting> posting = new HashMap<String, Posting>();
 		for (int i = 0; i < aTerms.size(); i++) {
@@ -78,10 +77,11 @@ public class QTerm extends QIndexType implements Expression {
 	private List<String> getAnalyzedTerm(String string) {
 		AnalyzerFactory fact = AnalyzerFactory.getInstance();
 		// Number of Permuation of a given String
-		// 1. Camel Case, 2. all lower, 3. given format
-		// 1. Ios 2. ios 3. iOS
+		// 1. Camel Case, 2. all lower, 3. given format 4. Upper Case
+		// 1. Ios 2. ios 3. iOS 4. IOS
 		String lowerCase = string.toLowerCase();
 		String camelCase = string.toUpperCase();
+		String upperCase = string.toUpperCase();
 		if (string.length() > 1) {
 			camelCase = string.substring(0, 1).toUpperCase() 
 					+ string.substring(1).toLowerCase();
@@ -94,6 +94,9 @@ public class QTerm extends QIndexType implements Expression {
 		if (!string.equals(camelCase)) {
 			terms.add(camelCase);
 		}
+		if (!string.equals(upperCase)) {
+			terms.add(upperCase);
+		}
 		try {
 			for (int i = 0; i < terms.size(); i++) {
 				TokenStream stream = new TokenStream(terms.get(i));
@@ -102,7 +105,12 @@ public class QTerm extends QIndexType implements Expression {
 				}
 				stream = analyzer.getStream();
 				stream.reset();
-				terms.set(i, stream.next().toString());
+				if (stream.hasNext()) {
+					terms.set(i, stream.next().toString());
+				}
+				else {
+					terms.set(i, "");
+				}
 			}
 			return terms;
 		} catch (TokenizerException e) {

@@ -32,6 +32,8 @@ public class ScorerClass {
 					if (termKeys.size() >= 5) val *= ((k3 + 1) * termFreq) / k3 + termFreq;
 					score += val;
 				}
+				if (score > 1.0)
+					score = 1.0;
 				rankedResult.put(docId, score);
 			}
 		}
@@ -41,11 +43,9 @@ public class ScorerClass {
 				Map<Integer, Double> docV = docVector.get(docId);
 				for (Integer termId : termKeys) {
 					sum += docV.get(termId) == null ? 0 : docV.get(termId) * queryVector.get(termId);
-					//					if(docId.equals("0003361") || docId.equals("0000218") 
-					//							|| docId.equals("0004824")) {
-					//						System.out.println(docId + " " + termId + " " + docVector.get(docId).get(termId));
-					//					}
 				}
+				if (sum > 1.0)
+					sum = 1.0;
 				rankedResult.put(docId, sum);
 			}
 		}
@@ -72,7 +72,7 @@ public class ScorerClass {
 			//to check weather they are same object or 
 			//not if same then return 0 else compare the value 
 			//of another string to first one
-			if (a == b) 
+			if (a.equals(b))
 				return 0;
 			Double aValue = map.get(a);
 			Double bValue = map.get(b);

@@ -117,13 +117,13 @@ public class BaseIndexer implements Serializable {
 
 	public void createIndex (String strContent, FieldNames fn, String docTerm,
 			HashMap<String, HashMap<Integer, Double>> docVector) {
-		if (docTerm.equals("0005645") || docTerm.equals("0005646")) {
+		if (docTerm.equals(".0007405") || docTerm.equals("0007405")) {
 			System.out.print("C2r");
 		}
 		if (!strContent.isEmpty()) {
 			double termWeight = 1.0;
 			if (fn.equals(FieldNames.TITLE)) {
-				termWeight = 4.0;
+				termWeight = 3.0;
 			}
 			else if (fn.equals(FieldNames.AUTHOR)) {
 				termWeight = 5.0;
@@ -132,7 +132,7 @@ public class BaseIndexer implements Serializable {
 				termWeight = 5.0;
 			}
 			else if (fn.equals(FieldNames.PLACE)) {
-				termWeight = 2.0;
+				termWeight = 5.0;
 			}
 			TokenStream tStream;
 			try {
@@ -191,13 +191,13 @@ public class BaseIndexer implements Serializable {
 
 	/**
 	 * Method for adding or Updating tokens having multiple 
-	 * strings with whitespace delimited, Add them seperately 
+	 * strings with whitespace delimited, Add them separately 
 	 * into dictionary with less weight
 	 * @param tk
 	 * @param docTerm
 	 * @param termSpace
 	 * @param termWeight
-	 * @param fn 
+	 * @param fn
 	 */
 	private void addOrUpdateSplitTermsInDict(Token tk,
 			String docTerm, HashMap<Integer, Double> termSpace, double termWeight, FieldNames fn) {
@@ -208,7 +208,7 @@ public class BaseIndexer implements Serializable {
 			if (len > 1) {
 				//Reducing the termWeight as it is sub String
 				// of the actual token
-				termWeight = termWeight * 0.3;
+				termWeight = termWeight * 0.9;
 				for (int i = 0; i < len; i++) {
 					Integer tkInt = termDict.get(splitTk[i]);
 					if (tkInt == null) {

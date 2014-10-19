@@ -36,6 +36,20 @@ public class Query {
 
 	public Map<Integer, Double> getVector(HashMap<IndexType, IndexReader> reader) {
 		// TODO Auto-generated method stub
-		return queryTerm.getQVector(reader);
+		Map<Integer, Double> map = queryTerm.getQVector(reader);
+		return map;
+	}
+
+	private Map<Integer, Double> getUnitVector (Map<Integer, Double> map) {
+		Double sum = 0.0;
+		for (Integer termId : map.keySet()) {
+			sum += Math.pow(map.get(termId), 2);
+		}
+		sum = Math.sqrt(sum);
+		for (Integer termId : map.keySet()) {
+			Double val = map.get(termId) / sum;
+			map.put(termId, val);
+		}
+		return map;
 	}
 }
