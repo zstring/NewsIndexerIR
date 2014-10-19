@@ -123,13 +123,13 @@ public class BaseIndexer implements Serializable {
 				termWeight = 3.0;
 			}
 			else if (fn.equals(FieldNames.AUTHOR)) {
-				termWeight = 100.0;
+				termWeight = 10.0;
 			}
 			else if (fn.equals(FieldNames.CATEGORY)) {
-				termWeight = 100.0;
+				termWeight = 10.0;
 			}
 			else if (fn.equals(FieldNames.PLACE)) {
-				termWeight = 100.0;
+				termWeight = 10.0;
 			}
 			TokenStream tStream;
 			try {

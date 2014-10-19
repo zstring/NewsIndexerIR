@@ -54,6 +54,16 @@ public class QTerm extends QIndexType implements Expression {
 			HashMap<IndexType, IndexReader> reader) {
 		// TODO Auto-generated method stub
 		IndexReader ir = reader.get(index);
+		Double weight = 1.0;
+		if (index.equals(IndexType.AUTHOR)) {
+			weight = 10.0;
+		}
+		else if (index.equals(IndexType.CATEGORY)) {
+			weight = 10.0;
+		}
+		else if (index.equals(IndexType.PLACE)) {
+			weight = 10.0;
+		}
 		HashMap<Integer, Double> qVector = new HashMap<Integer, Double>();
 		List<String> aTerms = getAnalyzedTerm(this.term);
 		for (int i = 0; i < aTerms.size(); i++) {
@@ -67,7 +77,7 @@ public class QTerm extends QIndexType implements Expression {
 			if (termOb != null) {
 				double termIdf = termOb.getIdf();
 				int termId = termOb.getTermId();
-				qVector.put(termId, termIdf * wt);
+				qVector.put(termId, termIdf * wt * weight);
 				System.out.println(termId + " " + this.term);
 			}
 		}
