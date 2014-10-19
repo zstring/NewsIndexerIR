@@ -99,7 +99,7 @@ public class ScorerClass {
 			for (String doc : sortedRankedRes.descendingKeySet()) {
 				double val = sortedRankedRes.get(doc) / maxVal;
 				if (val > 1.0) val = 1.0;
-				sortedRankedRes.put(doc, val / maxVal);
+				sortedRankedRes.put(doc, val);
 			}
 		}
 		return sortedRankedRes;
