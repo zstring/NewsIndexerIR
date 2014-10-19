@@ -19,15 +19,16 @@ public class ScorerClass {
 		Set<Integer> termKeys = queryVector.keySet();
 		
 		if(ScoringModel.OKAPI.equals(model)) {
-			double k1 = 0.5, k3 = 0.5, b = 0.5, termFreq = 0.0, idf = 0.0;
+			double k1 = 0.5, k3 = 0.5, b = 0.5;
+			Double termFreq = 0.0, idf = 0.0;
 			double val = 0.0, score = 0.0;
 			for (String docId : unRankedResult.keySet()) {
 				val = 0.0;
 				score = 0.0;
 				Map<Integer, Double> docV = docVector.get(docId);
 				for (Integer termId : termKeys) {
-					idf = queryVector.get(termId);
-					termFreq = docV.get(termId);
+					idf = queryVector.get(termId) == null ? 0 : queryVector.get(termId);
+					termFreq = docV.get(termId) == null ? 0 : docV.get(termId);
 					val = idf * ((k1 + 1) * termFreq) / (k1 * ((1 - b) + b * (docV.size() / avgLen)) + termFreq);
 					if (termKeys.size() >= 5) val *= ((k3 + 1) * termFreq) / k3 + termFreq;
 					score += val;
