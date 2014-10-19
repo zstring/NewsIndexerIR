@@ -31,7 +31,9 @@ public class QTerm extends QIndexType implements Expression {
 		List<String> aTerms = getAnalyzedTerm(this.term);
 		Map<String, Posting> posting = new HashMap<String, Posting>();
 		for (int i = 0; i < aTerms.size(); i++) {
-			posting.putAll(ir.getPostingList(aTerms.get(i)));
+			Map<String, Posting> ret = ir.getPostingList(aTerms.get(i));
+			if (ret != null)
+				posting.putAll(ret);
 		}
 		return posting;
 	}
@@ -61,7 +63,7 @@ public class QTerm extends QIndexType implements Expression {
 			// if its in another format than make it less e.g. 0.3
 			double wt = 1;
 			if (i != 0) {
-				wt = 0.3;
+				wt = 0.7;
 			}
 			if (termOb != null) {
 				double termIdf = termOb.getIdf();

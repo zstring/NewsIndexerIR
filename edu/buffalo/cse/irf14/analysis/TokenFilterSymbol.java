@@ -18,7 +18,7 @@ public class TokenFilterSymbol extends TokenFilter {
 	private static Matcher matSym, matPunc, matSingle, matIsWord;
 	static {
 		matSym = Pattern.compile("(-|^)([a-zA-Z])+(-)+([a-zA-Z])+(-|$)").matcher("");
-		matPunc = Pattern.compile("(^| )['\"-]*|([-'\"\\.!\\?]*|'s)($| )").matcher("");
+		matPunc = Pattern.compile("(^| )['\"-]*|([-'\"\\.!\\?,]*|'s)($| )").matcher("");
 		matSingle = Pattern.compile("'").matcher("");
 		matIsWord = Pattern.compile("[\\w]*").matcher("");
 	}
@@ -61,7 +61,7 @@ public class TokenFilterSymbol extends TokenFilter {
 					tkString = tkString.trim();
 
 					// Hyphens
-					String input = tkString;
+					String input = tkString; 
 					int indexGrp2 = 0, indexGrp1 =0;
 					//				Matcher matcher = pattSym.matcher(tkString);
 					if (tkString.contains("-")){
