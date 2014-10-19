@@ -40,22 +40,25 @@ public class BaseIndexer implements Serializable {
 	public BaseIndexer(IndexType indexerType) {
 		this.indexerType = indexerType;
 		this.isDocCounted = false;
-		tkr = new Tokenizer();
 		aFactory = AnalyzerFactory.getInstance();
 		fieldName = new ArrayList<FieldNames>();
 		if (IndexType.AUTHOR.equals(indexerType)) {
 			fieldName.add(FieldNames.AUTHOR);
 			fieldName.add(FieldNames.AUTHORORG);
+			tkr = new Tokenizer(", ");
 		}
 		else if (IndexType.CATEGORY.equals(indexerType)) {
 			fieldName.add(FieldNames.CATEGORY);
+			tkr = new Tokenizer();
 		}
 		else if (IndexType.PLACE.equals(indexerType)) {
 			fieldName.add(FieldNames.PLACE);
+			tkr = new Tokenizer();
 		}
 		else if (IndexType.TERM.equals(indexerType)) {
 			fieldName.add(FieldNames.TITLE);
 			fieldName.add(FieldNames.CONTENT);
+			tkr = new Tokenizer();
 		}
 		termDict = new HashMap<String, Integer>();
 		termMap = new HashMap<Integer, Term>();

@@ -78,7 +78,7 @@ public class QTerm extends QIndexType implements Expression {
 				double termIdf = termOb.getIdf();
 				int termId = termOb.getTermId();
 				qVector.put(termId, termIdf * wt * weight);
-				System.out.println(termId + " " + this.term);
+				System.out.println(termId + " " + aTerms.get(i));
 			}
 		}
 		return qVector;

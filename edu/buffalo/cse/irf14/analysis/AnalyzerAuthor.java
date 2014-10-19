@@ -16,7 +16,7 @@ private TokenFilter[] filter;
 		// TODO Auto-generated constructor stub
 		this.stream = stream;
 		TokenFilterFactory tfFactory = TokenFilterFactory.getInstance();
-		TokenFilterType[] filters = {TokenFilterType.ACCENT};
+		TokenFilterType[] filters = {TokenFilterType.ACCENT, TokenFilterType.SYMBOL, TokenFilterType.SPECIALCHARS};
 		this.filter = new TokenFilter[filters.length];
 		for (int i = 0; i < filters.length; i++) {
 			this.filter[i] = tfFactory.getFilterByType(filters[i],
