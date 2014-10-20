@@ -103,12 +103,31 @@ public class QTerm extends QIndexType implements Expression {
 		// Number of Permuation of a given String
 		// 1. Camel Case, 2. all lower, 3. given format 4. Upper Case
 		// 1. Ios 2. ios 3. iOS 4. IOS
+		string = string.replaceAll("\"", "");
 		String lowerCase = string.toLowerCase();
 		String camelCase = string.toUpperCase();
 		String upperCase = string.toUpperCase();
 		if (string.length() > 1) {
-			camelCase = string.substring(0, 1).toUpperCase() 
+			if (camelCase.contains(" ")) {
+				String[] split = camelCase.split(" ");
+				camelCase = "";
+				for (int i = 0; i < split.length; i++) {
+					if (split[i].length() > 1) {
+					camelCase += split[i].substring(0, 1).toUpperCase()
+							+ split[i].substring(1).toLowerCase();
+					}
+					else {
+						camelCase += split[i];
+					}
+					if (i != split.length - 1) {
+						camelCase += " ";
+					}
+				}
+			}
+			else {
+				camelCase = string.substring(0, 1).toUpperCase() 
 					+ string.substring(1).toLowerCase();
+			}
 		}
 		List<String> terms = new ArrayList<String>();
 		terms.add(string);
