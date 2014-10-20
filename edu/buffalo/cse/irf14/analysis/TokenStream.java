@@ -211,6 +211,20 @@ public class TokenStream implements Iterator<Token>{
 			tkPrevList[i + n] = tokenList.get(idx + i + n - 1);
 		return tkPrevList;
 	}
+	
+	public Token[] getSnippet(int n) {
+		if (n <= 0) {
+			return new Token[1];
+		}
+		Token[] tkPrevList = new Token[2*n + 1];
+		int sz = tokenList.size();
+		for (int i = n - 1; i >= 0 && idx + i - n >= 0; i--)
+			tkPrevList[i] = tokenList.get(idx + i - n);
+		for (int i = 0; i <= n - 1 && idx + i + n - 1 < sz; i++)
+			tkPrevList[i + n] = tokenList.get(idx + i + n - 1);
+		tkPrevList[n] = getCurrent();
+		return tkPrevList;
+	}
 
 	/**
 	 * Get the Token at particular Index position
