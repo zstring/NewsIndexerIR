@@ -81,7 +81,7 @@ public class TokenFilterSymbol extends TokenFilter {
 					}
 				}
 			}
-			else if (token.isDate() || token.isTime()){
+			else if (token != null && (token.isDate() || token.isTime())){
 				String str = token.getTermText();
 				char c = str.charAt(str.length() - 1);
 				if (!Character.isDigit(c)) {
