@@ -22,7 +22,7 @@ public class BaseIndexer implements Serializable {
 
 	private static final long serialVersionUID = 42L;
 	private int docId = 0;
-	private int termId = 0;
+	private Integer termId = 0;
 	private boolean isDocCounted;
 	private IndexType indexerType;
 	private List<FieldNames> fieldName;
@@ -37,9 +37,10 @@ public class BaseIndexer implements Serializable {
 	public transient Set<String> documentSet;
 
 
-	public BaseIndexer(IndexType indexerType) {
+	public BaseIndexer(IndexType indexerType, Integer counter) {
 		this.indexerType = indexerType;
 		this.isDocCounted = false;
+		termId = counter;
 		aFactory = AnalyzerFactory.getInstance();
 		fieldName = new ArrayList<FieldNames>();
 		if (IndexType.AUTHOR.equals(indexerType)) {
@@ -92,13 +93,14 @@ public class BaseIndexer implements Serializable {
 	 * @param d : The Document to be added
 	 * @throws IndexerException : In case any error occurs
 	 */
-	public void addDocument(Document d, 
-			HashMap<String, HashMap<Integer, Double>> docVector)
+	public int addDocument(Document d, 
+			HashMap<String, HashMap<Integer, Double>> docVector, int counter)
 					throws IndexerException {
 		//TODO : YOU MUST IMPLEMENT THIS
 		try {
 			if (d != null) {
 				isDocCounted = false;
+				termId = counter;
 				String docTerm = "";
 				if (d.getField(FieldNames.FILEID).length > 0) {
 					docTerm = d.getField(FieldNames.FILEID)[0];
@@ -116,6 +118,7 @@ public class BaseIndexer implements Serializable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return termId;
 	}
 
 	public void createIndex (String strContent, FieldNames fn, String docTerm,

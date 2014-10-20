@@ -33,16 +33,17 @@ public class IndexWriter {
 	private BaseIndexer biCategory;
 	private BaseIndexer biPlace;
 	private BaseIndexer biTerm;
-	
+	private Integer counter;
 	public HashMap<String, HashMap<Integer, Double>> docVector;
 	public HashMap<String, Double> docLength;
 	public IndexWriter(String indexDir) {
 		//TODO : YOU MUST IMPLEMENT THIS
 		this.indexDir = indexDir;
-		this.biAuthor = new BaseIndexer(IndexType.AUTHOR);
-		this.biCategory = new BaseIndexer(IndexType.CATEGORY);
-		this.biPlace = new BaseIndexer(IndexType.PLACE);
-		this.biTerm = new BaseIndexer(IndexType.TERM);
+		this.counter = 1;
+		this.biAuthor = new BaseIndexer(IndexType.AUTHOR, counter);
+		this.biCategory = new BaseIndexer(IndexType.CATEGORY, counter);
+		this.biPlace = new BaseIndexer(IndexType.PLACE, counter);
+		this.biTerm = new BaseIndexer(IndexType.TERM, counter);
 		this.docVector = new HashMap<String, HashMap<Integer, Double>>();
 		this.docLength = new HashMap<String, Double>();
 	}
@@ -60,15 +61,14 @@ public class IndexWriter {
 		if (d == null) {
 			throw new IndexerException();
 		}
-		biAuthor.addDocument(d, docVector);
-		biCategory.addDocument(d, docVector);
-		biPlace.addDocument(d, docVector);
-		biTerm.addDocument(d, docVector);
+		counter = biAuthor.addDocument(d, docVector, counter);
+		counter = biCategory.addDocument(d, docVector, counter);
+		counter = biPlace.addDocument(d, docVector, counter);
+		counter = biTerm.addDocument(d, docVector, counter);
 		String docTerm = "";
 		if (d.getField(FieldNames.FILEID).length > 0) {
 			docTerm = d.getField(FieldNames.FILEID)[0];
 		}
-		
 		HashMap<Integer, Double> termSpace = docVector.get(docTerm);
 		double ssd = 0.0;
 		for (Integer id : termSpace.keySet()) {
