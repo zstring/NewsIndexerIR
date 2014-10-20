@@ -123,18 +123,23 @@ public class BaseIndexer implements Serializable {
 		if (!strContent.isEmpty()) {
 			double termWeight = 1.0;
 			boolean fieldType = false;
+			IndexType indexType = IndexType.TERM;
 			if (fn.equals(FieldNames.TITLE)) {
 				termWeight = 3.0;
 				fieldType = true;
+				indexType = IndexType.TERM;
 			}
 			else if (fn.equals(FieldNames.AUTHOR)) {
 				termWeight = 10.0;
+				indexType = IndexType.AUTHOR;
 			}
 			else if (fn.equals(FieldNames.CATEGORY)) {
 				termWeight = 10.0;
+				indexType = IndexType.CATEGORY;
 			}
 			else if (fn.equals(FieldNames.PLACE)) {
 				termWeight = 10.0;
+				indexType = IndexType.PLACE;
 			}
 			TokenStream tStream;
 			try {
@@ -164,7 +169,7 @@ public class BaseIndexer implements Serializable {
 								//increment term id
 								termId += 1;
 								Term term = new Term(tkString, termId, docTerm,
-										tk.getPosIndex(), fieldType);
+										tk.getPosIndex(), fieldType, indexType);
 								this.termDict.put(tkString, termId);
 								this.termMap.put(termId, term);
 								termSpace.put(termId, termWeight);
@@ -172,7 +177,7 @@ public class BaseIndexer implements Serializable {
 							// If term already exist in index
 							else {
 								Term term = termMap.get(tkInt);
-								term.addOrUpdateDoc(docTerm, tk.getPosIndex(), fieldType);
+								term.addOrUpdateDoc(docTerm, tk.getPosIndex(), fieldType, indexType);
 								Double tFreq = termSpace.get(tkInt);
 								if (tFreq != null) {
 									termSpace.put(tkInt, tFreq + termWeight);
@@ -211,6 +216,7 @@ public class BaseIndexer implements Serializable {
 			if (fn.equals(FieldNames.TITLE)) {
 				fieldType = true;
 			}
+			
 			int len = splitTk.length;
 			if (len > 1) {
 				//Reducing the termWeight as it is sub String
@@ -222,14 +228,14 @@ public class BaseIndexer implements Serializable {
 						//increment term id
 						termId += 1;
 						Term term = new Term(splitTk[i], termId,
-								docTerm, tk.getPosIndex(), fieldType);
+								docTerm, tk.getPosIndex(), fieldType, fn.toIndexType());
 						this.termDict.put(splitTk[i], termId);
 						this.termMap.put(termId, term);
 						termSpace.put(termId, termWeight);
 					}
 					else {
 						Term term = termMap.get(tkInt);
-						term.addOrUpdateDoc(docTerm, tk.getPosIndex(), fieldType);
+						term.addOrUpdateDoc(docTerm, tk.getPosIndex(), fieldType, fn.toIndexType());
 						Double tFreq = termSpace.get(tkInt);
 						if (tFreq != null) {
 							termSpace.put(tkInt, tFreq + termWeight);

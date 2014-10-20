@@ -66,7 +66,8 @@ public class Term implements Serializable {
 		postingList = new HashMap<String, Posting>();
 	}
 
-	public Term(String termText, int termId, String docTerm, int posIndex, boolean fieldType) {
+	public Term(String termText, int termId, String docTerm, int posIndex, boolean title,
+			IndexType indexType) {
 		this.termId = termId;
 		this.termText = termText;
 		this.colFreq = 1;
@@ -75,7 +76,8 @@ public class Term implements Serializable {
 		this.postingMap.put(docTerm, 1);
 		this.postingList = new HashMap<String, Posting>();
 		Posting post = new Posting(posIndex);
-		post.setType(fieldType, termId);
+		post.setType(title, termId);
+		post.setIndexType(indexType);
 		this.postingList.put(docTerm, post);
 	}
 
@@ -122,12 +124,14 @@ public class Term implements Serializable {
 		docFreq += 1;
 	}
 
-	public void addOrUpdateDoc(String docTerm, int index, boolean fieldType) {
+	public void addOrUpdateDoc(String docTerm, int index, boolean title,
+			IndexType indexType) {
 		if (this.postingMap.containsKey(docTerm)) {
 			int termFreq = this.postingMap.get(docTerm) + 1;
 			this.postingMap.put(docTerm, termFreq);
 			Posting val = this.postingList.get(docTerm);
-			val.setType(fieldType, termId);
+			val.setType(title, termId);
+			val.setIndexType(indexType);
 			val.addPosIndex(index);
 			val.incTermFreq();
 		}
@@ -135,7 +139,8 @@ public class Term implements Serializable {
 			//Adding new document to the term posting
 			this.postingMap.put(docTerm, 1);
 			Posting post = new Posting(index);
-			post.setType(fieldType, termId);
+			post.setType(title, termId);
+			post.setIndexType(indexType);
 			this.postingList.put(docTerm, post);
 			this.incdocFreq();
 		}

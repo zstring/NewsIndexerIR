@@ -1,6 +1,5 @@
 package edu.buffalo.cse.irf14.Scorer;
 
-import java.text.DecimalFormat;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,12 +36,12 @@ public class ScorerClass {
 				for (Integer termId : termKeys) {
 					double titleWt = 1;
 					if (termId == termTitleId) {
-						titleWt = 4;
+						titleWt = 2;
 					}
-					idf = queryVector.get(termId) == null ? 0 : queryVector.get(termId);
-					termFreq = docV.get(termId) == null ? 0 : docV.get(termId) * titleWt;
+					idf = queryVector.get(termId) == null ? 0 : queryVector.get(termId)  * titleWt;
+					termFreq = docV.get(termId) == null ? 0 : docV.get(termId);
 					val = idf * ((k1 + 1) * termFreq) / (k1 * ((1 - b) + b * (docV.size() / avgLen)) + termFreq);
-					if (termKeys.size() >= 10) val *= ((k3 + 1) * queryTermFreq.get(termId)) / (k3 + queryTermFreq.get(termId));
+					if (termKeys.size() >= 15) val *= ((k3 + 1) * queryTermFreq.get(termId)) / (k3 + queryTermFreq.get(termId));
 					score += val;
 				}
 				rankedResult.put(docId, score);

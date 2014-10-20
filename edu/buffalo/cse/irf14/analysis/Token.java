@@ -50,7 +50,7 @@ public class Token {
 	 * to suit your class definition and data structure needs.
 	 * @return the underlying termText
 	 */
-	protected String getTermText() {
+	public String getTermText() {
 		return termText;
 	}
 

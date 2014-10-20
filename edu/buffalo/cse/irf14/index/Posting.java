@@ -10,10 +10,20 @@ public class Posting implements Serializable {
 	private List<Integer> posIndex;
 	private boolean type;
 	private int termId;
+	private IndexType indexType;
+	public IndexType getIndexType() {
+		return indexType;
+	}
+	public void setIndexType(IndexType indexType) {
+		this.indexType = indexType;
+	}
 
 	public Posting() {
 		posIndex = new ArrayList<Integer>();
 		this.termFreq = 1;
+	}
+	public List<Integer> getPosIndex() {
+		return posIndex;
 	}
 	
 	public Posting(int index) {

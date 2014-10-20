@@ -17,6 +17,13 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
 import edu.buffalo.cse.irf14.Scorer.ScorerClass;
+import edu.buffalo.cse.irf14.analysis.Token;
+import edu.buffalo.cse.irf14.analysis.TokenStream;
+import edu.buffalo.cse.irf14.analysis.Tokenizer;
+import edu.buffalo.cse.irf14.analysis.TokenizerException;
+import edu.buffalo.cse.irf14.document.Document;
+import edu.buffalo.cse.irf14.document.FieldNames;
+import edu.buffalo.cse.irf14.document.Parser;
 import edu.buffalo.cse.irf14.index.IndexReader;
 import edu.buffalo.cse.irf14.index.IndexType;
 import edu.buffalo.cse.irf14.index.Posting;
@@ -83,23 +90,96 @@ public class SearchRunner {
 	public void query(String userQuery, ScoringModel model) {
 		String defaultOperator = "OR";
 		try {
+			long startTime = System.currentTimeMillis();
 			Query query = QueryParser.parse(userQuery, defaultOperator);
 			Map<String, Posting> unRankedResult = query.execute(reader);
 			Map<Integer, Double> queryVector = query.getVector(reader);
 			Map<Integer, Double> queryTermFreq = query.getQueryTermFreq(reader);
 			Map<String, Double> rankedResult =  RankedResultWithModel(unRankedResult, queryVector, queryTermFreq, this.avgLen, model);
-			finalResult = rankedResult;
-			if (rankedResult != null) {
-//				for (String docId : rankedResult.keySet()) {
-//					stream.print("Doc: " + docId + " Score: " + rankedResult.get(docId));
-//					stream.println();
-//				}
+			long stopTime = System.currentTimeMillis();
+			long elapsedTime = stopTime - startTime;
+			System.out.println("Query: " + userQuery);
+			System.out.println("Query time: " + elapsedTime);
+			int rank = 0;
+			for (String docId : rankedResult.keySet()) {
+				rank++;
+				if (rank > 10) break;
+				System.out.println("");
+				System.out.println("Result Rank: " + rank);
+				Document d = Parser.parse(corpusDir + File.separator + docId);
+				System.out.println("Result Title: ");
+				if (d.getField(FieldNames.TITLE) != null) {
+					System.out.println(d.getField(FieldNames.TITLE)[0].trim());
+				}
+				else {
+					System.out.println("No Title!");
+				}
+				Posting posting = unRankedResult.get(docId);
+				List<Integer> positions = posting.getPosIndex();
+				TokenStream stream = null, streamTitle = null;
+				HashMap<FieldNames, TokenStream> streamMap = getStreamMap(docId, d, unRankedResult);
+				if (!streamMap.isEmpty()) {
+					stream = streamMap.get(posting.getIndexType().toFieldNames());
+					if(IndexType.TERM.equals(posting.getIndexType())) {
+						streamTitle = streamMap.get(FieldNames.TITLE);
+					}
+				}
+				if (stream != null) {
+					for (int i = 0; i < positions.size(); i++) {
+						Token[] tokenList = stream.getPrevTokens(7);
+						if (tokenList != null) {
+							StringBuilder sb = new StringBuilder("....");
+							for (int j = 0; j < tokenList.length; j++ ) {
+								if (tokenList[j] != null)
+								sb.append(tokenList[j].getTermText());
+							}
+							sb.append("....");
+							System.out.println(sb.toString());
+						}
+						if(i > 2) {
+							break;
+						}
+					}
+				}
+				if (streamTitle != null) {
+					for (int i = 0; i < positions.size(); i++) {
+						Token[] tokenList = streamTitle.getPrevTokens(7);
+						if (tokenList != null) {
+							StringBuilder sb = new StringBuilder(".... ");
+							for (int j = 0; j < tokenList.length; j++ ) {
+								if (tokenList[j] != null)
+								sb.append(tokenList[j].getTermText() + " ");
+							}
+							sb.append(" ....");
+							System.out.println(sb.toString());
+						}
+						if(i > 2) {
+							break;
+						}
+					}
+				}
+				System.out.println("Result Relevancy: " + rankedResult.get(docId));
 			}
 		}
 		catch (Exception ex){
 			ex.printStackTrace();
 		}
 		//TODO: IMPLEMENT THIS METHOD
+	}
+
+	public HashMap<FieldNames, TokenStream> getStreamMap(String docId, Document d,
+			Map<String, Posting> unRankedResult) throws TokenizerException {
+		Tokenizer tkr = new Tokenizer();
+		HashMap<FieldNames, TokenStream> streamMap = new HashMap<FieldNames, TokenStream>();
+		if (d.getField(FieldNames.AUTHOR) != null) 
+			streamMap.put(FieldNames.AUTHOR, tkr.consume(d.getField(FieldNames.AUTHOR)[0].trim()));
+		if (d.getField(FieldNames.AUTHORORG) != null)
+			streamMap.put(FieldNames.AUTHORORG, tkr.consume(d.getField(FieldNames.AUTHORORG)[0].trim()));
+		if (d.getField(FieldNames.TITLE) != null)
+			streamMap.put(FieldNames.TITLE, tkr.consume(d.getField(FieldNames.TITLE)[0].trim()));
+		if (d.getField(FieldNames.CONTENT)  != null)
+			streamMap.put(FieldNames.CONTENT, tkr.consume(d.getField(FieldNames.CONTENT)[0].trim()));
+		return streamMap;
 	}
 
 	/**
