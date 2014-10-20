@@ -1,5 +1,6 @@
 package edu.buffalo.cse.irf14.Scorer;
 
+import java.text.DecimalFormat;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -69,9 +70,6 @@ public class ScorerClass {
 		}
 		TreeMap<String, Double> sortedRankedRes = 
 				new TreeMap<String, Double>(new SortByValueComp(rankedResult));
-		for (Integer termId : termKeys) {
-			System.out.println("TermID: " + termId + " Weight: " + queryVector.get(termId));
-		}
 		sortedRankedRes.putAll(rankedResult);
 		boolean flagGreater = false;
 		for (String doc : sortedRankedRes.keySet()) {
@@ -87,10 +85,10 @@ public class ScorerClass {
 		//one
 		if (flagGreater) {
 			double maxVal = 0.0;
-			int iter = 0;
+			int iter = 1;
 			for (String doc : sortedRankedRes.keySet()) {
 				double val = sortedRankedRes.get(doc);
-				if (iter == 5 || val < 1.0)
+				if (iter == 6 || val < 1.0)
 					break;
 					maxVal += val;
 					iter++;

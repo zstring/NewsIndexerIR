@@ -4,12 +4,16 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.PrintStream;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.TreeMap;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
 import edu.buffalo.cse.irf14.Scorer.ScorerClass;
@@ -34,6 +38,8 @@ public class SearchRunner {
 	private char mode;
 	private PrintStream stream;
 	private double avgLen;
+	private int noOfResult;
+	private Map<String, Double> finalResult;
 	/**
 	 * Default (and only public) constuctor
 	 * @param indexDir : The directory where the index resides
@@ -47,6 +53,7 @@ public class SearchRunner {
 		this.corpusDir = corpusDir;
 		this.mode = mode;
 		this.stream = stream;
+		noOfResult = 0;
 		setUpIndexWriter();
 		setUpIndexReader();
 		//TODO: IMPLEMENT THIS METHOD
@@ -81,10 +88,12 @@ public class SearchRunner {
 			Map<Integer, Double> queryVector = query.getVector(reader);
 			Map<Integer, Double> queryTermFreq = query.getQueryTermFreq(reader);
 			Map<String, Double> rankedResult =  RankedResultWithModel(unRankedResult, queryVector, queryTermFreq, this.avgLen, model);
-			
-			for (String docId : rankedResult.keySet()) {
-				stream.print("Doc: " + docId + " Score: " + rankedResult.get(docId));
-				stream.println();
+			finalResult = rankedResult;
+			if (rankedResult != null) {
+//				for (String docId : rankedResult.keySet()) {
+//					stream.print("Doc: " + docId + " Score: " + rankedResult.get(docId));
+//					stream.println();
+//				}
 			}
 		}
 		catch (Exception ex){
@@ -106,17 +115,9 @@ public class SearchRunner {
 		if (unRankedResult != null && unRankedResult.keySet().size() > 1) {
 			rankedResult = sc.rankResult(unRankedResult, docVector, queryVector, queryTermFreq, avgLen, model);
 		}
-		if (rankedResult != null) {
-		int i = 0; 
-		for (String docId : rankedResult.keySet()) {
-			i++;
-			if (i > 25) break;
-			System.out.println("Doc: " + docId + " Score: " + rankedResult.get(docId));
-		}
-		}
-		return rankedResult;	
+		return rankedResult;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private HashMap<String, HashMap<Integer, Double>> readDocVector() {
 		// TODO Auto-generated method stub
@@ -143,6 +144,94 @@ public class SearchRunner {
 	 */
 	public void query(File queryFile) {
 		//TODO: IMPLEMENT THIS METHOD
+		try {
+			if (queryFile == null)
+				return;
+			Scanner sc = new Scanner(queryFile);
+			String regex = "(.*)(?:\\: *\\{ *)(.*)(?: *\\} *)";
+			Matcher mat = Pattern.compile(regex).matcher("");
+			String firstLine = "";
+			if (sc.hasNext()) {
+				firstLine = sc.nextLine();
+			}
+			String[] noOfQ = firstLine.split(".*=");
+			int numQuery = 0;
+			for (int i = 0; i < noOfQ.length; i++) {
+				if (!noOfQ[i].isEmpty()) {
+					numQuery = Integer.parseInt(noOfQ[i]);
+					break;
+				}
+			}
+			String[] queryId = new String[numQuery];
+			String[] queries = new String[numQuery];
+			int index = 0;
+			for (int i = 0; i < numQuery; i++) {
+				String q = sc.nextLine();
+				mat.reset(q);
+				if (mat.matches()) {
+					queryId[index] = mat.group(1);
+					queries[index++] = mat.group(2);
+				}
+			}
+			String[] queryResults = new String[index];
+			for (int i = 0; i < index; i++) {
+				queryForE(queries[i], ScoringModel.TFIDF);
+				setResultsInQuerySet(queryResults, finalResult, queryId, i);
+			}
+			stream.append("numResults=" + noOfResult);
+			stream.append("\n");
+			for (int i = 0; i < index; i++) {
+				if (queryResults[i] != null &&
+						!queryResults[i].isEmpty()) {
+					stream.append(queryResults[i]);
+					stream.append("\n");
+				}
+			}
+			noOfResult = 0;
+
+		} catch (FileNotFoundException ex) {
+		} catch (IOException ex) {
+		}
+	}
+		public void queryForE(String userQuery, ScoringModel model) {
+			String defaultOperator = "OR";
+			try {
+				Query query = QueryParser.parse(userQuery, defaultOperator);
+				Map<String, Posting> unRankedResult = query.execute(reader);
+				Map<Integer, Double> queryVector = query.getVector(reader);
+				Map<Integer, Double> queryTermFreq = query.getQueryTermFreq(reader);
+				Map<String, Double> rankedResult =  RankedResultWithModel(unRankedResult, queryVector, queryTermFreq, this.avgLen, model);
+				finalResult = rankedResult;
+			} catch (Exception ex) {
+				
+			}
+	}
+
+	private void setResultsInQuerySet(String[] queryResults,
+			Map<String, Double> fR, String[] queryId, int i) {
+		String res = queryId[i] + ":{";
+		if (fR != null) {
+			StringBuilder sb = new StringBuilder(res);
+			String hashString = "#";
+			String appendRes = ", ";
+			boolean flag = false;
+			int counter = 0;
+			for (String docId : fR.keySet()) {
+				if (counter > 9) break;
+				Double d = fR.get(docId);
+				DecimalFormat df = new DecimalFormat("#.####");
+				d = Double.parseDouble(df.format(d));
+				sb.append(docId + hashString + d);
+				sb.append(appendRes);
+				flag = true;
+				counter++;
+			}
+			if (flag) {
+				sb.replace(sb.length() - 2, sb.length(), "}");
+				queryResults[i] = sb.toString();
+				noOfResult++;
+			}
+		}
 	}
 
 	/**
