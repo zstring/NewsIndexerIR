@@ -98,67 +98,74 @@ public class SearchRunner {
 			Map<String, Double> rankedResult =  RankedResultWithModel(unRankedResult, queryVector, queryTermFreq, this.avgLen, model);
 			long stopTime = System.currentTimeMillis();
 			long elapsedTime = stopTime - startTime;
-			System.out.println("Query: " + userQuery);
-			System.out.println("Query time: " + elapsedTime);
+			StringBuilder resultFormat = new StringBuilder("");
+			resultFormat.append("Query: " + userQuery + "\n");
+			resultFormat.append("Query time: " + elapsedTime + "\n");
 			int rank = 0;
-			for (String docId : rankedResult.keySet()) {
-				rank++;
-				if (rank > 10) break;
-				System.out.println("");
-				System.out.println("Result Rank: " + rank);
-				Document d = Parser.parse(corpusDir + File.separator + docId);
-				System.out.println("Result Title: ");
-				if (d.getField(FieldNames.TITLE) != null) {
-					System.out.println(d.getField(FieldNames.TITLE)[0].trim());
-				}
-				else {
-					System.out.println("No Title!");
-				}
-				Posting posting = unRankedResult.get(docId);
-				List<Integer> positions = posting.getPosIndex();
-				TokenStream stream = null, streamTitle = null;
-				HashMap<FieldNames, TokenStream> streamMap = getStreamMap(docId, d, unRankedResult);
-				if (!streamMap.isEmpty()) {
-					stream = streamMap.get(posting.getIndexType().toFieldNames());
-					if(IndexType.TERM.equals(posting.getIndexType())) {
-						streamTitle = streamMap.get(FieldNames.TITLE);
+			if (rankedResult != null && !rankedResult.isEmpty()) {
+				for (String docId : rankedResult.keySet()) {
+					rank++;
+					if (rank > 10) break;
+					resultFormat.append("\n" + "Result Rank: " + rank + "\n");
+					Document d = Parser.parse(corpusDir + File.separator + docId);
+					resultFormat.append("Result Title: " + "\n");
+					if (d.getField(FieldNames.TITLE) != null) {
+						resultFormat.append(d.getField(FieldNames.TITLE)[0].trim() + "\n");
 					}
-				}
-				if (stream != null) {
-					for (int i = 0; i < positions.size(); i++) {
-						Token[] tokenList = stream.getPrevTokens(7);
-						if (tokenList != null) {
-							StringBuilder sb = new StringBuilder("....");
-							for (int j = 0; j < tokenList.length; j++ ) {
-								if (tokenList[j] != null)
-								sb.append(tokenList[j].getTermText());
+					else {
+						resultFormat.append("No Title!" + "\n");
+					}
+					Posting posting = unRankedResult.get(docId);
+					List<Integer> positions = posting.getPosIndex();
+					TokenStream stream = null, streamTitle = null;
+					HashMap<FieldNames, TokenStream> streamMap = getStreamMap(docId, d, unRankedResult);
+					if (!streamMap.isEmpty()) {
+						stream = streamMap.get(posting.getIndexType().toFieldNames());
+						if(IndexType.TERM.equals(posting.getIndexType())) {
+							streamTitle = streamMap.get(FieldNames.TITLE);
+						}
+					}
+					if (stream != null) {
+						for (int i = 0; i < positions.size(); i++) {
+							Token[] tokenList = stream.getPrevTokens(7);
+							if (tokenList != null) {
+								StringBuilder sb = new StringBuilder(".... ");
+								for (int j = 0; j < tokenList.length; j++ ) {
+									if (tokenList[j] != null)
+										sb.append(tokenList[j].getTermText() + " ");
+								}
+								sb.append(" ....");
+								resultFormat.append(sb.toString() + "\n");
 							}
-							sb.append("....");
-							System.out.println(sb.toString());
-						}
-						if(i > 2) {
-							break;
-						}
-					}
-				}
-				if (streamTitle != null) {
-					for (int i = 0; i < positions.size(); i++) {
-						Token[] tokenList = streamTitle.getPrevTokens(7);
-						if (tokenList != null) {
-							StringBuilder sb = new StringBuilder(".... ");
-							for (int j = 0; j < tokenList.length; j++ ) {
-								if (tokenList[j] != null)
-								sb.append(tokenList[j].getTermText() + " ");
+							if(i > 2) {
+								break;
 							}
-							sb.append(" ....");
-							System.out.println(sb.toString());
-						}
-						if(i > 2) {
-							break;
 						}
 					}
+					if (streamTitle != null) {
+						for (int i = 0; i < positions.size(); i++) {
+							Token[] tokenList = streamTitle.getPrevTokens(7);
+							if (tokenList != null) {
+								StringBuilder sb = new StringBuilder(".... ");
+								for (int j = 0; j < tokenList.length; j++ ) {
+									if (tokenList[j] != null)
+										sb.append(tokenList[j].getTermText() + " ");
+								}
+								sb.append(" ....");
+								resultFormat.append(sb.toString() + "\n");
+							}
+							if(i > 2) {
+								break;
+							}
+						}
+					}
+					resultFormat.append("Result Relevancy: " + rankedResult.get(docId) + "\n");
 				}
-				System.out.println("Result Relevancy: " + rankedResult.get(docId));
+				this.stream.println(resultFormat.toString());
+			}
+			else {
+				resultFormat.append("No Result Found!" + "\n");
+				this.stream.println(resultFormat.toString());
 			}
 		}
 		catch (Exception ex){
@@ -273,18 +280,18 @@ public class SearchRunner {
 		} catch (IOException ex) {
 		}
 	}
-		public void queryForE(String userQuery, ScoringModel model) {
-			String defaultOperator = "OR";
-			try {
-				Query query = QueryParser.parse(userQuery, defaultOperator);
-				Map<String, Posting> unRankedResult = query.execute(reader);
-				Map<Integer, Double> queryVector = query.getVector(reader);
-				Map<Integer, Double> queryTermFreq = query.getQueryTermFreq(reader);
-				Map<String, Double> rankedResult =  RankedResultWithModel(unRankedResult, queryVector, queryTermFreq, this.avgLen, model);
-				finalResult = rankedResult;
-			} catch (Exception ex) {
-				
-			}
+	public void queryForE(String userQuery, ScoringModel model) {
+		String defaultOperator = "OR";
+		try {
+			Query query = QueryParser.parse(userQuery, defaultOperator);
+			Map<String, Posting> unRankedResult = query.execute(reader);
+			Map<Integer, Double> queryVector = query.getVector(reader);
+			Map<Integer, Double> queryTermFreq = query.getQueryTermFreq(reader);
+			Map<String, Double> rankedResult =  RankedResultWithModel(unRankedResult, queryVector, queryTermFreq, this.avgLen, model);
+			finalResult = rankedResult;
+		} catch (Exception ex) {
+
+		}
 	}
 
 	private void setResultsInQuerySet(String[] queryResults,
