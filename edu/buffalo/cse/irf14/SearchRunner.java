@@ -24,6 +24,7 @@ import edu.buffalo.cse.irf14.analysis.TokenizerException;
 import edu.buffalo.cse.irf14.document.Document;
 import edu.buffalo.cse.irf14.document.FieldNames;
 import edu.buffalo.cse.irf14.document.Parser;
+import edu.buffalo.cse.irf14.document.ParserException;
 import edu.buffalo.cse.irf14.index.IndexReader;
 import edu.buffalo.cse.irf14.index.IndexType;
 import edu.buffalo.cse.irf14.index.Posting;
@@ -100,7 +101,7 @@ public class SearchRunner {
 			long elapsedTime = stopTime - startTime;
 			StringBuilder resultFormat = new StringBuilder("");
 			resultFormat.append("Query: " + userQuery + "\n");
-			resultFormat.append("Query time: " + elapsedTime + "\n");
+			resultFormat.append("Query time in ms: " + elapsedTime + "\n");
 			int rank = 0;
 			if (rankedResult != null && !rankedResult.isEmpty()) {
 				for (String docId : rankedResult.keySet()) {
@@ -108,58 +109,67 @@ public class SearchRunner {
 					if (rank > 10) break;
 					resultFormat.append("\n" + "Result Rank: " + rank + "\n");
 					Document d = Parser.parse(corpusDir + File.separator + docId);
-					resultFormat.append("Result Title: " + "\n");
+					resultFormat.append("Document: " + docId + "\n");
+					resultFormat.append("Result Title: " + " ");
 					if (d.getField(FieldNames.TITLE) != null) {
 						resultFormat.append(d.getField(FieldNames.TITLE)[0].trim() + "\n");
 					}
 					else {
 						resultFormat.append("No Title!" + "\n");
 					}
+					resultFormat.append("Result Snippet: " + "\n");
 					Posting posting = unRankedResult.get(docId);
 					List<Integer> positions = posting.getPosIndex();
-					TokenStream stream = null, streamTitle = null;
+					TokenStream tkStream = null, streamTitle = null;
 					HashMap<FieldNames, TokenStream> streamMap = getStreamMap(docId, d, unRankedResult);
 					if (!streamMap.isEmpty()) {
-						stream = streamMap.get(posting.getIndexType().toFieldNames());
+						tkStream = streamMap.get(posting.getIndexType().toFieldNames());
 						if(IndexType.TERM.equals(posting.getIndexType())) {
 							streamTitle = streamMap.get(FieldNames.TITLE);
 						}
 					}
-					if (stream != null) {
-						for (int i = 0; i < positions.size(); i++) {
-							Token[] tokenList = stream.getPrevTokens(7);
+					boolean staticContent = false;
+					if (tkStream != null) {
+						int i = 0;
+						if(posting.getType()) {
+							i = 1;
+						}
+						for ( ;i < positions.size(); i++) {
+							tkStream.setCurrentIndex(positions.get(i));
+							Token[] tokenList = tkStream.getSnippet(7);
 							if (tokenList != null) {
 								StringBuilder sb = new StringBuilder(".... ");
 								for (int j = 0; j < tokenList.length; j++ ) {
-									if (tokenList[j] != null)
+									if (tokenList[j] != null) {
 										sb.append(tokenList[j].getTermText() + " ");
+										staticContent = true;
+									}
 								}
-								sb.append(" ....");
-								resultFormat.append(sb.toString() + "\n");
+								if (staticContent) {
+									sb.append(" ....");
+									resultFormat.append(sb.toString() + "\n");
+								}
 							}
 							if(i > 2) {
 								break;
 							}
 						}
 					}
-					if (streamTitle != null) {
-						for (int i = 0; i < positions.size(); i++) {
-							Token[] tokenList = streamTitle.getPrevTokens(7);
-							if (tokenList != null) {
-								StringBuilder sb = new StringBuilder(".... ");
-								for (int j = 0; j < tokenList.length; j++ ) {
-									if (tokenList[j] != null)
-										sb.append(tokenList[j].getTermText() + " ");
-								}
-								sb.append(" ....");
-								resultFormat.append(sb.toString() + "\n");
-							}
-							if(i > 2) {
-								break;
-							}
+					if (!staticContent) {
+						TokenStream streamContent = streamMap.get(FieldNames.CONTENT);
+						int counterStream = 0;
+						StringBuilder sb = new StringBuilder();
+						while(streamContent.hasNext()) {
+							sb.append(streamContent.next() + " ");
+							counterStream ++ ;
+							if (counterStream > 7 ) break;
 						}
+						resultFormat.append(sb.toString() + " ....\n");
 					}
-					resultFormat.append("Result Relevancy: " + rankedResult.get(docId) + "\n");
+					Double dg = rankedResult.get(docId);
+					DecimalFormat df = new DecimalFormat("#.####");
+					dg = Double.parseDouble(df.format(dg));
+					resultFormat.append("Result Relevancy: " + dg + "\n");
 				}
 				this.stream.println(resultFormat.toString());
 			}
@@ -168,8 +178,11 @@ public class SearchRunner {
 				this.stream.println(resultFormat.toString());
 			}
 		}
+		catch(ParserException p) {
+			System.out.println("Corpus Dir not found!");
+		}
 		catch (Exception ex){
-			ex.printStackTrace();
+			System.out.println("Error Occured!");
 		}
 		//TODO: IMPLEMENT THIS METHOD
 	}
