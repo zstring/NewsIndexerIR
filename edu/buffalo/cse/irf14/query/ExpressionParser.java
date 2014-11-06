@@ -4,7 +4,9 @@
 package edu.buffalo.cse.irf14.query;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -413,6 +415,15 @@ public class ExpressionParser implements Expression {
 			HashMap<IndexType, IndexReader> reader) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public Expression expandWildCard(HashMap<IndexType, SortedMap<String, Integer>> hm,
+			HashMap<IndexType, SortedMap<String, Integer>> hmRev,
+			Map<String, List<String>> expandResult) {
+		// TODO Auto-generated method stub
+		return this;
+		
 	}
 
 }

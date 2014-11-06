@@ -2,8 +2,10 @@ package edu.buffalo.cse.irf14.query;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 
 import edu.buffalo.cse.irf14.index.IndexReader;
 import edu.buffalo.cse.irf14.index.IndexType;
@@ -112,6 +114,17 @@ public class AndOperator implements Expression {
 			}
 		}
 		return rightMap;
+	}
+
+	@Override
+	public Expression expandWildCard(HashMap<IndexType, SortedMap<String, Integer>> hm,
+			HashMap<IndexType, SortedMap<String, Integer>> hmRev,
+			Map<String, List<String>> expandResult) {
+		// TODO Auto-generated method stub
+		this.leftOperand = this.leftOperand.expandWildCard(hm, hmRev, expandResult);
+		this.rightOperand = this.rightOperand.expandWildCard(hm, hmRev, expandResult);
+		return this;
+		
 	}
 
 }

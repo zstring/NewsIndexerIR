@@ -1,7 +1,9 @@
 package edu.buffalo.cse.irf14.query;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 
 import edu.buffalo.cse.irf14.index.IndexReader;
 import edu.buffalo.cse.irf14.index.IndexType;
@@ -22,9 +24,12 @@ public class Query {
 	}
 	public String toString() {
 		//TODO: YOU MUST IMPLEMENT THIS
-		return queryTerm.toString();
+		return "{ " + queryTerm.toString() + " }";
 	}
-	
+	public Expression getQueryTerm() {
+		return this.queryTerm;
+	}
+
 	public Map<String, Posting> execute(HashMap<IndexType, IndexReader> reader) {
 		// TODO Auto-generated method stub
 		Map<String, Posting> ret = queryTerm.interpret(reader);
@@ -57,5 +62,11 @@ public class Query {
 			map.put(termId, val);
 		}
 		return map;
+	}
+	public void expandWildCard(HashMap<IndexType, SortedMap<String, Integer>> hm,
+			HashMap<IndexType, SortedMap<String, Integer>> hmRev,
+			Map<String, List<String>> expandResult) {
+		// TODO Auto-generated method stub
+		queryTerm = queryTerm.expandWildCard(hm, hmRev, expandResult);
 	}
 }

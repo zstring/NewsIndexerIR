@@ -38,6 +38,10 @@ public class IndexReader {
 		indexReaderOpen();
 	}
 
+	public BaseIndexer getBaseIndexer() {
+		return this.bi;
+	}
+
 	private void indexReaderOpen() {
 		// TODO Auto-generated method stub
 		FileInputStream fi;

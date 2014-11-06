@@ -5,10 +5,13 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -41,12 +44,16 @@ public class SearchRunner {
 	public enum ScoringModel {TFIDF, OKAPI};
 	private HashMap<IndexType, IndexReader> reader;
 	HashMap<String, HashMap<Integer, Double>> docVector;
+	HashMap<IndexType, SortedMap<String, Integer>> hm;
+	HashMap<IndexType, SortedMap<String, Integer>> hmRev; 
+	private Map<String, List<String>> expandResult;
 	private String indexDir;
 	private String corpusDir;
 	private char mode;
 	private PrintStream stream;
 	private double avgLen;
 	private int noOfResult;
+	private Query query;
 	private Map<String, Double> finalResult;
 	/**
 	 * Default (and only public) constuctor
@@ -61,9 +68,11 @@ public class SearchRunner {
 		this.corpusDir = corpusDir;
 		this.mode = mode;
 		this.stream = stream;
+		this.query = null;
 		noOfResult = 0;
 		setUpIndexWriter();
 		setUpIndexReader();
+		sortKeysForWildCard();
 		//TODO: IMPLEMENT THIS METHOD
 	}
 
@@ -92,7 +101,10 @@ public class SearchRunner {
 		String defaultOperator = "OR";
 		try {
 			long startTime = System.currentTimeMillis();
-			Query query = QueryParser.parse(userQuery, defaultOperator);
+			query = QueryParser.parse(userQuery, defaultOperator);
+			if (userQuery.contains("*") || userQuery.contains("?")) {
+				wildCardProcessing();
+			}
 			Map<String, Posting> unRankedResult = query.execute(reader);
 			Map<Integer, Double> queryVector = query.getVector(reader);
 			Map<Integer, Double> queryTermFreq = query.getQueryTermFreq(reader);
@@ -296,7 +308,10 @@ public class SearchRunner {
 	public void queryForE(String userQuery, ScoringModel model) {
 		String defaultOperator = "OR";
 		try {
-			Query query = QueryParser.parse(userQuery, defaultOperator);
+			query = QueryParser.parse(userQuery, defaultOperator);
+			if (userQuery.contains("*") || userQuery.contains("?")) {
+				wildCardProcessing();
+			}
 			Map<String, Posting> unRankedResult = query.execute(reader);
 			Map<Integer, Double> queryVector = query.getVector(reader);
 			Map<Integer, Double> queryTermFreq = query.getQueryTermFreq(reader);
@@ -347,7 +362,7 @@ public class SearchRunner {
 	 */
 	public static boolean wildcardSupported() {
 		//TODO: CHANGE THIS TO TRUE ONLY IF WILDCARD BONUS ATTEMPTED
-		return false;
+		return true;
 	}
 
 	/**
@@ -357,10 +372,39 @@ public class SearchRunner {
 	 */
 	public Map<String, List<String>> getQueryTerms() {
 		//TODO:IMPLEMENT THIS METHOD IFF WILDCARD BONUS ATTEMPTED
-		return null;
-
+		return expandResult;
 	}
 
+	private void sortKeysForWildCard() {
+		hm = new HashMap<IndexType, SortedMap<String, Integer>>();
+		hmRev = new HashMap<IndexType, SortedMap<String, Integer>>();
+		for (IndexType it : reader.keySet()) {
+			TreeMap<String, Integer> sm = new TreeMap<String, Integer>();
+			TreeMap<String, Integer> smRev = new TreeMap<String, Integer>(
+					new SortByReverseString());
+			IndexReader ir = reader.get(it);
+			sm.putAll(ir.getBaseIndexer().termDict);
+			smRev.putAll(ir.getBaseIndexer().termDict);
+			hm.put(it, sm);
+			hmRev.put(it, smRev);
+		}
+	}
+	
+	private void wildCardProcessing() {
+		expandResult =new HashMap<String, List<String>>();
+		query.expandWildCard(hm, hmRev, expandResult);
+	}
+
+
+	public class SortByReverseString implements Comparator<String> {
+		public int compare(String a, String b) {
+			StringBuilder sbA = new StringBuilder(a);
+			a = sbA.reverse().toString();
+			StringBuilder sbB = new StringBuilder(b);
+			b = sbB.reverse().toString();
+			return a.compareTo(b);
+		}
+	}
 	/**
 	 * Method to indicate if speel correct queries are supported
 	 * @return true if supported, false otherwise
